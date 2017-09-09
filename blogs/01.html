@@ -68,6 +68,27 @@
               <p class="card-text">https://arxiv.org/pdf/1604.07316v1.pdf </p>
               <p class='card-text'>https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/</p>
               <p class='card-text'>https://devblogs.nvidia.com/parallelforall/explaining-deep-learning-self-driving-car/</p>
+              <p class ='card-text'>
+                Nvidia 的研究人员搭建了一个基于DAVE（DARPA Autonomous Vehicle）的 DAVE2的自动驾驶系统，通过卷积神经网络，来控制车辆的转弯等动作，使得车辆始终保持在车道上。
+
+                该神经网络系统如下：
+                输入： 3*66*200 image
+                normalize
+                conv1： 24@5*5 kernel，stride 2*2， 得到 24@31*98 feature map
+                conv2： 36@5*5 kernel，stride 2*2， 得到 36@14*47 feature map
+                conv3： 48@5*5 kernel，stride 2*2， 得到 48@5*22 feature map
+                conv4： 64@3*2 kernel，stride 1*1， 得到 64@3*20 feature map
+                conv5： 64@3*3 kernel，stride 1*1， 得到 64@1*18 feature map
+                flattern： 展开得到 1152 （64*18），但是论文中显示为 1164， 相差12， 很奇怪？？
+                fullyconnect：100
+                fullyconnect：50
+                fullyconnect：10
+                fullyconnect：1
+
+                激活函数我采用了ReLU，除了最后一层fullyconnect layer，因为本质上是一个回归问题。
+
+                
+              </p>
               <a href="#" class="btn btn-primary">Read More &rarr;</a>
             </div>
             <div class="card-footer text-muted">
@@ -76,57 +97,6 @@
             </div>
           </div>
           
-          <!-- Blog Post -->
-          <div class="card mb-4">
-            <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">
-            <div class="card-body">
-              <h2 class="card-title">Post Title</h2>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla? Quos cum ex quis soluta, a laboriosam. Dicta expedita corporis animi vero voluptate voluptatibus possimus, veniam magni quis!</p>
-              <a href="#" class="btn btn-primary">Read More &rarr;</a>
-            </div>
-            <div class="card-footer text-muted">
-              Posted on January 1, 2017 by
-              <a href="#">Start Bootstrap</a>
-            </div>
-          </div>
-
-          <!-- Blog Post -->
-          <div class="card mb-4">
-            <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">
-            <div class="card-body">
-              <h2 class="card-title">Post Title</h2>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla? Quos cum ex quis soluta, a laboriosam. Dicta expedita corporis animi vero voluptate voluptatibus possimus, veniam magni quis!</p>
-              <a href="#" class="btn btn-primary">Read More &rarr;</a>
-            </div>
-            <div class="card-footer text-muted">
-              Posted on January 1, 2017 by
-              <a href="#">Start Bootstrap</a>
-            </div>
-          </div>
-
-          <!-- Blog Post -->
-          <div class="card mb-4">
-            <img class="card-img-top" src="http://placehold.it/750x300" alt="Card image cap">
-            <div class="card-body">
-              <h2 class="card-title">Post Title</h2>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reiciendis aliquid atque, nulla? Quos cum ex quis soluta, a laboriosam. Dicta expedita corporis animi vero voluptate voluptatibus possimus, veniam magni quis!</p>
-              <a href="#" class="btn btn-primary">Read More &rarr;</a>
-            </div>
-            <div class="card-footer text-muted">
-              Posted on January 1, 2017 by
-              <a href="#">Start Bootstrap</a>
-            </div>
-          </div>
-
-          <!-- Pagination -->
-          <ul class="pagination justify-content-center mb-4">
-            <li class="page-item">
-              <a class="page-link" href="#">&larr; Older</a>
-            </li>
-            <li class="page-item disabled">
-              <a class="page-link" href="#">Newer &rarr;</a>
-            </li>
-          </ul>
 
         </div>
 

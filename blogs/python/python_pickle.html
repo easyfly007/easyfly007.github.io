@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> python 01 - 列表的复制 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="https://easyfly007.github.io/index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="https://easyfly007.github.io/index.html">Home
+                <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://easyfly007.github.io/about.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://easyfly007.github.io/cv.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-8">
+
+          <h1 class="my-4">Page Heading
+            <small>Secondary Text</small>
+          </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title">python 学习笔记</h2>
+              <p class ='card-text'>
+
+                很多时候我们需要对于 一个list 进行复制，如果我们 用
+                
+  <pre>
+  a = [1,2,3]
+  b = a
+  print(a)
+  print(b)
+  print(id(a))
+  print(id(b))
+  </pre>
+                
+                那么你会发现其实a 和b 指向了相同的一个对象
+
+                <br><br>
+                如果你对a 和b 比较了解，知道他们是一个层次只有一层的list，那么简单的可以用
+                <br>
+  <pre>                  
+  a = [1,2,3]
+  b = a[:]
+  print(id(a))
+  print(id(b))
+  </pre>
+
+                你会发现a 确实被复制到了b，对a 进行append 之类操作，不会影响到b。
+
+                如果a 是一个层次比较深的list，比如下面这样
+
+  <pre>                  
+  a = [[1,2], [3,4], 5]
+  b = a[:]
+  print(id(a))
+  print(id(b))
+  a.append(6)
+  print(a)
+  print(b)
+  </pre>
+
+                这样的话，你只是在第一层次进行了copy
+  <pre>                  
+  print(id(a[0]))
+  print(id(b[0]))
+  a[0].append(7)
+  print(a)
+  print(b)
+  </pre>
+
+                如果像上面这样比较复杂，那么可以选用copy模块的deepcopy函数
+
+  <pre>                  
+  import copy
+  a = [[1,2], [3,4], 5]
+  b = copy.deepcopy(a)
+  print(id(a[0]))
+  print(id(b[0]))
+  a[0].append(6)
+  print(a)
+  print(b)
+  </pre>
+
+                很好，这样确实 a 所有的数据都复制给了 b
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-08-21 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+          
+
+        </div>
+
+        <!-- Sidebar Widgets Column -->
+        <div class="col-md-4">
+          <!-- Categories Widget -->
+          <div class="card my-4">
+            <h5 class="card-header">博客列表</h5>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-6">
+                  <ul class="list-unstyled mb-0">
+                    <li>
+                      python
+                      <ul>
+                        <a href="https://easyfly007.github.io/blogs/02.html"> 01 列表的复制 </a>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Your Website 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

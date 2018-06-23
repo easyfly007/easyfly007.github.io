@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 深度学习 01 - miniflow </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 深度学习 01： miniflow </h2>
+              <p class ='card-text' >
+
+
+
+<br><br>
+
+Tensorflow 利用一个计算图（computer graph）把从输入到输出统合到一起，利用你定义的模型（比如线性回归，logisticregression或者卷积神经网络等等，当中有很多的模型的参数，参数的值待定，一开始一般为随机值），从输入计算出一个预测的输出，再用你的预测输出与真实结果进行比较，计算出一个损失函数（Loss Function）。
+
+<br><br>
+
+在数学上，我们可以用一个非常复杂的表达式直接写出从输入到输出以及从输入到损失函数的关系，从这个表达式中可以计算出损失函数对于模型中间参数的导数。
+
+<br><br>
+
+我们的目标是找出最好的模型，也就是找到那些模型参数，使得对于我们的输入的损失函数有最小值。
+
+<br><br>
+
+利用梯度下降，我们每次按照梯度下降的方法改变这些模型参数，直到梯度降低为0（或者小于一定的阈值），模型收敛。
+
+<br><br>
+
+利用这个训练出来的模型，我们就可以对于新的输入进行预测了。
+
+<br><br>
+
+在实际每个参数的梯度计算中，我们利用的是链式法则，从后往前（也就是从损失函数到输入），逐步计算每一层节点的梯度。这个过程被称之为反向传播（back propagation）。
+
+<br><br>
+
+而从输入到输出的从前往后的计算过程，我们称之为前向传播（forward pass）。
+
+<br><br>
+
+由于tensorflow的代码结构非常复杂，为了厘清上述概念，我们利用miniflow来实现并分析每个节点是如何进行前向传播和反向传播的（forward pass，back propagation），同时他们是如何整合成一个计算图来完成整个模型的训练的。
+
+<br><br>
+
+这里有一份很简单的miniflow 代码，可以在我的 github 找到，
+https://github.com/easyfly007/miniflow/
+
+<br><br>
+
+更为详细的实现可以参考这里：
+http://neuralnetworksanddeeplearning.com/
+
+<br><hr>
+
+<pre>
+import numpy as np
+
+class Node(object):
+	def __init__(self, inbound_nodes = []):
+		self.inbound_nodes = inbound_nodes
+		self.outbound_nodes = []
+		for n in self.inbound_nodes:
+			n.outbound_nodes.append(self)
+		self.value = None
+		self.gradients = {}
+	
+	def forward(self):
+		raise NotImplementedError
+
+	def backward(self):
+		raise NotImplementedError
+	
+</pre>
+
+<hr><br>
+
+这是一个有待继承的 Node 基类，它提供了构造函数，以及两个接口定义 forward 和 backward。
+
+<br><br>
+
+这个 Node 的类它有：
+
+<br>
+
+inbound_nodes 为输入Node列表，outbound_nodes 为输出 Node 列表，以及value 本身的数值和gradients 梯度，
+当然它应该还有和Node 类型相关的参数，这个应不同的实现而异，有待于在继承的具体Node 中来定义。
+
+<br><br>
+
+下面我们来定义一个输入节点:
+
+<br><hr>
+
+<pre>
+	
+class Input(Node):
+	def __init__(self):
+		Node.__init__(self)
+
+	def forward(self, value = None):
+		if value is not None:
+			self.value = value
+
+</pre>
+
+<hr><br>
+
+输入节点的forward pass 很简单，就是更新一下 value 而已。
+<br>
+输入节点没有backward propagation，因为它不需要计算梯度（来更新value），因为它的value 是不变的。
+
+<br><br>
+
+下面我们来定义一个叫做Add 的Node，他可以把来自于前面一层的两个Node 的值加起来
+
+<br><hr>
+
+<pre>
+class Add(Node):
+	def __init__(self, x, y):
+		Node.__init__(self, [x, y])
+
+	def forward(self):
+		self.value = 0.0
+		for node in self.inbound_nodes:
+			self.value += node.value
+</pre>
+
+<hr><br>
+
+可以看到，通过一次 forward，Add 这个Node 的值更新为的他的输入的 inout Nodes 的值的和。
+
+<br><br>
+
+下面我们来定义一个叫做 Linear 的 Node，来实现 Y = w * x + b 的线性组合计算，其中有三个输入节点 w，x，b：
+
+<br><br>
+
+w 是 [n2, n1] 的系数矩阵，
+
+<br>
+
+x 是 [n1, ] 的输入节点向量，
+
+<br>
+
+b 是 [n2, ] 的偏置系数
+
+<br>
+
+y 是 [n2, ] 的输出节点向量，
+
+<br><hr>
+
+<pre>
+
+class Linear(Node):
+	def __init__(self, [inputs, weights, bias]):
+		Node.__init__(self, [inputs, weights, bias])
+
+	def forward(self):
+		x = np.array(self.inbound_nodes[0].value)
+		w = np.array(self.inbound_nodes[1].value)
+		b = np.array(self.inbound_nodes[2].value)
+		self.value = np.dot(w, x) + b
+</pre>
+
+<hr><br>
+
+有了以上的几个，我们可以写出一个最简单的 线性回归计算图的 forwrad pass 了。
+
+<br><br>
+
+我们来定义一个 fowward pass 的函数，
+
+<br><hr>
+
+<pre>
+def forward_pass(output_node, sorted_nodes):
+	'''
+	perform a forward pass through a list of sorted nodes
+	arguments:
+		output_node: the output node of the graph (no outgoing edges)
+		sorted_nodes: a topologically sorted list of nodes
+	returns the output node's value
+	'''
+	for n in sorted_nodes:
+		n.forward()
+
+	return output_node.value
+</pre>
+
+<hr><br>
+
+这里 sorted_nodes 包含了一个完整的从输入到输出的 有序排列的 node 列表。
+
+<br><br>
+
+我们一开始定义了各种 node，以及他们的前后连接关系（指的是Node A 是 Node B的输入节点，而Node B 又是Node C 的输入节点等等），而这个就是一个计算图的结构。
+
+<br><br>
+
+有了linear Node， 我们可以做regression 的预测，而对于classification 或者多层的 linear，我们需要定义至少一种的非线性激活函数，比如sigmoid
+现在就来写一个：
+
+<br><hr>
+
+<pre>
+class Sigmoid(Node):
+	def __init__(self, x):
+		Node.__init__(self, [x])
+
+	def _sigmoid(self, x):
+		return 1.0/(1.0+ np.exp(-x))
+	
+	def forward(self):
+		x = self.inbound_nodes[0].value
+		self.value = self._sigmoid(x)
+
+</pre>
+
+<hr><br>
+
+以上，我们就可以来做一个 forward pass 了，从一个输入利用 logistic regresison 做出一个预测。
+
+也就是 Y_label = sigmoid(W*X + b)
+
+
+<br><hr>
+
+<pre>
+	
+def forward_pass(output_node, sorted_nodes):
+    """
+    Performs a forward pass through a list of sorted nodes.
+
+    Arguments:
+
+        `output_node`: A node in the graph, should be the output node (have no outgoing edges).
+        `sorted_nodes`: A topologically sorted list of nodes.
+
+    Returns the output Node's value
+    """
+
+    for n in sorted_nodes:
+        n.forward()
+
+    return output_node.value
+
+</pre>
+
+<hr><br>
+
+当然我们提供一个从输入节点产生的整个computergraph 的方法
+
+<br><hr>
+
+<pre>
+def topological_sort(feed_dict):
+    """
+    Sort the nodes in topological order using Kahn's Algorithm.
+
+    `feed_dict`: A dictionary where the key is a `Input` Node and the value is the respective value feed to that Node.
+
+    Returns a list of sorted nodes.
+    """
+
+    input_nodes = [n for n in feed_dict.keys()]
+
+    G = {}
+    nodes = [n for n in input_nodes]
+    while len(nodes) > 0:
+        n = nodes.pop(0)
+        if n not in G:
+            G[n] = {'in': set(), 'out': set()}
+        for m in n.outbound_nodes:
+            if m not in G:
+                G[m] = {'in': set(), 'out': set()}
+            G[n]['out'].add(m)
+            G[m]['in'].add(n)
+            nodes.append(m)
+
+    L = []
+    S = set(input_nodes)
+    while len(S) > 0:
+        n = S.pop()
+
+        if isinstance(n, Input):
+            n.value = feed_dict[n]
+
+        L.append(n)
+        for m in n.outbound_nodes:
+            G[n]['out'].remove(m)
+            G[m]['in'].remove(n)
+            # if no other incoming edges add to S
+            if len(G[m]['in']) == 0:
+                S.add(m)
+    return L
+
+</pre>
+
+<hr><br>
+
+现在，我们来简单的测试一下，这个forward pass 是否能够正常工作：
+
+<br><hr>
+
+<pre>
+x, y, z = Input(), Input(), Input()
+
+f = Add(x, y, z)
+
+feed_dict = {x: 4, y: 5, z: 10}
+
+graph = topological_sort(feed_dict)
+output = forward_pass(f, graph)
+
+# should output 19
+print("{} + {} + {} = {} (according to miniflow)".format(feed_dict[x], feed_dict[y], feed_dict[z], output))
+
+</pre>
+
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-08-21 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

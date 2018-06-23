@@ -172,8 +172,8 @@ class Input(Node):
 
 <pre>
 class Add(Node):
-	def __init__(self, x, y):
-		Node.__init__(self, [x, y])
+	def __init__(self, x_list):
+		Node.__init__(self, x_list)
 
 	def forward(self):
 		self.value = 0.0
@@ -363,7 +363,7 @@ def topological_sort(feed_dict):
 <pre>
 x, y, z = Input(), Input(), Input()
 
-f = Add(x, y, z)
+f = Add((x, y, z))
 
 feed_dict = {x: 4, y: 5, z: 10}
 

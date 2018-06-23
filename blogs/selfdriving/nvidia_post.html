@@ -8,13 +8,13 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> Blog Home - Start Bootstrap Template</title>
+    <title> Nvidia 的无人驾驶论文阅读 </title>
 
     <!-- Bootstrap core CSS -->
-    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="../css/blog-home.css" rel="stylesheet">
+    <link href="../../css/blog-home.css" rel="stylesheet">
 
   </head>
 
@@ -23,25 +23,25 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="https://easyfly007.github.io/index.html">Yifei's homepage</a>
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link" href="https://easyfly007.github.io/index.html">Home
-                <span class="sr-only">(current)</span>
+              <a class="nav-link" href="../../index.html">Home
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="https://easyfly007.github.io/about.html">About</a>
+              <a class="nav-link" href="../about/index.html">About</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="https://easyfly007.github.io/cv.html">CV</a>
+              <a class="nav-link" href="../cv/index.html">CV</a>
             </li>
             <li class="nav-item active">
-              <a class="nav-link" href="#">Blogs</a>
+              <a class="nav-link" href="../index.html">Blogs</a>
+              <span class="sr-only">(current)</span>
             </li>
           </ul>
         </div>
@@ -54,10 +54,9 @@
       <div class="row">
 
         <!-- Blog Entries Column -->
-        <div class="col-md-8">
+        <div class="col-md-12">
 
-          <h1 class="my-4">Page Heading
-            <small>Secondary Text</small>
+          <h1 class="my-4">--
           </h1>
 
           <!-- Blog Post -->
@@ -70,26 +69,40 @@
               <p class ='card-text'>
 
                 Nvidia 的研究人员搭建了一个基于DAVE（DARPA Autonomous Vehicle）的 DAVE2的自动驾驶系统，通过卷积神经网络，来控制车辆的转弯等动作，使得车辆始终保持在车道上。
-                <br>
-                该神经网络系统如下：
-                输入： 3*66*200 image
-                normalize
-                conv1： 24@5*5 kernel，stride 2*2， 得到 24@31*98 feature map
-                conv2： 36@5*5 kernel，stride 2*2， 得到 36@14*47 feature map
-                conv3： 48@5*5 kernel，stride 2*2， 得到 48@5*22 feature map
-                conv4： 64@3*2 kernel，stride 1*1， 得到 64@3*20 feature map
-                conv5： 64@3*3 kernel，stride 1*1， 得到 64@1*18 feature map
-                flattern： 展开得到 1152 （64*18），但是论文中显示为 1164， 相差12， 很奇怪？？
-                fullyconnect：100
-                fullyconnect：50
-                fullyconnect：10
-                fullyconnect：1
+                
+                <br><br>
 
+                该神经网络系统如下：
+                
+                <br><br>
+                输入： 3*66*200 image
+                <br>
+                normalize
+                <br>
+                conv1： 24@5*5 kernel，stride 2*2， 得到 24@31*98 feature map
+                <br>
+                conv2： 36@5*5 kernel，stride 2*2， 得到 36@14*47 feature map
+                <br>
+                conv3： 48@5*5 kernel，stride 2*2， 得到 48@5*22 feature map
+                <br>
+                conv4： 64@3*2 kernel，stride 1*1， 得到 64@3*20 feature map
+                <br>
+                conv5： 64@3*3 kernel，stride 1*1， 得到 64@1*18 feature map
+                <br>
+                flattern： 展开得到 1152 （64*18），但是论文中显示为 1164， 相差12， 很奇怪？？
+                <br>
+                fullyconnect：100
+                <br>
+                fullyconnect：50
+                <br>
+                fullyconnect：10
+                <br>
+                fullyconnect：1
+                <br>
                 激活函数我采用了ReLU，除了最后一层fullyconnect layer，因为本质上是一个回归问题。
 
 
               </p>
-              <a href="#" class="btn btn-primary">Read More &rarr;</a>
             </div>
             <div class="card-footer text-muted">
               Posted on 2017-09-09 by Yifei
@@ -100,64 +113,7 @@
 
         </div>
 
-        <!-- Sidebar Widgets Column -->
-        <div class="col-md-4">
 
-          <!-- Search Widget -->
-          <div class="card my-4">
-            <h5 class="card-header">Search</h5>
-            <div class="card-body">
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search for...">
-                <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button">Go!</button>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Categories Widget -->
-          <div class="card my-4">
-            <h5 class="card-header">Categories</h5>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-lg-6">
-                  <ul class="list-unstyled mb-0">
-                    <li>
-                      <a href="#">Web Design</a>
-                    </li>
-                    <li>
-                      <a href="#">HTML</a>
-                    </li>
-                    <li>
-                      <a href="#">Freebies</a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-lg-6">
-                  <ul class="list-unstyled mb-0">
-                    <li>
-                      <a href="#">JavaScript</a>
-                    </li>
-                    <li>
-                      <a href="#">CSS</a>
-                    </li>
-                    <li>
-                      <a href="#">Tutorials</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Side Widget -->
-          <div class="card my-4">
-            <h5 class="card-header">Side Widget</h5>
-            <div class="card-body">
-              You can put anything you want inside of these side widgets. They are easy to use, and feature the new Bootstrap 4 card containers!
-            </div>
-          </div>
 
         </div>
 

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 深度学习 02 - miniflow </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 深度学习 02： miniflow </h2>
+              <p class ='card-text' >
+<br>
+<a href="miniflow_02.py"> 本文代码下载 </a>
+
+<br><br>
+
+之前介绍了如何用 miniflow 实现 forward pass，现在我们来实现 backward propagation，也就是从loss function 出发，利用链式法则，推导出每一个参数的导数。
+
+<br><br>
+
+首先我们得添加Loss Function 相关的代码。
+下面是 MSE （Mean Square Error）的实现。
+
+<br><br>
+C(w,b) = 1 / m *​ ∑_x ∣∣ y(x)−a ∣∣ ^2 
+
+<br><hr>
+
+<pre>
+class MSE(Node):
+    def __init__(self, y, a):
+        """
+        The mean squared error cost function.
+        Should be used as the last node for a network.
+        """
+        Node.__init__(self, [y, a])
+
+    def forward(self):
+        """
+        Calculates the mean squared error.
+        """
+        # NOTE: We reshape these to avoid possible matrix/vector broadcast
+        # errors.
+        #
+        # For example, if we subtract an array of shape (3,) from an array of shape
+        # (3,1) we get an array of shape(3,3) as the result when we want
+        # an array of shape (3,1) instead.
+        #
+        # Making both arrays (3,1) insures the result is (3,1) and does
+        # an elementwise subtraction as expected.
+        y = self.inbound_nodes[0].value.reshape(-1, 1)
+        a = self.inbound_nodes[1].value.reshape(-1, 1)
+        m = self.inbound_nodes[0].value.shape[0]
+
+        diff = y - a
+        self.value = np.mean(diff**2)
+</pre>
+
+<br>
+接下来就是来计算每一个Node 的梯度了。
+
+<br><hr>
+
+<pre>
+
+class Input(Node):
+    def backward(self):
+        # An Input node has no inputs so the gradient (derivative)
+        # is zero.
+        # The key, `self`, is reference to this object.
+        self.gradients = {self: 0}
+        # Weights and bias may be inputs, so you need to sum
+        # the gradient from output gradients.
+        for n in self.outbound_nodes:
+            self.gradients[self] += n.gradients[self]
+</pre>
+
+<hr>
+
+<pre>
+class Linear(Node):
+    def backward(self):
+        """
+        Calculates the gradient based on the output values.
+        """
+        # Initialize a partial for each of the inbound_nodes.
+        self.gradients = {n: np.zeros_like(n.value) for n in self.inbound_nodes}
+        # Cycle through the outputs. The gradient will change depending
+        # on each output, so the gradients are summed over all outputs.
+        for n in self.outbound_nodes:
+            # Get the partial of the cost with respect to this node.
+            grad_cost = n.gradients[self]
+            # Set the partial of the loss with respect to this node's inputs.
+            self.gradients[self.inbound_nodes[0]] += np.dot(grad_cost, self.inbound_nodes[1].value.T)
+            # Set the partial of the loss with respect to this node's weights.
+            self.gradients[self.inbound_nodes[1]] += np.dot(self.inbound_nodes[0].value.T, grad_cost)
+            # Set the partial of the loss with respect to this node's bias.
+            self.gradients[self.inbound_nodes[2]] += np.sum(grad_cost, axis=0, keepdims=False)
+</pre>
+<hr>
+<pre>
+class Sigmoid(Node):
+    def backward(self):
+        """
+        Calculates the gradient using the derivative of
+        the sigmoid function.
+        """
+        # Initialize the gradients to 0.
+        self.gradients = {n: np.zeros_like(n.value) for n in self.inbound_nodes}
+        # Sum the partial with respect to the input over all the outputs.
+        for n in self.outbound_nodes:
+            grad_cost = n.gradients[self]
+            sigmoid = self.value
+            self.gradients[self.inbound_nodes[0]] += sigmoid * (1 - sigmoid) * grad_cost
+
+</pre>
+<hr>
+<pre>
+class MSE(Node):
+    def backward(self):
+        """
+        Calculates the gradient of the cost.
+        """
+        self.gradients[self.inbound_nodes[0]] = (2 / self.m) * self.diff
+        self.gradients[self.inbound_nodes[1]] = (-2 / self.m) * self.diff
+
+</pre>
+<br>
+同时，我们也要实现如何利用梯度下降对每个 Node 的 value 进行更新。
+
+<br><hr>
+
+<pre>
+def sgd_update(trainables, learning_rate=1e-2):
+    """
+    Updates the value of each trainable with SGD.
+
+    Arguments:
+
+        `trainables`: A list of `Input` Nodes representing weights/biases.
+        `learning_rate`: The learning rate.
+    """
+    # TODO: update all the `trainables` with SGD
+    # You can access and assign the value of a trainable with `value` attribute.
+    # Example:
+    # for t in trainables:
+    #   t.value = your implementation here
+    for t in trainables:
+        t.value -= learning_rate * t.gradients[t]
+
+</pre>
+
+<br>
+基本上，我们的 miniflow 就完成了，你可以用实际的数据跑一下，看看能否 run 起来
+
+<br><hr>
+<pre>
+  
+# import numpy as np
+from sklearn.datasets import load_boston
+from sklearn.utils import shuffle, resample
+
+# Load data
+data = load_boston()
+X_ = data['data']
+y_ = data['target']
+
+# Normalize data
+X_ = (X_ - np.mean(X_, axis=0)) / np.std(X_, axis=0)
+
+n_features = X_.shape[1]
+n_hidden = 10
+W1_ = np.random.randn(n_features, n_hidden)
+b1_ = np.zeros(n_hidden)
+W2_ = np.random.randn(n_hidden, 1)
+b2_ = np.zeros(1)
+
+# Neural network
+X, y = Input(), Input()
+W1, b1 = Input(), Input()
+W2, b2 = Input(), Input()
+
+l1 = Linear(X, W1, b1)
+s1 = Sigmoid(l1)
+l2 = Linear(s1, W2, b2)
+cost = MSE(y, l2)
+
+feed_dict = {
+    X: X_,
+    y: y_,
+    W1: W1_,
+    b1: b1_,
+    W2: W2_,
+    b2: b2_
+}
+
+epochs = 10
+# Total number of examples
+m = X_.shape[0]
+batch_size = 11
+steps_per_epoch = m // batch_size
+
+graph = topological_sort(feed_dict)
+trainables = [W1, b1, W2, b2]
+
+print("Total number of examples = {}".format(m))
+
+# Step 4
+for i in range(epochs):
+    loss = 0
+    for j in range(steps_per_epoch):
+        # Step 1
+        # Randomly sample a batch of examples
+        X_batch, y_batch = resample(X_, y_, n_samples=batch_size)
+
+        # Reset value of X and y Inputs
+        X.value = X_batch
+        y.value = y_batch
+
+        # Step 2
+        forward_and_backward(graph)
+
+        # Step 3
+        sgd_update(trainables)
+
+        loss += graph[-1].value
+
+    print("Epoch: {}, Loss: {:.3f}".format(i+1, loss/steps_per_epoch))
+
+
+</pre>
+
+<br><br>
+这就是最简单的 forward pass 和 back propagation 的实现，
+tensorflow 等框架的背后也是差不多的代码（笑），只不过他们都帮你实现了整个过程，你只要 run 一个命令就好。
+
+<br><br>
+
+而你要是想要定义自己的 Node，比如一个很复杂的 非线性激活函数，现在应该很容易就可以实现了吧。
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-08-24 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

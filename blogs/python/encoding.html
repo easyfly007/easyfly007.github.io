@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 整数的编码 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 信息的位表示  </h2>
+              <p class ='card-text'>
+
+<br><br>
+
+对于 无符整数，uint8, 
+<br>
+这个 a 的取值范围是 0 - 2^8-1, 也就是 0 - 255, 恰好这就是 图像的 RGB 像素的范围。
+
+<br>
+比如 b00011011 =  2^0 + 2^1 + 2^4 + 2^5
+
+<br><br>
+对于 singed int，比如总共有 8 位，对于其能表示的范围是多少？
+
+<br>
+
+最开始的一位是符号位，符号位位 0，表示正数，符号位为 1 表示负数。
+
+<br>
+
+对于符号位为 0 的表示范围，为 0 - 2 ^7
+
+<br>
+
+对于符号位为 1 的表示范围，我们用补码表示，所谓补码，
+
+<br><br>
+
+比如说我们要表示一个 -3， 相当于我们要表示 - 3 + 2^8 = -3 + 256 = 253
+<br>
+而 253 在 uint8 上面的表示是 11111101，这就是 -3 在 int8 上面的编码表示。
+
+<br><br>
+在具体的操作上，由于 b11111111 = 2^8 -1, 
+
+<br><br>
+
+(signed int 8) -3 =  (unsigned int8) (-3 + 2^8) = (unsigned int8) (-3 + b11111111 +1)
+<br><br>
+我们把 3，也就是 00000011 按位取反，得到了b11111111 - b00000011， 再加上1 就得到了 -3 在signed int8 上面的编码。
+
+也就是 -3：
+
+<br><br>
+1. 先看3 的编码： 00000011
+<br>
+2. 对之按位取反：11111100
+<br>
+3. 再加一：11111101
+<br>
+那么11111101 就是-3 在signed int8上面的编码表示。
+
+<br><br>
+<hr>
+在进行数码的处理过程中时，记住一点即可：各种需要转换判断的，先看一下各自的编码，再进行处理。
+
+<br><br><hr><br>
+1. signed int8的表示范围是多时少？<br>
+符号位为 0，表示范围 [ 0,    2^7-1 ]<br>
+符号位为 1，表示范围：[- 2^7,  -1]<br>
+我们发现负数的表示范围比正数多了一位，也就是 -2 ^7 <br><br>
+
+这个数怎么表示：<br>
+1. 先看unsigned int8的 2^7, 为 10000000 <br>
+2. 取反，01111111 <br>
+3. 加一，10000000<br>
+
+<br>
+两边合在一起，signed int8 的表示范围就是 [-2^7 , 2^7 -1]<br>
+总计 2^8 可以表示，这是很合理的，因为 8 个 位上，每个位有0 或者1 两种选择，最多也就是 2 ^8 中组合。
+
+
+<br><br><hr><br>
+2. 对于signed int8 a，-a 有可能越界。<br>
+在 a = -128 的时候，-a = 128 不在 signed int8 的范围内。
+
+<br><br><hr><br>
+3. 对于 signed int8 和unsgined int8 的 算术操作，基本的规则是：转成 unsigned int8之后继续操作。<br>
+signed int8 转成 unsigned int8，先看他的位表示方法，然后把这个位表示方法转成 unsigned int8 读入，再对两个unsigned int8 进行算术操作。
+
+<br><br>
+
+我们来写一段最简单的代码看一下
+（这里用的是 python，省的编译了）
+<br><br>
+<pre>
+from numpy import uint8
+a = -3
+b = uint8(6)
+c = uint8(a) + uint8(b)
+print('uint8 a = ', uint8(a))
+print(c)
+print(type(c))
+</pre>
+
+<br><hr><br>
+
+<pre>
+  
+C:\Users\echok\Desktop\test.py:4: RuntimeWarning: overflow encountered in ubyte_scalars
+  c = uint8(a) + uint8(b)
+253
+c type =  <class 'numpy.uint8'> , val =  3
+[Finished in 0.5s]
+</pre>
+<br>
+嗯，计算 c 的时候越界了，不过 c 还是算出一个值来了，为 3.
+
+<br><br>
+这个3 是怎么算出来的？
+<br><br>
+a 的按位来看，是 111101, 那么把这个8 个位按位来看，作为 unsigned int8 来读入，刚好是253.<br>
+在 uint8 中 253 + 6 超过了256，计算得到了 100000011，最前面一位被丢弃，也就是得到了 00000011，等于3，最终的3 是这么来的。
+
+<br>
+或者，简单来说，如果uint8 向上溢出了, 那么减去256
+
+<br><br><hr><br>
+4. 向下溢出
+<br><br>
+再来一段代码：
+<br>
+<pre>
+from numpy import uint8
+a = uint8(1)
+b = uint8(3)
+c = a - b
+print('c type = ', type(c), ', val = ', c)
+</pre>
+<hr><br>
+<pre>
+  
+C:\Users\echok\Desktop\test.py:4: RuntimeWarning: overflow encountered in ubyte_scalars
+  c = a - b
+c type =  <class 'numpy.uint8'> , val =  254
+[Finished in 0.5s]
+</pre>
+<br>
+发现向下溢出了，因为 1-3 = -2，不在uint8的表示范围内。
+<br><br>
+我们来看编码，1 的编码 00000001， 2 的编码 00000011, -2 的编码： 11111100 <br>
+两者相加：11111101 <br>
+这是什么？ 用  uint8 来看，就是 254 <br>
+
+<br><br>
+简单来说，如果 向下溢出，那么加上 2^8， 如果向上溢出，那么减去2 ^8 <br>
+
+减去一个数字，等于加上一个数的 相反数。<br>
+
+
+<br><br><hr><br>
+
+5. 对于 int8， 负数的表示范围 最小有 - 2^7 没有对应的相反数，怎么办？
+<br><br>
+<pre>
+from numpy import int8, uint8
+a = int8(3)
+b = int8(-128)
+print('b type = ', type(b), ', val = ', b)
+c = a - b
+print('c type = ', type(c), ', val = ', c)
+</pre>
+<br>
+<pre>
+  
+b type =  <class 'numpy.int8'> , val =  -128
+C:\Users\echok\Desktop\test.py:5: RuntimeWarning: overflow encountered in byte_scalars
+  c = a - b
+c type =  <class 'numpy.int8'> , val =  -125
+[Finished in 0.4s]
+</pre>
+<br><br>
+算出来是 - 125， 怎么来的？<br>
+b 的按位表示是 10000000<br>
+b 的相反数，也就是取反加一之后，为 10000000，没变啊<br>
+a 的按位表示是 00000011<br>
+两者相加，10000011，这是 - 125<br>
+
+<br><br><hr><br>
+
+5. 在 C 语言当中，碰到了 uint 和int 的组合操作，就会先把 int 转换成uint 然后继续运算，得到一个 uint
+<br><br><hr><br>
+
+6. 判断 加法是否越界？
+<br>
+
+<pre>
+  
+bool int8add_valid(int8 x, int8 y)
+{
+  int8 sum = x + y;
+  int neg_over = x < 0 && y < 0 && sum > 0;
+  int pos_over = x >0 && y > 0 && sum < 0;
+  return ! neg_over && !pos_over;
+}
+
+bool uint8add_valid(uint8 x, uint8 y)
+{
+  uint8 sum = x + y;
+  if (sum < x || sum < y)
+    return false;
+  return true;
+}
+
+bool int8sub_valid(int8 x, int8 y)
+{
+  int8 sub = x - y;
+  return int8add_valid(x, -y);
+}
+</pre>
+
+
+<br><br><hr><br>
+
+7. 乘法
+<br>
+由于乘法消耗的指令非常多，需要10个或者更多的时钟周期，一般对于整数乘以常数的运算，会用移位和加法来代替。
+<br>
+
+<br>
+比如 x * 14,
+<br>
+14 = 2^3 + 2^2 + 2^1
+<br>
+x *14 = x * 2^3 + x * 2^2 + x * 2^1
+<br>
+x 左移 3 位，得到了 x *2^3，记作 x3
+<br>
+x 左移 2 位，得到了 x *2^2，记作 x2
+<br>
+x 左移 1 位，得到了 x *2^1，记作 x1
+<br>
+x *14 = x3 + x2 + x1
+<br>
+<br>
+或者写为：
+<br>
+ x * 14 = (x << 3 ) + (x << 2) + (x << 1)
+
+<br><br><hr><br>
+8. 除法
+<br>
+如果一个数除以 2^k 次，那么可以用算术右移来实现
+<br>
+x / 2^k = x >> k
+<br>
+算术右移，就是说，如果 x 的符号位为 0， 那么右移相当于除了符号位之外的那些右移，同时补0
+<br>
+如果x 的符号位为1， 那么符号位不动，其他的右移，同时在第二位开始补1
+<br>
+比如 10000011，这个数是 - 125，
+<br>
+它算术右移1位，得到了11000001，这个数是 - 63
+
+</p>              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">YIfei Huang 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

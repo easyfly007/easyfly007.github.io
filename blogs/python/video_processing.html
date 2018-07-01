@@ -74,13 +74,24 @@ def process_iamge(img1):
   return img2
 
 clip = VideoFileClip(input_video)
-// clip2 = VideoFileClip(input_video).subclip(1,5)
-// only select the range from 1 sec to 5 sec
+# clip2 = VideoFileClip(input_video).subclip(1,5)
+# only select the range from 1 sec to 5 sec
 
 transfer_clip = clip.fl_image(process_image)
 transfer_clip.write_videofile(output_video, audio = False)
 
 </pre>
+
+<br><br><hr> input <br><br>
+<video width="640" height="480" controls="controls">
+  <source src="video_processing/test_input.mp4" type="video/mp4" />
+</video>
+
+<br><br><hr><br> output <br><br>
+
+<video width="640" height="480" controls="controls">
+  <source src="video_processing/test_output.mp4" type="video/mp4" />
+</video>
 
 
               </p>

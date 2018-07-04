@@ -102,7 +102,7 @@ data processing
 <br><hr><br>
 
 <pre>
-  import numpy as np
+import numpy as np
 
 # Pad images with 0s
 X_train      = np.pad(X_train, ((0,0),(2,2),(2,2),(0,0)), 'constant')
@@ -111,6 +111,13 @@ X_test       = np.pad(X_test, ((0,0),(2,2),(2,2),(0,0)), 'constant')
     
 print("Updated Image Shape: {}".format(X_train[0].shape))
 </pre>
+
+np.pad 的语法是这样的，目前我们 X_train 的 shape 是 4 个维度的，<br>
+第一个维度是 sample,<br>
+第二个维度是 width， <br>
+第三个维度是 height，<br>
+第四个维度是 rgb 或者 gray， <br><br>
+我们对第二第三个维度前后分别进行 2 的padding， 这样刚好凑成了 32 * 32 的 img
 
 <br><hr><br>
 构建 LeNet
@@ -121,7 +128,6 @@ print("Updated Image Shape: {}".format(X_train[0].shape))
 from tensorflow.contrib.layers import flatten
 
 def LeNet(x):    
-    # Arguments used for tf.truncated_normal, randomly defines variables for the weights and biases for each layer
     mu = 0
     sigma = 0.1
     

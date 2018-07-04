@@ -74,7 +74,7 @@ load data
 <br><hr><br>
 <pre>
 
-fromfrom  tensorflow.examples.tutorials.mnisttensorf  import input_data
+from  tensorflow.examples.tutorials.mnist import input_data
 
 mnist = input_data.read_data_sets("MNIST_data/", reshape=False)
 X_train, y_train           = mnist.train.images, mnist.train.labels
@@ -93,6 +93,9 @@ print("Validation Set: {} samples".format(len(X_validation)))
 print("Test Set:       {} samples".format(len(X_test)))
 </pre>
 
+可以看到，MNIST 的数据集是 28 * 28 的灰度图
+<br>
+而我们的 LeNet 是 32*32 的灰度图输入，我们需要做 padding 填充。
 
 <br><hr><br>
 data processing
@@ -228,6 +231,9 @@ with tf.Session() as sess:
     print("Test Accuracy = {:.3f}".format(test_accuracy))
 
 </pre>
+
+以上就是我们如何用 LeNet 来对手写数字进行识别的例子。
+
 
 
 

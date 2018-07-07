@@ -66,14 +66,103 @@
 
 <br><br>
 
-我们利用基于LeNet 的神经网络来识别交通标志。
+我们利用基于 LeNet 的神经网络来识别交通标志。
 
 <br>
 
 LeNet 的基本使用见于上一篇博客。
 <a href="./lenet.html">LeNet</a>
 
+<br><br>
 
+而我的这个项目的实现代码在: <a href="https://github.com/easyfly007/carnd_term1_proj/tree/master/proj_traffic_sign_classifier"> github </a>
+
+
+<br><br><br>
+
+1. 数据集 <br><br>
+你可以用：
+<a href="http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset">German Traffic Sign Dataset </a>  
+
+<br><br>
+
+也可以用：
+<a href="https://d17h27t6h515a5.cloudfront.net/topher/2017/February/5898cd6f_traffic-signs-data/traffic-signs-data.zip"> 32*32 dataset </a>
+
+<br><br>
+前者是一个完整的数据集，后者已经裁剪号称为了 32*32， 而且是 pickle 文件格式，不需要额外的读取。
+
+<br><br>
+我们可以这样读取数据集：
+
+<br>
+<pre>
+  
+import pickle
+
+training_file = './train.p'
+validation_file= './valid.p'
+testing_file = './test.p'
+
+with open(training_file, mode='rb') as f:
+    train = pickle.load(f)
+with open(validation_file, mode='rb') as f:
+    valid = pickle.load(f)
+with open(testing_file, mode='rb') as f:
+    test = pickle.load(f)
+    
+X_train, y_train = train['features'], train['labels']
+X_valid, y_valid = valid['features'], valid['labels']
+X_test, y_test = test['features'], test['labels']
+
+print('X_train shape = ', X_train.shape)
+print('y_train shape = ', y_train.shape')
+print('X_valid shape = ', X_valid.shape)
+print('y_valid shape = ', y_valid.shape)
+print('X_test shape = ', X_test.shape)
+print('y_test shape = ', y_test.shape)
+</pre>
+
+<br><br>
+
+训练集是：(34799, 32, 32, 3) ，(34799,) <br>
+验证集是：(4410, 32, 32, 3)，(4410,) <br>
+测试集是：(12630, 32, 32, 3)，(12630,) <br>
+
+<br><br><br>
+
+2. 数据快速浏览 <br><br>
+<pre>
+import matplotlib.pyplot as plt
+i = 234
+plt.imshow(X_train[i])
+print(y_train[i])
+plt.show()
+plt.imshow(X_train[i])
+print(y_train[i])
+plt.show()
+
+print(np.unique(y_train))
+print(np.unique(y_valid))
+print(np.unique(y_test))
+
+</pre>
+
+我们可以看到样本基本上长这个样子： <br><br>
+<img src="./traffic_sign_classification/train122.png">
+<img src="./traffic_sign_classification/train667.png">
+<img src="./traffic_sign_classification/train908.png">
+
+<br><hr><br>
+3. model
+
+可以参考 <a href="http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf"> Yann LeKun 的这篇文章 </a>
+作为一个 baseline 的accuracy 可以达到 98.97 %。 <br>
+而人眼识别的正确率在 98.81 %。
+
+<br><br>
+
+下面是一个小小的实现
 
 
               </p>

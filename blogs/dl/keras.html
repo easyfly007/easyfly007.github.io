@@ -69,6 +69,149 @@
 
 <br><br>
 
+同时下列链接也是常用的：<br>
+<a href="https://faroit.github.io/keras-docs/1.2.1/"> Keras document</a> <br>
+<a href="https://keras.io/zh/"> Keras 中文文档 </a> <br><br>
+
+Keras 在后台使用 tensorflow 或者 theano 框架，是一种更加高层次的深度学习框架，
+可以很容易搭建一个神经网络（当然如果你需要更加定制化以及精细的控制的话，可能 Keras 不一定够了）
+
+
+<br><br>
+1. 利用 Keras 对 MNIST 手写数字识别 <br><br>
+
+<a href="https://github.com/keras-team/keras/blob/master/examples/mnist_cnn.py"> Keras MNIST</a>
+<br><hr><br><br>
+
+<pre>
+'''Trains a simple convnet on the MNIST dataset.
+Gets to 99.25% test accuracy after 12 epochs
+(there is still a lot of margin for parameter tuning).
+16 seconds per epoch on a GRID K520 GPU.
+'''
+
+from __future__ import print_function
+import keras
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras import backend as K
+
+batch_size = 128
+num_classes = 10
+epochs = 12
+
+# input image dimensions
+img_rows, img_cols = 28, 28
+
+# the data, split between train and test sets
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+if K.image_data_format() == 'channels_first':
+    x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
+    x_test = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
+    input_shape = (1, img_rows, img_cols)
+else:
+    x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
+    x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+    input_shape = (img_rows, img_cols, 1)
+
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+x_train /= 255
+x_test /= 255
+print('x_train shape:', x_train.shape)
+print(x_train.shape[0], 'train samples')
+print(x_test.shape[0], 'test samples')
+
+# convert class vectors to binary class matrices
+y_train = keras.utils.to_categorical(y_train, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
+
+model = Sequential()
+model.add(Conv2D(32, kernel_size=(3, 3),
+                 activation='relu',
+                 input_shape=input_shape))
+model.add(Conv2D(64, (3, 3), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.25))
+model.add(Flatten())
+model.add(Dense(128, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(num_classes, activation='softmax'))
+
+model.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=keras.optimizers.Adadelta(),
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train,
+          batch_size=batch_size,
+          epochs=epochs,
+          verbose=1,
+          validation_data=(x_test, y_test))
+score = model.evaluate(x_test, y_test, verbose=0)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
+</pre>
+
+<br><br>
+可以看到 Keras 的神经网络搭建真的非常简单，完全就像搭建积木一样 <br>
+利用 model.add() 按照 sequence 的顺序，一层又一层，
+这个 Sequence 的 model 又提供了接口 fit(), evaluate(), compile()
+就像 sklearn 一样。
+
+<br><br>
+Keras 提供了各种不同类型的 layer，包括：
+Dense, Activation, Flatten，Conv2D 等等。
+
+比较关心的是 Conv2D():
+<pre>
+keras.layers.Conv2D(
+    filters, kernel_size, strides=(1, 1), 
+    padding='valid', data_format=None, 
+    dilation_rate=(1, 1), 
+    activation=None, use_bias=True, 
+    kernel_initializer = 'glorot_uniform', 
+    bias_initializer = 'zeros', 
+    kernel_regularizer = None, 
+    bias_regularizer=None, 
+    activity_regularizer = None, 
+    kernel_constraint = None, 
+    bias_constraint=None)
+</pre>
+<br><br>
+基本上这些参数是很好理解的。 <br> <br>
+filters: 输出层的层数 <br>
+kernel_size： 卷积核的大小，比如 (3, 3) <br> 
+strides： 滑动步长 <br>
+activation: 默认没有 activation，也可以是 'relu' 或者 'sigmoid'，'tanh' 等等 <br><br>
+
+padding = 'same': <br> 
+padding means the size of output feature-maps are the same as the input feature-maps (under the assumption of stride=1).  <br>
+For instance, if input is nin channels with feature-maps of size 28×28, then in the output you expect to get nout feature maps each of size 28×28 as well.
+<br><br>
+padding = 'valid': <br>
+no padding <br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
               </p>
               

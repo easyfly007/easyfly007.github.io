@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 迁移学习 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 迁移学习 </h2>
+              <p class ='card-text'>
+<br><br>
+在搭建自己的深度神经网络的时候，我们完全可以借鉴别人已有的成功经验，比如 ALEX NET，VGG NET， RESNET，等等。
+<br>
+这种方法就叫做 迁移学习 <strong> transfer learning </strong> <br><br>
+什么时候，以及我们应该如何迁移？<br><br><br>
+
+对于不同的任务我们要采用不同的策略。<br>
+如果你有一个来自很大数据集（百万级以上）的已经训练好的模型，当你面对自己的训练集来完成你的目的时，
+<br>
+<img src="./transfer_learning/02-guide-how-transfer-learning-v3-02.png" height = '300'>
+<br><br><br>
+
+1. 你的训练集很大，训练任务很相似。<br>
+==> 复制已有的模型结构，以已经训练好的模型为开始状态，在你的训练集上继续训练（fine tune）
+<br>
+<img src="./transfer_learning/02-guide-how-transfer-learning-v3-08.png" height = '300'>
+<br><br><br>
+
+2. 你的训练集很大，训练任务不相似。<br>
+==> 复制已有的模型结构，重新开始训练（或者 fine tune 也可以）
+<br>
+<img src="./transfer_learning/02-guide-how-transfer-learning-v3-10.png" height = '300'>
+<br><br><br>
+
+3. 你的训练集很小，任务很相似。<br>
+==> 复制已有的结构模型，只在最后一层改为你需要的输出，冻结前面所有的模型参数，只训练最后输出层的参数
+<br>
+<img src="./transfer_learning/02-guide-how-transfer-learning-v3-04.png" height = '300'>
+<br><br><br>
+
+4. 你的训练集很小，训练任务不相似。<br>
+==> 无他，重新设计你的模型并开始训练（迁移学习也无解）
+<br>
+<img src="./transfer_learning/02-guide-how-transfer-learning-v3-06.png" height = '300'>
+<br><br><br>
+
+<hr>
+总结起来，就是如下：<br>
+<img src="./transfer_learning/02-guide-how-transfer-learning.png" height = '300'>
+<br><br><br>
+
+
+<hr><hr>
+既然采用了迁移学习，那么常用的两种方法就是 feature extraction 和 fine-tuning
+<br><br>
+前者在于，我们改变已有 model 的最后输出层（或者几层），同时对前面层的参数固定不变。<br>
+后者在于，前面层的参数在训练的时候也是会改变的。<br>
+
+换种理解，feature extraction 就是我们让样本现通过已有的模型的前面，得到在 high level 的 feature，
+再对 high level 的 feature 进行训练。<br><br>
+
+
+>> git clone https://github.com/udacity/CarND-Alexnet-Feature-Extraction
+
+https://d17h27t6h515a5.cloudfront.net/topher/2016/October/580a829f_train/train.p
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-07-07 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

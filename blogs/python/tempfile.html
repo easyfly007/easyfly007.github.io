@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> python 临时文件 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> python 临时文件 </h2>
+              <p class ='card-text'>
+<br><br>
+很多时候，我们需要利用一个临时的文件来保存程序的中间过程，
+如何产生一个临时文件（这个时候我们并不关心它具体叫什么名字，放在哪里，只要能够生成、修改、访问、删除即可）
+
+<br><br>
+
+这种情况下，python 的 <a href="https://docs.python.org/2/library/tempfile.html">tempfile </a>
+模块能够给我们带来很大帮助。
+<br><br>
+代码在：<a href="https://github.com/python/cpython/blob/2.7/Lib/tempfile.py"> code </a>
+<br><br>
+
+看个例子：
+
+<br><hr>
+<pre>
+  
+from tempfile import TemporaryFile
+outfile = TemporaryFile()
+print(type(outfile))
+print(outfile.name)
+x = np.arange(10)
+np.save(outfile, x)
+outfile.seek(0)
+y = np.load(outfile)
+print(y)
+
+</pre>
+
+<br><br><hr><br><br>
+
+<pre>
+import tempfile
+temp = tempfile.TemporaryFile(mode='w+t')
+try:
+    temp.write('Some data')
+    temp.write('Some data 2')
+    
+    temp.seek(0)
+    
+    print(temp.read())
+finally:
+    temp.close()
+
+</pre>
+<hr><br><br>
+
+这里 outfile 是一个 FILE 的封装的对象，你可以像正常文件一样使用它，但是在这个文件会在 outfile 对象被释放的时候自动删除。
+
+<br><br>
+
+更多的接口还有：<br><br>
+gettempdir() <br>
+mktemp() <br>
+mkdtemp() <br>
+mktemp()
+
+<br><br><br>
+比如我要建立一个临时的文件夹，可以这样<br><br>
+<pre>
+directory_name = tempfile.mkdtemp()
+print(type(directory_name))
+print(directory_name)
+# Clean up the directory yourself
+os.removedirs(directory_name)
+</pre>
+
+<br><br>
+这里生成一个可用的临时文件夹，并把这个文件夹地址作为 str 返回。 <br>
+你可以自己来后续操作。
+
+<br><br>
+
+其他的一些操作可以参考：<br>
+https://pymotw.com/2/tempfile/#temporaryfile
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

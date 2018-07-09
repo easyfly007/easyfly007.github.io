@@ -110,11 +110,11 @@
 后者在于，前面层的参数在训练的时候也是会改变的。<br>
 
 换种理解，feature extraction 就是我们让样本现通过已有的模型的前面，得到在 high level 的 feature，
-再对 high level 的 feature 进行训练。<br><br>
+再对 high level 的 feature 进行训练。
 
-<br><br><br>
+<br><br><br><hr>
 
-DEMO
+0. 参考资料
 
 <br><br>
 这是一个利用AlexNet 来进行交通标志识别的模型 <br>
@@ -131,7 +131,7 @@ AlexNet 的相关论文可以在一下地址访问到：
 <a href="http://www.cs.toronto.edu/~guerzhoy/tf_alexnet/"> tensorflow AlexNet </a>
 
 训练集还是来自于
-<a href="http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset"> German Traffic Sign Recognition Benchmark dataset</a>
+<a href="http://benchmark.ini.rub.de/?section=gtsrb&subsection=dataset"> German Traffic Sign Recognition Benchmark dataset</a> <br><br>
 这里有一个已经经过预处理的训练集：
 <a href="https://d17h27t6h515a5.cloudfront.net/topher/2016/October/580a829f_train/train.p">train data set </a>
 
@@ -143,7 +143,7 @@ AlexNet 的相关论文可以在一下地址访问到：
 <br><br>
 我们来解读一下代码，看看这个 transfere learning 到底怎么做。
 
-<br><br>
+<br><br><hr>
 1. AlexNet <br><br>
 
 首先我们要复现这个 AlexNet 的结构，<br><br>
@@ -317,8 +317,13 @@ def AlexNet(features, feature_extract=False):
 
     return probabilities
 </pre>
+<br><br>
+这个 AlexNet 的基本结构就是按照 Andrew 的论文来实现的，
+<img src="./transfer_learning/alexnet.png" height = '300'>
 
-feature extraction <br>
+<br><br><hr>
+
+02. feature extraction <br>
 如何利用 AlexNet 提取特征？
 
 <br><br>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 文件名以及路径的解析 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 文件名以及路径的解析  </h2>
+              <p class ='card-text'>
+<br>
+很多时候我们需要对文件以及文件所在路径进行处理，这个时候os.path 模块就很好用，
+一般我们不推荐手工进行解析或者拼接，因为会存在 操作系统的不兼容问题，比如windows / linux /macOs 都是不太一样的。
+而用 os.path 就可以很好解决问题。
+
+<br><br>详细的文档见于：
+<a href="https://docs.python.org/2/library/os.path.html"> link </a>
+<br><br>
+
+这里列举几个较为常用的
+
+<br><br><hr>
+1. 拼接<br><br>
+<pre>
+a = 'a'
+b = 'b.txt'
+filename = os.path.join(a, b)
+# filename = 'a/b.txt'
+</pre>
+
+<br><br><hr>
+2. 拆分<br><br>
+<pre>
+path = 'a/b.txt'
+dir, absfile = os.path.split(path)
+# dir, absfile = 'a', 'b.txt'
+head, ext = os.path.splitext(path)
+# head = 'a/b', ext = 'txt'
+</pre>
+
+<br><br><hr>
+3. 获取单纯的文件（不包含路径）<br><br>
+<pre>
+path = 'a/b.txt'
+basename = os.path.basename(path)
+dirname = os.path.dirname(path)
+# basename = 'b.txt'
+# dirname = 'a'
+</pre>
+
+<br><br><hr>
+4. 获取当前工作目录：<br><br>
+<pre>
+cwd = os.getcwd()
+</pre>
+
+<br><br><hr>
+5. 判断文件是否存在<br><br>
+<pre>
+validpath = os.path.exists(path)
+print(validpath) # True or False
+</pre>
+
+<br><br><hr>
+6. 获取时间戳<br><br>
+<pre>
+os.path.getmtime(path)
+# Return the time of last modification of path
+</pre>
+
+<br><br><hr>
+7.检查文件或者路径是否存在<br>
+<pre>  
+os.path.isfile(path)
+os.path.isdir(path)
+</pre>
+
+<br><br><hr>
+8. 判断文件是否是同一个<br>
+<pre>  
+os.path.samefile(path1, path2)
+</pre>
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

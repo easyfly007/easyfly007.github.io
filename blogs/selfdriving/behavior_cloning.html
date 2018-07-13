@@ -75,32 +75,59 @@
 <br><br><br>
 
 <hr><br>
-1. 资料
+1. 资料 <br><br>
 
-没有实车，我们需要有一款仿真器<br> <br>
-
+没有实车，我们需要有一款仿真器<br>
 <a href="https://github.com/udacity/self-driving-car-sim"> simulator </a>
+
 <br><br>
-以及相关的起步代码<br>
+相关的起步代码<br>
 <a href="https://github.com/udacity/CarND-Behavioral-Cloning-P3"> behavior cloning code repo </a> 
+
 <br><br>
 以及一个训练数据集<br>
 <a href="https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip"> dataset</a>
 
 <br><br><hr><br>
-2. 数据采集
+2. 数据采集 <br><br>
+
 尽管已经有一些训练数据提供了，你还是需要采集更多的控制数据集，同时，在你的 自动驾驶遇到困难的时候，也需要有针对性做一些采集工作。
 <br><br>
 尤其是，你在转弯的时候过不了，就要在转弯的阶段多跑几次，多采集样本。
 同时，不仅要有跑偏了的样本，也要多采集跑回来的样本。
 
 <br><br>
+
 当然在这个模型中我们用单个的图片进行作为输入，没有考虑时序的信息。
+
+<br><br>
 
 数据的 X 是原始照片，数据的标签 Y 是转向角度，转向角度的范围在 -1 到 +1 之间。
 
 <br><br><hr><br>
-3. 
+
+
+3. 数据增强
+<br><br>
+
+在‘record’ 模式下，会生成一个 IMG 文件夹，另外有一个driving_log.csv 的文件，记录了每个图片对应的转向角，油门，以及刹车等数据。
+<br><br>
+有三个摄像头, 位于左中右不同的位置。
+
+<br><br>
+为了增强数据的训练集，以及减小问题的不必要的复杂度，
+我们需要采用这三个摄像头的图片，把左边的图片的偏转角度 调整为要右打方向盘一定角度，中间不变，右边调整为左打方向盘一定角度。
+
+<br><br>
+同时可以看到，摄像头的整张图片中，上面一部分是背景，包括天空之类，是属于无用的信息，如果都考虑进来，会极大影响结果。
+而最底下也有一部分是车头的一部分，也是无用的，需要截去。
+
+<br><br>
+下面是左中右三个摄像头分别拍到的画面 <br><br>
+
+<img src="./behavior_cloning/left.jpg" > 
+<img src="./behavior_cloning/center.jpg" > 
+<img src="./behavior_cloning/right.jpg" >
 
 
               </p>

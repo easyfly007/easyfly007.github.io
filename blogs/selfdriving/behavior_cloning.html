@@ -110,7 +110,7 @@
 3. 数据增强
 <br><br>
 
-在‘record’ 模式下，会生成一个 IMG 文件夹，另外有一个driving_log.csv 的文件，记录了每个图片对应的转向角，油门，以及刹车等数据。
+在‘record’ 模式下，会生成一个 IMG 文件夹，另外有一个 driving_log.csv 的文件，记录了每个图片对应的转向角，油门，以及刹车等数据。
 <br><br>
 有三个摄像头, 位于左中右不同的位置。
 
@@ -129,12 +129,65 @@
 <img src="./behavior_cloning/center.jpg" > 
 <img src="./behavior_cloning/right.jpg" >
 
+<br><br><hr><br>
+4. 数据读入 <br><br>
+我们需要来读入跑出来的数据。
+
+<pre>
+import csv
+import numpy as np
+import cv2
+
+lines = []
+with open('driving_log.csv') as csvfile:
+    reader = csv.reader(csvfile)
+    for line in reader:
+        lines.append(line)
+
+images = []
+measurements = []
+for line in lines:
+    source_path = line[0]
+    # switch from absolute path to relative path
+    # filename = source_path.split('/')[-1]
+    filename = os.path.basename(source_path)
+    current_path = os.path.join('../data/IMG/', filename)
+    image = cv2.imread(current_path)
+    images.append(image)
+    measurement = float(line[3])
+    measurements.append(measurement)
+
+X_train = np.array(images)
+Y_train = np.array(measurements)
+
+</pre>
+
+<br><br><br><hr>
+5. 搭建网络 <br><br>
+这里我们用Keras 来写，Keras 的参考 <br><br>
+<a href="https://keras.io/zh/"> 中文</a> &nbsp; <a href="https://keras.io/"> english </a>
+<br><br>
+<pre>
+from keras.models import Sequential
+from keras.layers import Flatten, Dense
+
+model = Sequential()
+model.add(Flatten(input_shape = (160, 320, 3)))
+model.add(Dense(1))
+
+model.compile(loss = 'mse', optimizer = 'adam')
+model.fit(X_train, Y_train, validation_split)
+
+</pre>
+
+
+
 
               </p>
               
             </div>
             <div class="card-footer text-muted">
-              Posted on 2018-07-12 by Yifei
+              Posted on 2018-07-13 by Yifei
               <!-- <a href="#">Start Bootstrap</a> -->
             </div>
           </div>

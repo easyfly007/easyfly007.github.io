@@ -61,30 +61,54 @@
             <div class="card-body">
               <h2 class="card-title"> 迁移学习 2 </h2>
               <p class ='card-text'>
+
 <br><br>
 接下来我们要利用 
 <a href="https://arxiv.org/pdf/1409.1556.pdf"> VGG </a> 来进行迁移学习。 <br><br>
-VGGNet 是2014 年的 ImageNet 比赛的冠军，相比于AlexNet，在于它层数较多，而且每一层都利用了 3*3 的小卷积核。
+VGGNet 是 2014 年的 ImageNet 比赛的冠军，相比于 AlexNet，在于它层数较多，而且每一层都利用了 3*3 的小卷积核。
 
-相比于Alex Net 的采用了 7*7 大小的卷积核，比方说，我们的 3个3 *3 的 卷积层与一个 7*7 的卷积层相比，
-更小的卷积核，中间有了三层 ReLU 非线性层，能够做出更加细致的判别。
-而且参数更加少了，在嘉定输入输出层都是C 的情况下，小卷积网络的参数数目是 3 * (3 * 3 * C *C),
+<br><br>
+
+相比于 Alex Net 的 7*7 大卷积核，用多个 （3个）3 *3 的 卷积层能够取得相同的效果，而且，
+<br>
+中间有了三层 ReLU 非线性层，能够做出更加细致的判别。 
+
+<br><br>
+
+而且参数更加少了，在比方说输入输出层都是 C ，小卷积网络的参数数目是 3 * (3 * 3 * C *C), <br>
 而大卷积网络的参数数目是 7* 7 *C * C (考虑 bias 的参数的话，为 3* (3*3+1) *C *C 和 7 * (7*7 +1) *C * C)
- 
- 训练往往是一个很难的事情，对于这样很深的网络以及巨量的参数下。
- 我们需要找比较好的初始值，一开始，我们训练 VGG11 模型，因为相对来说比较简单。
- 然后我们用 VGG11 的值作为初始值，来训练 VGG16.
 
- 对于数据，采用了一些数据增强的方法，
- 1. 裁剪 Crop ==》 224 * 224
- 2.  
- 
+<br><br>
+训练往往是一个很难的事情，对于这样很深的网络以及巨量的参数下。
+<br>
+作者需要找比较好的初始值，一开始，我们训练 VGG11 模型，因为相对来说比较简单。
+<br>
+作者用 VGG11 的值作为初始值，来训练 VGG16.
+
+<br><br>
+给几个图看一下 VGGNet 的结构：<br><br>
+
+各种深浅不一的 VGGNet 的结构：<br>
+<img src="./transfer_learning_2/imagenet_vggnet_table1.png">
+
+<br><br>
+AlexNet 和 VGGNet (VGG13) 的直观比较: <br>
+<img src = "./transfer_learning_2/AlexNet-and-VGGNet-architecture.png"> 
+
+<br><br>
+VGG16 的结构示意图 <br>
+<img src="./transfer_learning_2/imagenet_vgg16.png">
+
+<br><br>
+
+
+
 
               </p>
               
             </div>
             <div class="card-footer text-muted">
-              Posted on 2018-07-10 by Yifei
+              Posted on 2018-07-14 by Yifei
               <!-- <a href="#">Start Bootstrap</a> -->
             </div>
           </div>

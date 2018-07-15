@@ -62,8 +62,11 @@
               <h2 class="card-title"> 迁移学习 2 </h2>
               <p class ='card-text'>
 
-<br><br>
-接下来我们要利用 
+<br><hr>
+
+<h2> VGGNet</h2>
+<br>
+利用 
 <a href="https://arxiv.org/pdf/1409.1556.pdf"> VGG </a> 来进行迁移学习。 <br><br>
 VGGNet 是 2014 年的 ImageNet 比赛的冠军，相比于 AlexNet，在于它层数较多，而且每一层都利用了 3*3 的小卷积核。
 
@@ -88,19 +91,28 @@ VGGNet 是 2014 年的 ImageNet 比赛的冠军，相比于 AlexNet，在于它�
 <br><br>
 给几个图看一下 VGGNet 的结构：<br><br>
 
-各种深浅不一的 VGGNet 的结构：<br>
+各种深浅不一的 VGGNet 的结构：<br><br>
 <img src="./transfer_learning_2/imagenet_vggnet_table1.png">
 
-<br><br>
-AlexNet 和 VGGNet (VGG13) 的直观比较: <br>
+<br><br><br>
+AlexNet 和 VGGNet (VGG13) 的直观比较: <br><br>
 <img src = "./transfer_learning_2/AlexNet-and-VGGNet-architecture.png"> 
 
-<br><br>
-VGG16 的结构示意图 <br>
+<br><br><br>
+VGG16 的结构示意图 <br><br>
 <img src="./transfer_learning_2/imagenet_vgg16.png">
 
-<br><br>
+<br><br><hr>
 
+<h2>ResNet</h2>
+<a href="https://arxiv.org/pdf/1512.03385.pdf"> paper</a> <br>
+
+显而易见，从 LeNet 到 AlexNet 再到 VGGNet 到 GoogLeNet，网络的层数在不断增加，效果也越来越好<br>
+但是同时有一个问题也越来越显著，就是梯度消失（Gradient Vanish）或者梯度爆炸（Gradient Exploding）。<br><br>
+而 ResNet 通过一个 short-cut 来跳过了一些层以进行从较为前面的 layer 到较为靠后 layer 的直接联通，
+可以在一定程度上防止 梯度消失的问题。<br>
+
+<img src="./transfer_learning_2/resnet_shortcut.png" height = '240'> <br><br>
 
 
 

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Keras Model 保存与重载 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> Keras Model 的保存与重载 </h2>
+              <p class ='card-text'>
+<br><br>
+
+对于Keras 的模型，我们可以很容易保存它以及重载它。如下所示<br><br>
+
+<pre>
+from keras.models import save_model
+from keras.models import load_model
+</pre>
+
+<a href="https://www.tensorflow.org/api_docs/python/tf/keras/models/load_model"> API </a>
+
+<br><br>
+
+<a href="https://github.com/tensorflow/tensorflow/blob/r1.9/tensorflow/python/keras/engine/saving.py"> 源代码 </a>
+
+<br>
+Keras 在后台需要 h5py 模型来保存 hdf5 格式的模型文件。
+
+h5py 的参考文档见于：
+<a href="http://docs.h5py.org/en/latest/quick.html"> hdf5 </a>
+
+<br><br><hr><br>
+1. HDF5 与 h5py
+<br><br>
+HDF5 可以用来保存非常庞大的数据，包括 dataset， 或者 numpy 格式的。
+
+<br><br>
+
+新建一个 hdf5 的文件<br>
+<pre>
+import h5py
+import numpy as np
+f = h5py.File("mytestfile.hdf5", "w")
+arr = np.arange(100)
+dset = f.create_dataset("mydataset", data=arr, dtype = 'i')
+# with h5py.File("mytestfile.hdf5", "w") as f:
+#   dset = f.create_dataset("mydataset", (100,), dtype='i')
+</pre>
+
+<br><br><br>
+
+读取 一个 hdf5 文件<br>
+<pre>
+import h5py
+f = h5py.File('mytestfile.hdf5', 'r')
+dset = f['mydataset']
+</pre>
+
+<br><br><hr><br>
+2. load model<br>
+<pre>
+model = keras.models.load_model(filepath, custom_objects=None, compile=True)
+</pre>
+
+我们可以这样加载一个预先训练好的 Keras 模型。<br>
+当然可以预先判断一下 当时生成这个 hdf5 文件时候的 Keras 版本与当前运行的 Keras 版本，两者必须一致。
+
+<pre>
+from keras import __version__ as keras_version
+
+f = h5py.File(model_filename, mode='r')
+model_version = f.attrs.get('keras_version')
+keras_version = str(keras_version).encode('utf8')
+
+assert model_version == keras_version, 'loaded keras version not match with current keras version'
+
+</pre>
+
+<br><br><hr><br>
+3. save model<br>
+对于 Keras 的 model，我们可以 save 之
+
+<pre>
+X_train = np.array(augmented_images)
+y_train = np.array(augmented_measurements)
+
+model = Sequential()
+model.add(...)
+model.compile(...)
+model.fit(...)
+model.save('model_1.h5')
+
+</pre>
+
+
+
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-07-07 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

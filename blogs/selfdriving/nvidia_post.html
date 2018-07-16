@@ -63,43 +63,57 @@
           <div class="card mb-4">
             <div class="card-body">
               <h2 class="card-title">Nvidia 自动驾驶系列论文和 blog 阅读笔记</h2>
-              <p class="card-text">https://arxiv.org/pdf/1604.07316v1.pdf </p>
-              <p class='card-text'>https://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/</p>
-              <p class='card-text'>https://devblogs.nvidia.com/parallelforall/explaining-deep-learning-self-driving-car/</p>
-              <p class ='card-text'>
 
-                Nvidia 的研究人员搭建了一个基于DAVE（DARPA Autonomous Vehicle）的 DAVE2的自动驾驶系统，通过卷积神经网络，来控制车辆的转弯等动作，使得车辆始终保持在车道上。
-                
-                <br><br>
+<a href="https://arxiv.org/pdf/1604.07316v1.pdf">https://arxiv.org/pdf/1604.07316v1.pdf</a><br>
 
-                该神经网络系统如下：
-                
-                <br><br>
-                输入： 3*66*200 image
-                <br>
-                normalize
-                <br>
-                conv1： 24@5*5 kernel，stride 2*2， 得到 24@31*98 feature map
-                <br>
-                conv2： 36@5*5 kernel，stride 2*2， 得到 36@14*47 feature map
-                <br>
-                conv3： 48@5*5 kernel，stride 2*2， 得到 48@5*22 feature map
-                <br>
-                conv4： 64@3*2 kernel，stride 1*1， 得到 64@3*20 feature map
-                <br>
-                conv5： 64@3*3 kernel，stride 1*1， 得到 64@1*18 feature map
-                <br>
-                flattern： 展开得到 1152 （64*18），但是论文中显示为 1164， 相差12， 很奇怪？？
-                <br>
-                fullyconnect：100
-                <br>
-                fullyconnect：50
-                <br>
-                fullyconnect：10
-                <br>
-                fullyconnect：1
-                <br>
-                激活函数我采用了ReLU，除了最后一层fullyconnect layer，因为本质上是一个回归问题。
+<a href="ttps://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/">ttps://devblogs.nvidia.com/parallelforall/deep-learning-self-driving-cars/</a> <br>
+
+<a href="https://devblogs.nvidia.com/parallelforall/explaining-deep-learning-self-driving-car/">
+https://devblogs.nvidia.com/parallelforall/explaining-deep-learning-self-driving-car/</a>
+
+<br><br>
+
+Nvidia 的研究人员搭建了一个基于 DAVE（DARPA Autonomous Vehicle）的 DAVE2 的自动驾驶系统，通过卷积神经网络，来控制车辆的转弯等动作，使得车辆始终保持在车道上。
+
+<br><br>
+<a href="https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf"> End to End Learning for Self-Driving Cars </a>
+<br><br>
+
+该神经网络系统如下：
+
+<br><br>
+<img src="./nvidia_post/cnn_architecture"><br>
+
+<img src="./nvidia_post/cnn_architecture.png"><br>
+
+<br><br>
+
+<br><br>
+输入： 3*66*200 image
+<br>
+normalize
+<br>
+conv1： 24@5*5 kernel，stride 2*2， 得到 24@31*98 feature map
+<br>
+conv2： 36@5*5 kernel，stride 2*2， 得到 36@14*47 feature map
+<br>
+conv3： 48@5*5 kernel，stride 2*2， 得到 48@5*22 feature map
+<br>
+conv4： 64@3*2 kernel，stride 1*1， 得到 64@3*20 feature map
+<br>
+conv5： 64@3*3 kernel，stride 1*1， 得到 64@1*18 feature map
+<br>
+flattern： 展开得到 1152 （64*18），但是论文中显示为 1164， 相差12， 很奇怪？？
+<br>
+fullyconnect：100
+<br>
+fullyconnect：50
+<br>
+fullyconnect：10
+<br>
+fullyconnect：1
+<br>
+激活函数我采用了ReLU，除了最后一层fullyconnect layer，因为本质上是一个回归问题。
 
 
               </p>

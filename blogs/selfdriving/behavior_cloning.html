@@ -75,7 +75,7 @@
 <br><br><br>
 
 <hr><br>
-1. 资料 <br><br>
+<h4> 1. 资料 </h4><br><br>
 
 没有实车，我们需要有一款仿真器<br>
 <a href="https://github.com/udacity/self-driving-car-sim"> simulator </a>
@@ -89,7 +89,7 @@
 <a href="https://d17h27t6h515a5.cloudfront.net/topher/2016/December/584f6edd_data/data.zip"> dataset</a>
 
 <br><br><hr><br>
-2. 数据采集 <br><br>
+<h4>2. 数据采集  </h4> <br><br>
 
 尽管已经有一些训练数据提供了，你还是需要采集更多的控制数据集，同时，在你的 自动驾驶遇到困难的时候，也需要有针对性做一些采集工作。
 <br><br>
@@ -106,8 +106,9 @@
 
 <br><br><hr><br>
 
-
+<h4>
 3. 数据增强
+</h4>
 <br><br>
 
 在‘record’ 模式下，会生成一个 IMG 文件夹，另外有一个 driving_log.csv 的文件，记录了每个图片对应的转向角，油门，以及刹车等数据。
@@ -130,7 +131,8 @@
 <img src="./behavior_cloning/right.jpg" >
 
 <br><br><hr><br>
-4. 数据读入 <br><br>
+
+<h4> 4. 数据读入 </h4><br><br>
 我们需要来读入跑出来的数据。
 
 <pre>
@@ -162,8 +164,8 @@ Y_train = np.array(measurements)
 
 </pre>
 
-<br><br><br><hr>
-5. 搭建网络 <br><br>
+<hr>
+<h4>5. 搭建网络 </h4><br><br>
 这里我们用Keras 来写，Keras 的参考 <br><br>
 <a href="https://keras.io/zh/"> 中文</a> &nbsp; <a href="https://keras.io/"> english </a>
 <br><br>
@@ -181,7 +183,93 @@ model.fit(X_train, Y_train, validation_split)
 </pre>
 
 这个 model 当然是非常简单的，估计效果也不会很好。不过可以从这么一个简单的模型开始，进一步改进。
+<br><br><br>
+
+<h4> 6. 进一步改善</h4>
+1. 截图，去掉无关紧要的顶部和底部像素
+<pre>
+from keras.layers import Cropping2D
+model = Sequential()
+model.add(Cropping2D(cropping=((50,20), (0,0)), input_shape=(3,160,320)))
+</pre>
+
 <br><br>
+这里利用 Keras 的 Cripping2D 函数，cropping 的参数分别是 （上，下），（左，右）
+<br><br>
+我们采用Keras 的 Cropping2D 而不是手动写一个循环来做，是因为 Keras 能够并行处理，速度较快。
+
+<br><br>
+2. 更加复杂的网络 <br><br>
+请参考另外一篇博客 <a href="./nvidia_post.html">Nvidia model </a>
+
+<h4> 7. 数据增强 </h4>
+除了利用左中右三个摄像头的数据之外，我们还可以采用各种多类型的训练数据类型，<br>
+比如，换个方向跑几圈，
+将图像左右翻转一下，
+在转弯的地方多跑几圈，
+从偏离状态恢复到正常也跑几圈。
+
+<h4>8. 训练拟合 </h4>
+Keras 提供了 API 用来进行 fit，以及 fit_generator() 来保存 fit 的中间过程。
+这里 train_generator 是一个 生成器，用来迭代的获取数据。
+
+<br><br>
+
+为什么要怎么做？<br>
+因为数据实在是太大了，现在一张图片的大小是 160 x 320 x 3 的 float，10000 张就需要1.5 G 的大小，不可能完全一次全部吃进到内存中去。
+
+<pre>
+from keras.models import Model
+import matplotlib.pyplot as plt
+
+history_object = model.fit_generator(train_generator, samples_per_epoch =
+    len(train_samples), validation_data = 
+    validation_generator,
+    nb_val_samples = len(validation_samples), 
+    nb_epoch=5, verbose=1)
+
+### print the keys contained in the history object
+print(history_object.history.keys())
+
+### plot the training and validation loss for each epoch
+plt.plot(history_object.history['loss'])
+plt.plot(history_object.history['val_loss'])
+plt.title('model mean squared error loss')
+plt.ylabel('mean squared error loss')
+plt.xlabel('epoch')
+plt.legend(['training set', 'validation set'], loc='upper right')
+plt.show()
+</pre>
+
+<br><br>
+我们可以这样定义 train_generator:<br><br>
+<pre>
+def generator(samples, batch_size=32):
+    num_samples = len(samples)
+    while 1: # Loop forever so the generator never terminates
+        shuffle(samples)
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset+batch_size]
+
+            images = []
+            angles = []
+            for batch_sample in batch_samples:
+                name = './IMG/'+batch_sample[0].split('/')[-1]
+                center_image = cv2.imread(name)
+                center_angle = float(batch_sample[3])
+                images.append(center_image)
+                angles.append(center_angle)
+
+            # trim image to only see section with road
+            X_train = np.array(images)
+            y_train = np.array(angles)
+            yield sklearn.utils.shuffle(X_train, y_train)
+train_generator = generator(train_samples, batch_size=32)
+validation_generator = generator(validation_samples, batch_size=32)
+
+</pre>
+
+
 
 
 

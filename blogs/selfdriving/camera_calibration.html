@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 图像的镜头校正 Camera Caliberation </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+              <span class="sr-only">(current)</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4">--
+          </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 图像的镜头校正 </h2>
+              <p>
+
+<h4></h4>
+<br>
+从车载摄像头拍摄的照片不可不免有些失真，我们需要有一些方法来进行还原。
+<a href="https://en.wikipedia.org/wiki/Distortion_(optics)"> wiki distortion </a>
+<br><br>
+存在两种失真，一种是径向的（tangential distortion）(左图)，一种是切向的（Radial Distortion）（右图）<br><br>
+
+<img src="./camera_caliberation/tangential_distortion.jpg" width = '480'> &nbsp;&nbsp;&nbsp;&nbsp;
+<img src="./camera_caliberation/radial_distortion.jpg" width = '480'>
+
+<br><br>
+前者引起的原因在于，相机的镜头没有与所拍摄的物体完全平行，导致生成的图像有倾斜失真。<br>
+后者引起的原因在于，由于光线在透过相机的镜头的边缘的时候会有所变形，导致生成的图像边缘失真。
+
+<br><br>
+
+我们可以通过一些预定义好的真实以及失真图像来确定参数，然后把这个参数应用到其他的图像上去。
+<br><br>
+<img src="./camera_caliberation/ratial_undistortion.png"><br><br>
+x_distorted = x_ideal* (1 + k_1 * r^2 + k_2 * r^4 + k_3 * r^6) <br>
+y_distorted = y_ideal* (1 + k_1 * r^2 + k_2 * r^4 + k_3 * r^6) <br> <br>
+ 
+x_corrected = x + [2 * p_1 * x * y + p_2 * ( r^2 + 2 * x^2)] <br>
+y_corrected = y + [p_1 * (r^2 +2 * y^2) + 2 * p_2 * x * y] <br><br>
+
+<!-- 用数学公式来描述真实图像和失真图像的关系，<br><br>
+<img src="./camera_caliberation/distortion_equation.svg">
+<br><br>
+这里，<br>
+(x_d, y_d): 失真图像上的像素点的位置。<br>
+(x_u, y_u): 真实的（未失真的）图像上的对应的像素点的位置。<br>
+(x_c, y_c): 图像中心点，在只考虑径向失真的情况下，可以认为中心点是不变的。<br>
+K_n : n 阶 radial diatortion 参数。<br>
+P_n : n 阶 tangential distortion 参数。<br>
+r = sqrt((x_d - x_c)^2 + (y_d - y_c)^2 )。 表示离开中心点的距离。<br> -->
+
+
+
+<!-- <br><br>
+<img src="./camera_caliberation/undistortion_equation.svg">
+<br><br> -->
+
+OpenCV 提供了对应的 API 来帮助我们做这个事情。
+<br><br>
+
+我们可以提供一个棋盘格子的图像，来告诉 OpenCV 上面有多少个格子，<br>
+没有变形的棋盘格是方方正正的，拍出来的照片总是有一些变形。
+<br><br>
+<img src="./camera_caliberation/calibration_test.jpg" width = "480">
+<br><br>
+<pre>
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+# prepare object points
+nx = 8
+ny = 6
+
+# Make a list of calibration images
+fname = 'calibration_test.png'
+img = cv2.imread(fname)
+
+# Convert to grayscale
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Find the chessboard corners
+ret, corners = cv2.findChessboardCorners(gray, (nx, ny), None)
+
+# If found, draw corners
+if ret == True:
+    # Draw and display the corners
+    cv2.drawChessboardCorners(img, (nx, ny), corners, ret)
+    plt.imshow(img)
+
+</pre>
+
+<br><br>
+
+nx, ny 是如何确定的？<br>
+nx 和 ny 就是 x 轴 以及 y 轴上的 grid 点的数目，比如 棋盘格上面有 18 * 8，那么 nx 就是 18 - 1， ny 就是 8 - 1
+
+<br><br>
+我们可以这样做来进行 undistortion <br><br>
+
+<pre>
+import numpy as np
+import cv2
+import glob
+import matplotlib.pyplot as plt
+from matplotlib.image import imsave as mpsave
+from matplotlib.image import imread as mpread
+
+def get_calibration_mtx():
+    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+    objp = np.zeros((6*9,3), np.float32)
+    objp[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
+
+    # Arrays to store object points and image points from all the images.
+    objpoints = [] # 3d points in real world space
+    imgpoints = [] # 2d points in image plane.
+
+    # Make a list of calibration images
+    img_name_list = glob.glob('../camera_cal/calibration*.jpg')
+
+    # Step through the list and search for chessboard corners
+    for img_name in img_name_list:
+        img = mpread(img_name)
+        gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+
+        # Find the chessboard corners
+        ret, corners = cv2.findChessboardCorners(gray, (9,6), None)
+
+        # If found, add object points, image points
+        if ret == True:
+            objpoints.append(objp)
+            imgpoints.append(corners)
+
+            # Draw and display the corners
+            img = cv2.drawChessboardCorners(img, (9,6), corners, ret)
+            cv2.imshow('img',img) # 'img' is the show window name
+            cv2.waitKey(500)
+
+    cv2.destroyAllWindows()
+    
+    ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+    return mtx, dist
+</pre>
+
+<br><br>
+注意到这里我们给 objpoints append 的是同一个 objp，毕竟在 calibrateCamera() 的调用中它会保持不变的。<br><br>
+返回的 mtx 以及 dist 可以用来做进一步的 undistortion
+
+<br><br>
+
+下面就来做 undistortion <br><br>
+
+<pre>
+import numpy as np
+
+def img_calibration(mtx, dist):
+    img_name = '../camera_cal/calibration.jpg'
+    img_org = mpread(img_name)
+    img_dst = cv2.undistort(img_org, mtx, dist, None, mtx)
+</pre>
+
+<hr><br><br>
+
+所以一个正常的流程就是：<br><br>
+1. 准备好一些棋盘格的图片，用同一个相机拍摄 <br>
+2. 转换成灰度图 <br>
+3. 利用函数 cv2.findChessboardCorners() 找到 corners <br>
+4. 构造对应的 grid points <br>
+5. 利用函数 cv2.calibrateCamera() 计算 distortion 相关的参数 <br>
+6. 利用得到的参数作用在新的图片上（来自于同一个相机），得到 undistortion 的图片
+
+<br><br><br>
+在经过这一系列处理之后，我们能够成功的把图片进行还原，比如这样：<br><br>
+<img src="./camera_caliberation/img_calebration.png" width = "780">
+<br><br>
+
+
+
+
+
+
+
+
+
+
+
+
+              </p>
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2017-09-09 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+          
+
+        </div>
+
+
+
+        </div>
+
+      </div>
+      <!-- /.row -->
+
+    </div>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Copyright &copy; Your Website 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

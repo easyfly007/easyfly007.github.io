@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> git bisect 代码两分查错 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 利用 git bisect 两分查错 </h2>
+              <p class ='card-text'>
+<br><br>
+如果你用 git 来管理你的代码，某年某月某日发现你的代码被你改坏了，但是在较早的版本中是好的，
+你需要找出从哪一个版本开始，你的代码出 bug 了。
+
+<br><br>
+
+这个时候 git bisect 命令就是非常管用了。 
+<a href="https://git-scm.com/docs/git-bisect"> git bisect </a>
+<br><br>
+
+比如当年版本号是 v100，是坏的，你检查了一下，大概 v50 是好的，              
+
+<pre>
+>>  git bisect start
+>> git bisect bad                 # Current version is bad
+>> git bisect good v50            # v50 is known to be good
+
+</pre>
+
+当你提供了至少一个 good 一个 bad 的时候，git 会出现提示框， 并自动定位到一个合适的 commit 让你继续检查。
+
+<br><br>
+
+<pre>  
+Bisecting: 675 revisions left to test after this (roughly 10 steps)
+</pre>
+
+<br><br>
+这个时候你用 git 提供的这个版本的代码，来做检查，依据你的检查结果，输入
+
+<br><br>
+
+<pre>
+>> git bisect good
+</pre>
+
+<br><br>
+或者
+
+<br><br>
+
+<pre>
+>> git bisect bad
+</pre>
+
+当没有剩下的版本的时候，git 会提示你第一个开始变坏的版本。
+
+<br><br>
+
+找到错误的起源之后，你就可以 debug，当然你会需要把版本重新定位到最新的位子并取消 bisect 相关的设置。
+
+<br><br>
+
+<pre>
+>> git bisect reset
+</pre>
+
+<br><br>
+
+或者
+
+<br><br>
+
+<pre>
+>> git bisect reset v_the_commit_you_want_to_locate
+</pre>
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-07-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

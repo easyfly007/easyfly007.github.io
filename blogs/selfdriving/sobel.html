@@ -129,11 +129,18 @@ def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi/2)):
     return binary_output
 </pre>
 
-下面有个简单的练习，我们如何在以下图片中把车道线找出来的<br><br>
-<img src="./sobel/signs_vehicles_xygrad.png">
 <br><br><br>
+
+下面有个简单的练习，我们如何在以下图片中把车道线找出来的<br><br>
+<img src="./sobel/signs_vehicles_xygrad.png" width = "720">
+
+<br><br><br>
+
 最终我们得到的图片应该是这个样子的：<br><br>
-<img src="./sobel/binary-combo-example.jpg">
+
+<img src="./sobel/binary-combo-example.jpg" width = "720">
+
+<br><br><br>
 
 <pre>
 def abs_sobel_thresh(img, orient='x', thresh_min=0, thresh_max=255):

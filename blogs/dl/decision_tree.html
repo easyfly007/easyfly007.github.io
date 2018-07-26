@@ -62,6 +62,7 @@
               <h2 class="card-title">决策树 </h2>
               <p class ='card-text'>
 
+<h4> sklearn 中的 decision tree </h4>
 <br><br>
 决策树算法是最简单的一种分类算法，如果用 sklearn 来做的话，两三行代码就可以实现。
 <br>
@@ -125,6 +126,8 @@ print(predict_prob)
 
 <br><br>
 <h4> 二分类的决策树</h4>
+<br><br>
+
 决策树就是在不断选取一个特征空间的一个特征，设定一个阈值，进行 if-else 的划分。<br>
 这种划分是互斥和完备的。也就是说，每一个样本，按照这种方式进行划分，能被而且只被一条划分的路径涵盖。
 
@@ -137,11 +140,16 @@ print(predict_prob)
 
 首先选取一个 feature（feature A），在上面设定一个阈值 threshold A（ta），进行两分，小于 ta 的分为一组，大于 ta 的分为另外一组。
 
+<br><br>
+
 再对这两组样本继续在 feature B 上进行分类。
 
+<br><br>
 这个过程不断进行，直到样本被完全分好类或者没有 feature 可以供我们进行划分为止。
 
+<br><br>
 <h4> 特征选取</h4>
+<br><br>
 
 如何选取特征？ 我们用信息增益来衡量每个特征。<br>
 先定义什么叫做熵（entropy）。<br>
@@ -205,21 +213,223 @@ g(D, A) = H(D) - H(D|A)
 我们可以用信息增益比（information gain ration）来进行校正。
 <br><br>
 
-信息增益比的定义如下：<br>
+信息增益比的定义如下：<br><br>
 gr(D,A) = g(D,A) / Ha(D) <br><br>
 Ha(D) = - SUM_n ( |Dn| / |D| * log(|Dn|/ |D|) )
 
 <br><br>
 <h4> 决策树的生成</h4>
 
-1. ID3 算法<br><br>
-在决策树的各个结点利用信息增益准则选取特征，递归构建决策树。
-具体做法如下：
+<strong> ID3 算法</strong>
+<br><br>
+
+在决策树的各个结点利用信息增益准则选取特征，递归构建决策树。<br>
+具体做法如下：<br><br>
+1. 输入为数据集 D，特征 A， 阈值 e <br>
+2. 如果 D 中所有实例属于同一类 C_k, 则 T 为单结点树，返回 T <br>
+3. 如果 A 为空，则T 为单结点树，返回 T <br>
+4. 如果不是 2/3 中的情况，则对 A 中的每一个特征计算信息增益，选取最大的 Ag <br>
+5. 如果 Ag 小于阈值 e，则 T 为单结点树，以数据集 D 中数目最多的一类为类的标记，返回 T <br>
+6. 如果 Ag 大于阈值 e，对于 Ag 特征的每一个可选项，分割成若干子集，每一个子集重复1-> 6 的步骤 <br>
+
+<br><br>
+
+<strong>C4.5 算法</strong>
+<br><br>
+C4.5 相比于 ID3 算法， 利用信息增益比来选择特征。 步骤同上。
+
+<br><br>
+<h4> 树的剪枝 prunning </h4>
+
+ID3 和 C4.5 只有树的生成，容易过拟合。<br><br>
+所以在生成了整颗决策树之后，需要进行剪枝处理来防止过拟合。<br>
+
+剪枝的过程就是降低树的复杂度。 <br><br>
+
+我们需要重新定义 loss function。
+<br><br>
+我们定义决策树的损失函数为：<br>
+loss function,  Ca(T) = SUM_t(Nt*Ht(T)) + a * |T| <br>
+Ht(T) = - SUM_k(N_tk / Nt * log(Ntk/Nt)) <br> <br>
+
+其实也就是增加了一个对于树的复杂度的惩罚项，|T| 表示树的复杂度。
+<br><br>
+可以用动态规划来递归的计算 |T|，方法如下： <br>
+1. 生成整颗决策树 以及参数 a <br>
+2. 计算每个结点的经验熵 <br>
+3. 递归的从每个节点开始向上回缩 <br>
+比较回缩之前和之后的损失函数，如果回缩之后的损失函数比较小，那么采用回缩进行剪枝，否则保持不变 <br>
+4. 重复 3，直到无法进行回缩为止。
+
+<br><br>
+
+<h4> CART 算法 </h4>
+<br><br>
+决策树不仅可以用来做分类，也可以用来做回归。前者叫做分类树，后者叫做回归树。
+<br><br>
+
+CART 是 classification and regression tree 的简称，分类与回归树。 <br><br>
+对于回归树利用平方误差最小准则，<br>
+对于分类树利用基尼系数最小化准则。<br><br>
+
+对于回归树，我们选定一个 feature，然后用一个阈值 t 进行两分，<br>
+对分到两边的两组样本计算各自的平均值，对每个样本针对该平均值计算平方误差，求出使得平方误差最小的 t。<br>
+我们对每个 feature 都计算最小平方误差，找出这个最小平方误差最小的 feature，作为我们选择 feature 。<br>
+
+<br><br>
+对于分类树，定义基尼系数 Gini index <br><br>
+Gini(p) = SUM_k( p_k *(1.0 - p_k)) = 1 - SUM_k(p_k^2)<br>
+p_k 表示样本点属于 k 类别的概率。
+
+<br><br><br>
+算法停止的条件是结点中样本数小于阈值，或者基尼指数小于阈值，或者没有更多的特征。
+
+<br><br>
+
+<h4> CART 剪枝</h4>
+<br><br>
+
+CART 算法也需要剪枝来防止过拟合。<br><br>
+重新定义 loss function <br>
+= C(T) + a * |T| <br>
+其中 |T| 定义为树的节点个数。 <br>
 
 <br><br>
 
 
+<h4> 代码 </h4>
+<br><br>
+徒手写了一个 decision tree，没有考虑剪枝，好累 <a href="./decision_tree/decision_tree.py"> code </a>
+<br><br><hr>
+<pre>
+import numpy as np
 
+class Tree():
+  def __init__(self):
+    '''
+    for leaf node, 
+      label: 
+        label value which is >=0
+      select_feature:
+      select_feature_val:
+      neg_tree, pos_tree: 
+        useless, None
+
+    for non-leaf node, 
+      label: 
+        useless, -1
+      select_feature: 
+        select feature index to make decision, >=0
+      select_feature_val:
+        select feature value to make decision, int value
+      neg_tree:
+        the Tree() boject to take a look for sample with select_feature value != select_feature_val
+      pos_tree:
+        the Tree() boject to take a look for sample with select_feature value == select_feature_val
+    '''
+
+    self.select_feature = None
+    self.select_feature_val = None
+    self.neg_tree = None
+    self.pos_tree = None
+    self.label = -1
+
+
+
+class DecisionTreeClf():
+  def __init__(self):
+    self.tree = None
+
+  def calc_gini_index_val(Y):
+    labels, counts = np.unique(Y, return_counts = True)
+    total_counts = float(sum(counts))
+    probs = counts / total_counts
+    gini_index_val = 1.0 - sum(probs * probs)
+    return gini_index_val
+
+  def fit(self, X, Y):
+
+    def build_tree(X, Y, feature_list):
+      if Y.shape[0] == 0: # no samples
+        return None
+      if len(feature_list) == 0 or np.max(Y) == np.min(Y): 
+        # no features, or there's only one label in the samples
+        tree = Tree()
+        labels, counts = np.unique(Y, return_counts = True)
+        tree.label = labels[np.argmax(counts)]
+        return tree
+
+      # print('X shape = ', X.shape)
+      # print('Y shape = ', Y.shape)
+      assert X.ndim == 2, 'input X should be an 2 D ndarray'
+      assert Y.ndim == 1, 'input Y should be an 1 D ndarray'
+      assert X.shape[0] == Y.shape[0], 'sample size not match for X/Y'
+      assert Y.dtype == np.int, 'Y datatype should be int'
+      assert X.dtype == np.int, 'X datatype should be int'
+
+      best_feature = -1
+      best_feature_val = None
+      best_gini_val = None
+      best_pos_sample_idx_list = None
+      best_neg_sample_idx_list = None
+
+      for select_feature in feature_list:
+        X_select = X[:, select_feature]
+        select_feature_val_list = np.unique(X_select)
+        if len(select_feature_val) == 1:
+          continue
+        for select_feature_val in select_feature_val_list:
+          pos_sample_idx_list = X_select == select_feature_val
+          neg_sample_idx_list = X_select != select_feature_val
+          pos_Y = Y[pos_sample_idx_list]
+          neg_Y = Y[neg_sample_idx_list]
+
+          pos_gini = calc_gini_val(pos_Y)       
+          neg_gini = calc_gini_val(neg_Y)
+          pos_gini = float(pos_Y.shape[0] / Y.shape[0]) * pos_gini
+          neg_gini = float(neg_Y.shape[0] / Y.shape[0]) * neg_gini
+        
+          feature_val_gini = pos_gini + neg_gini
+          if best_feature == -1 or feature_val_gini < best_gini_val:
+            best_feature = select_feature_val
+            best_feature_val = select_feature
+            best_gini_val = feature_val_gini
+            best_pos_sample_idx_list = pos_sample_idx_list
+            best_neg_sample_idx_list = neg_sample_idx_list
+
+      tree = Tree()
+      tree.select_feature = best_feature
+      tree.select_feature_val = best_feature_val
+      tree.neg_tree = Tree()
+      tree.pos_tree = Tree()
+      remain_feature_list = copy.copy(feature_list)
+      remain_feature_list.remove(select_feature)
+
+      tree.pos_tree = build_tree(X[best_pos_sample_idx_list, :], Y[best_pos_sample_idx_list], tree.neg_tree, remain_feature_list)
+      tree.neg_tree = build_tree(X[best_neg_sample_idx_list, :], Y[best_neg_sample_idx_list], tree.pos_tree, remain_feature_list)
+      return tree
+
+    feature_list = list(range(X.shape[1]))
+    self.tree = build_tree(X, Y, feature_list)
+    self.feature_size = X.shape[1]
+
+
+  def predict(self, X):
+    assert X.shape[1] == self.feature_size
+    tree = self.tree
+    Y = np.zeros((X.shape[0], ), np.int) - 1
+    for sample_idx in range(X.shape[0]):
+      tree = self.tree
+      while tree:
+        if tree.label != None or tree.label == -1:
+          Y[sample_idx] = tree.label
+          break
+        if X[sample_idx, tree.select_feature] == tree.select_feature_val:
+          tree = tree.pos_tree
+        else:
+          tree = tree.neg_tree
+    return Y
+</pre>
 
 
 
@@ -228,7 +438,7 @@ Ha(D) = - SUM_n ( |Dn| / |D| * log(|Dn|/ |D|) )
               
             </div>
             <div class="card-footer text-muted">
-              Posted on 2018-06-22 by Yifei
+              Posted on 2018-06-26 by Yifei
               <!-- <a href="#">Start Bootstrap</a> -->
             </div>
           </div>

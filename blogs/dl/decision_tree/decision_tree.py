@@ -28,15 +28,14 @@ class Tree():
 		self.select_feature_val = None
 		self.neg_tree = None
 		self.pos_tree = None
-		self.label = -1
-
+		self.label = None
 
 
 class DecisionTreeClf():
 	def __init__(self):
 		self.tree = None
 
-	def calc_gini_index_val(Y):
+	def calc_gini_val(Y):
 		labels, counts = np.unique(Y, return_counts = True)
 		total_counts = float(sum(counts))
 		probs = counts / total_counts
@@ -72,13 +71,14 @@ class DecisionTreeClf():
 			for select_feature in feature_list:
 				X_select = X[:, select_feature]
 				select_feature_val_list = np.unique(X_select)
-				if len(select_feature_val) == 1:
-					continue
+				if len(select_feature_val_list) == 1:
+					continue # all value for this feature are the same
+
 				for select_feature_val in select_feature_val_list:
-					pos_sample_idx_list = X_select == select_feature_val
-					neg_sample_idx_list = X_select != select_feature_val
-					pos_Y = Y[pos_sample_idx_list]
-					neg_Y = Y[neg_sample_idx_list]
+					pos_sample_idx_mask = X_select == select_feature_val
+					neg_sample_idx_mask = X_select != select_feature_val
+					pos_Y = Y[pos_sample_idx_mask]
+					neg_Y = Y[neg_sample_idx_mask]
 
 					pos_gini = calc_gini_val(pos_Y)				
 					neg_gini = calc_gini_val(neg_Y)
@@ -87,11 +87,11 @@ class DecisionTreeClf():
 				
 					feature_val_gini = pos_gini + neg_gini
 					if best_feature == -1 or feature_val_gini < best_gini_val:
-						best_feature = select_feature_val
-						best_feature_val = select_feature
+						best_feature = select_feature
+						best_feature_val = select_feature_val
 						best_gini_val = feature_val_gini
-						best_pos_sample_idx_list = pos_sample_idx_list
-						best_neg_sample_idx_list = neg_sample_idx_list
+						best_pos_sample_idx_mask = pos_sample_idx_mask
+						best_neg_sample_idx_mask = neg_sample_idx_mask
 
 			tree = Tree()
 			tree.select_feature = best_feature
@@ -101,8 +101,8 @@ class DecisionTreeClf():
 			remain_feature_list = copy.copy(feature_list)
 			remain_feature_list.remove(select_feature)
 
-			tree.pos_tree = build_tree(X[best_pos_sample_idx_list, :], Y[best_pos_sample_idx_list], tree.neg_tree, remain_feature_list)
-			tree.neg_tree = build_tree(X[best_neg_sample_idx_list, :], Y[best_neg_sample_idx_list], tree.pos_tree, remain_feature_list)
+			tree.pos_tree = build_tree(X[best_pos_sample_idx_mask, :], Y[best_pos_sample_idx_mask], tree.neg_tree, remain_feature_list)
+			tree.neg_tree = build_tree(X[best_neg_sample_idx_mask, :], Y[best_neg_sample_idx_mask], tree.pos_tree, remain_feature_list)
 			return tree
 
 		feature_list = list(range(X.shape[1]))

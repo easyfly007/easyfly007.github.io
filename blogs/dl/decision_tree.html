@@ -113,9 +113,110 @@ print(predict_prob)
 
 <br><br>
 
+再回过头来看一下 sklearn 的 decision tree classifier 接口
+<a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier"> decision tree classifier </a>
 
 <br><br>
 
+以上我们简单的用 sklearn 调用来分类，我们具体来看一下里背后的算法原理。
+
+<br><br>
+以下内容来自 《统计学习方法》 （李航）第五章 -- 决策树
+
+<br><br>
+<h4> 二分类的决策树</h4>
+决策树就是在不断选取一个特征空间的一个特征，设定一个阈值，进行 if-else 的划分。<br>
+这种划分是互斥和完备的。也就是说，每一个样本，按照这种方式进行划分，能被而且只被一条划分的路径涵盖。
+
+<br><br>
+
+以 iris 数据集为例，有 4 个 feature，分贝是 sepal length，sepal width， petal width， petal length
+<br>
+同时有 3 个分类，Iris-Setosa， Iris-Versicolour， Iris-Virginica
+<br><br>
+
+首先选取一个 feature（feature A），在上面设定一个阈值 threshold A（ta），进行两分，小于 ta 的分为一组，大于 ta 的分为另外一组。
+
+再对这两组样本继续在 feature B 上进行分类。
+
+这个过程不断进行，直到样本被完全分好类或者没有 feature 可以供我们进行划分为止。
+
+<h4> 特征选取</h4>
+
+如何选取特征？ 我们用信息增益来衡量每个特征。<br>
+先定义什么叫做熵（entropy）。<br>
+在信息论中，熵表示随机变量不确定性的度量。
+
+<br><br>
+
+比如我们有一堆样本，每个样本的标签可以为 a 也可以为 b。<br>
+如果这些样本都为 a 标签，那么不确定性最低，熵最小。<br>
+如果这些样本处于完全的随机分布，也就是说，一半为 a，一半为 b，那么不确定性最大。<br>
+如果这些样本有 m 个为 a，n 个为 b，m > n，那么这个不确定性为以上两者之间。
+
+<br><br>
+我们给出一个数学上的定义，假设 X 是一个取有限值的离散随机变量，其概率分布为：
+<br><br>
+P(X= x_i) = p_i, i = 1, 2, 3, ..., n
+<br><br>
+H(X) = - SUM_i(p_i * log(p_i))
+<br><br>
+
+我们这里给定 log(0.) = 0.0
+<br>
+这里也可以记为
+<br><br>
+H(p) = - SUM_i(p_i * log(p_i))
+<br><br>
+
+那么我们定义信息增益为：
+特征 A 对训练集 D 的信息增益 g(D, A)， 为 集合 D 的经验熵 H(D) 于 特征 A 给定条件下 D 的经验条件熵 H(D|A) 的差。
+也就是：
+<br><br>
+g(D, A) = H(D) - H(D | A)
+<br><br>
+
+这里所谓的经验的，是因为，我们无法知道实际的真实的分布，我们只能从采样的这些有限的样本中进行估计（特别是极大似然估计）来获得这个分布。（换句话说，我们要是知道实际的真实的分布，根本不用做这个分类器了，直接从该分布得出每种分类的概率即可）。
+
+<br><br>
+根据信息增益准则，我们按照如下规则选取特征：<br>
+对训练集（或者其子集） D, 计算其每个特征的信息增益，并比较他们的大小，选择信息增益最大的特征。
+<br><br>
+
+具体做法如下：
+<br><br>
+设 训练集为 D，大小为 m，有 k 个分类 C_k，k 为 1, 2, 3, ... K, <br>
+设 特征 A 有 n 个不同的取值，a_1, a_2, ..., a_n <br>
+计算信息增益如下：<br>
+
+1. 数据集 D 的经验熵：<br><br>
+H(D) = - SUM_k( |Ck| / |D| * log(|Ck| / |Dk|))
+<br><br><br>
+
+2. 特征 A 对数据集 D 的经验条件熵 H(D|A): <br>
+H(D|A) = SUM_n( |D_n| / |D|) * H(D_n) <br>
+D(D_n) = - SUM_k( |D_nk| / |D| * log2(|D_nk| / |D_n|)) 
+<br><br>
+
+g(D, A) = H(D) - H(D|A) 
+<br><br><br>
+
+以上的根据信息增益最大来选取特征的做法，往往倾向于选择值较多的特征的问题。
+我们可以用信息增益比（information gain ration）来进行校正。
+<br><br>
+
+信息增益比的定义如下：<br>
+gr(D,A) = g(D,A) / Ha(D) <br><br>
+Ha(D) = - SUM_n ( |Dn| / |D| * log(|Dn|/ |D|) )
+
+<br><br>
+<h4> 决策树的生成</h4>
+
+1. ID3 算法<br><br>
+在决策树的各个结点利用信息增益准则选取特征，递归构建决策树。
+具体做法如下：
+
+<br><br>
 
 
 

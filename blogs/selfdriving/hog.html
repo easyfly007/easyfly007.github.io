@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> object detection </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 用于目标检测的 HOG -- histogram of oriented gradients </h2>
+              <p class ='card-text'>
+<br><br>
+
+<a href="https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients"> HOG wiki </a> 
+
+<br>
+
+HOG（梯度方向直方图）可以用来检测物体的轮廓，对于我们识别一个目标物体是非常有用的。
+
+<br><br>
+
+HOG 的计算通过以下步骤实现：<br><br>
+
+1. (可选的) 对图像做全局的归一化 （normalisation）<br>
+2. 像素在计算 x 和 y 轴上的梯度 <br>
+3. 计算在一个 cell 级别上的 梯度直方图 （gradient histograms）<br>
+4. 在 block 级别做归一化 （normalization）<br>
+5. 展开成为一个特征向量 （feature vector）<br>
+
+<br><br>
+第一步的归一化，可以去除光照强度对图像的影响。
+
+<br><br>
+
+第二步用来计算像素的一阶导数（梯度），能够探测到物体的轮廓、纹理以及文字等信息。
+也可以采用二阶的导数，这样就能够探测到一个条状的物体，比如自行车上面的辐条、人的四肢等。
+
+<br><br>
+
+第三步把局部的梯度方向信息投影到直方图的 bin 区间，图形被划分成一个个的 cell 大小，统计每个 cell 内做直方图分布。
+我们还考虑梯度的大小用来产生直方图。
+
+<br><br>
+
+第四步利用周围的 block 级别的区域（每个 block 往往包含了多个 cell）进行归一化。<br>
+每一个cell 的归一化因子是它周围的cell 组成的block的值，所以会发现在每个cell 会归到不同的block 中去计算，多有重复。
+不过 block 级别的normalization 有助于去除光照强度、阴影等对目标检测的影响。
+
+<br><br>
+
+第五步我们需要把生成的 HOG 数据展开成一个向量作为分类器的输入。
+
+<br><br><br>
+
+这也是 
+<a href="https://lear.inrialpes.fr/people/triggs/pubs/Dalal-cvpr05.pdf">Dalal, N. and Triggs, B., 在 “Histograms of Oriented Gradients for Human Detection,” IEEE Computer Society Conference on Computer Vision and Pattern Recognition, 2005, San Diego, CA, USA. </a> 当中的算法。
+
+<br><br>
+
+skimage 提供了 hog 的接口，让我们能够很容易的调用。
+<a href="http://scikit-image.org/docs/dev/auto_examples/features_detection/plot_hog.html"> skimage hog </a>
+<br><br>
+
+<pre>  
+skimage.feature.hog(img, 
+    orientations = 9, 
+    pixels_per_cell = (8, 8), 
+    cells_per_block = (3, 3), 
+    block_norm = None, 
+    visualize = False, 
+    visualise = None, 
+    transform_sqrt = False, 
+    feature_vector = True, 
+    multichannel = None)
+</pre>
+
+<br><br>
+这里需要关注的是：<br><br>
+orientations: <br>
+把 360° 的方向分成多少个 bin，一般来说取 6 - 12 之间。<br>
+这也是生成的方向的 histogram 的 bin 的大小。<br>
+<br><br>
+
+pixels_per_cell: <br><br>
+表示我们统计一个 histogram 的 cell 大小，每个 cell 会生成一个自己的 hitogram，histogram 的 bin 的数量就是 orientations。 <br>
+pixels_per_cell = (x, y),其中 x 和 y 可以有不同的选值，一般会选择相同的值。
+
+<br><br>
+
+cells_per_block: <br>
+每个 block 里面包含多少个 cell， block 是用来做normalization 的。
+<br><br>
+
+visualize: <br>
+若为 True，返回 feature_vector 和 hog_img<br>
+若为 False，返回 feature_vector
+ <br><br>
+
+
+我们来计算一下，image 大小是 64 * 64，<br>
+pixels_per_cell = (8, 8)<br>
+cells_per_block = (2, 3)<br>
+最后展成的向量长度是多少？<br><br>
+
+很容易我们会认为是 8*8*9， 然而并不是。<br><br>
+
+我们应该这么计算： <br>
+block 按照 cell 进行滑动，在图上会产生 7 * 7 个 block <br>
+每个block 里面包含有 2 * 2 的cell，每个cell 的histogram 有9 个bin，<br>
+所以总的维度是 7 * 7 * 2 * 2 * 9 <br>
+
+<br><br>
+
+<pre>
+
+import matplotlib.pyplot as plt
+
+from skimage.feature import hog
+from skimage import data, exposure
+
+
+image = data.astronaut()[:,:,0]
+print('image shape = ', image.shape)
+
+fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
+                    cells_per_block=(2, 2), visualise =True)
+
+print('fd shape = ', fd.shape)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
+
+ax1.axis('off')
+ax1.imshow(image, cmap=plt.cm.gray)
+ax1.set_title('Input image')
+
+# Rescale histogram for better display
+hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+
+ax2.axis('off')
+ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
+ax2.set_title('Histogram of Oriented Gradients')
+plt.show()
+</pre>
+<br><br><img src="./hog/sphx_glr_plot_hog_001.png">
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

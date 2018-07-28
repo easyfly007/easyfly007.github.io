@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 利用 github 来部署自己的博客 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title">利用 github 来搭建自己的网站</h2>
+              <p class ='card-text'>
+<br><br>
+
+我以前也经常写博客，最开始的时候是在歪酷，现在似乎是已经登不上了，那些在上面的博客也不知道在哪里了。<br>
+还有 space 上，不过这个现在也没有了。<br>
+前几年还在新浪的博客上写过，这个倒是还一直在。<br>
+
+<br><br>
+
+期间也注册过自己的网站，但是又要各种备案各种租用服务器什么的，觉得有些头大。
+
+<br><br>
+
+最后发现了 github 的这个page 服务，觉得还不错。
+
+<br><br>
+
+其实我的需求也比较简单：
+<br><br>
+
+1. 能够写写博客，放点个人或者项目介绍等等。<br>
+2. 打理容易，文件上传下载等都比较方便。<br>
+3. 在版面样式上最好能够自定义。<br>
+4. 稳定，不太会在几年内倒闭或者被关掉。<br>
+5. 容易迁移，备份什么要很容易。<br>
+6. 费用低，最好是免费的。<br>
+
+<br><br>
+然后第一个问题是：<br>
+我需要一个动态还是静态的网页？
+
+<br><br>
+动态页面能够实现较为复杂的交互功能，比如用户访问控制、留言等等，但是需要涉及到后台数据库，自己的网站的话需要租用服务器，当然也可以用博客网站。
+
+<br><br>
+静态的页面的话无法提供交互功能，只是一些 html 页面的集合，只能做纯粹的展示功能。<br>
+但是在实现起来会容易很多很多。<br>
+
+<br><br>
+想来想去，我的目标只是一个个人的展示页面，并不关心多少人访问了以及他们的留言。<br>
+所以觉得可以用静态页面来实现。这样我只要懂点 html 就可以来做了。<br>
+
+
+<br><br>
+这个时候就发现了 https://pages.github.com, 它刚好能够符合我的需求。而且实现起来特别简单。
+
+<br><br>
+我们知道在 github 上面我们可以建立自己的代码仓，比如我的 github 用户名是 easyfly007，<br>
+我建立了一个叫做 test 的代码仓，在 https://github.com/easyfly007/test 就可以访问。
+
+<br><br>
+
+为了建立自己的 主页，我只需要创建一个和我的用户名 easyfly007 同名的代码仓，然后登陆 http://easyfly007.github.io
+就可以访问了。
+
+<br><br>
+通过提交一个 index.html 创建第一个主页页面，等待几秒钟，就可以在这个页面看到这个主页了。
+
+<br><br>
+
+当然一个简单的 hello world 页面还是不够的，
+
+<br><br>
+
+找一个漂亮点的模板, <br><br>
+然后建立了几个文件夹，比如一个用来放博客，一个用来放各种项目介绍。<br>
+再给每个文件夹分门别类加上一页索引页面以及模板页面，就都齐活了。<br>
+
+<br><br>
+每次要写篇博客或者什么，直接在模板上写，另存为一个页面，然后更新一下目录页面即可。
+
+<br><br>
+这样做有借好处：<br>
+1. 格式完全的自主可控，精确到网页源代码级别。<br>
+2. 写起来也方便，写完了页面只要 git push 一下就好。<br>
+3. 备份方便，git clone 一下本地都有了，而且在本地打开预览也很方便。<br>
+4. 顺便把 github 的代码提交记录刷的绿油油的，很是好看。<br>
+5. 万一哪天你想建立自己的网站，这些代码和文件可以完全没有问题的重用。
+<br><br>
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

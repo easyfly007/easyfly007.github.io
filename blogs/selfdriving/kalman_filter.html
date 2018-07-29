@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 卡尔曼滤波器 Kalman Filter </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title">卡尔曼滤波器 -- Kalman Filter </h2>
+              <p class ='card-text'>
+<br><br>
+<a href="https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/"> 参考 1 </a>
+
+在车辆目标追踪时（vehicle tracking），我们往往要用到卡尔曼滤波器。
+
+<br><br>
+
+在 object tracking 的过程中，两个步骤反复出现：<br>
+1. 目标移动了，他的状态会随之发生变化，这个状态指的是它的位置、速度等等。 <br>
+2. 测量目标，我们得到了和状态有关的一些信息，比如每隔一定时间我们获取 GPS 定位等等。
+
+<br><br>
+
+每一次，目标状态改变了，我们掌握的对目标的状态的不确定性增加了一点。 <br>
+每一次，我们得到测量的数据，那么对于目标状态的不确定性消除了一点。
+<br><br>
+
+卡尔曼滤波器能够帮助你通过这两个过程对目标的状态进行预测。
+
+<h4> 预测 prediction </h4>
+假设我们有个移动的小车，它的状态包含了它的当前运动的速度以及位置，我们时不时通过 GPU 去定位这个小车的位置，<br>
+但是 GPU 有一定的误差，大概在几米的范围。而且 GPS 只能测量位置，不能测量速度（至少不能直接测量速度）。
+
+<br><br>
+
+x_k = [p_k, v_k], <br>
+# p is the position and v is the velocity <br>
+# k means the time point k 
+<br><br>
+
+<img src="./kalman_filter/gauss_0.png"><img src="./kalman_filter/gauss_1.png" width = "360">
+<br><br>
+一开始假设小车处于状态 x0, 对于 位置p 和速度 v， 存在分布 mu_p0, sigma_p0 以及 mu_v0, sigma_v0。<br>
+这里 mu 和 sigma 都是正态分布的参数，均值和方差。<br>
+
+<br><br>
+在这个图中，我们认为 位置和速度是独立无关的。他们的正态分布是互相独立的。
+
+<br><br>
+但是有时候，速度和位置是有关系的，<br>
+比如我们从原点起步，再间隔一定时间后，我们观测到了新的位置，如果位置更远，往往速度更快。如果位置更近，往往速度更慢。
+如下图所示。
+
+<br><br>
+<img src="./kalman_filter/gauss_2.png">
+<br><br>
+
+这个时候位置和速度的分布就不是互相独立的，而是相关的。<br>
+我们用一个协方差矩阵来描述这种概率上的分布。<br>
+这也是 multi-variable gaussian distribution 的表述。<br>
+
+<br><br>
+在经过一定的时间 dt 之后，我们得到一个新的状态。<br>
+
+<br><br>
+这里从 [p_k1, v_k1] 到 [p_k2, v_k2] 的状态转换，可以用下面的公式来表示，<br>
+p_k2 = p_k1 + Δt * v_k1 <br>
+v_k2 =             v_k1
+
+<br><br>
+或者换成矩阵描述，<br>
+[[p_k2,] ,    [[1, dt],    [[p_k1],]<br>
+[v_k2]]     =  [0, 1]]  *   [v_k1] ]<br>
+<br><br>
+
+我们定义这个转换矩阵为 F_k <br><br>
+<img src="./kalman_filter/eqn01.jpg">
+
+<br><br>
+如果在 k1 时刻的协方差矩阵为 P，根据下面的公式，可知 k2 时刻的协方差矩阵为  F_k * P_k * F_k.T
+<br><br>
+<img src="./kalman_filter/eqn02.jpg">
+<br><br>
+
+这里数学上的证明比较麻烦，作为卡尔曼滤波器的使用者，我们暂时只要记住结论即可<br>
+
+<br><br>
+
+接下来我们考虑更加复杂的。如果外界对物体的移动有一定的作用，又该如何？<br>
+比方说，小车可能在加速或者减速，有一个加速度 a<br>
+那么公式就要变为：<br>
+<br><br>
+<img src="./kalman_filter/eqn03.jpg">
+<br><br>
+这里 B 定义为控制矩阵，当然这个控制过程也会带来误差，比如说加速度 a，就可能处于一个高斯分布，
+<br><br>
+
+a 会带来新的不确定性，导致最终的不确定性增加 <br>
+<br><br>
+<img src="./kalman_filter/eqn04.jpg">
+<br><br>
+这里 Q 是 control 带来的不确定性 variance
+<br><br>
+
+<h4> 测量 measurement </h4>
+<br>
+每一次对状态的测量能够让我们获得更多的信息，哪怕这个测量存在一定的误差或者variance<br>
+一般的，我们测量的数据并不一定就是全部的状态，比如状态有 位置和速度，而我们只能测量位置（或者速度， 或者其他的奇奇怪怪的东西），但是测量的数据可以通过从状态得到。
+
+<br><br>
+
+<img src="./kalman_filter/eqn05.jpg">
+
+<br><br>
+
+我们用一个矩阵 H 表示从状态中得到的测量数值的期望，同时，也能得到测量的误差。
+<br><br>
+
+但是测量本身是带有误差的，比如 GPS 的精度是若干米。
+<br><br>
+<img src="./kalman_filter/gauss_6a.png">
+<br><br>
+
+那么现在的问题变成了，我们发现新的状态有了两种分布，一种是我们预测得到的，一种是我们测量得到的。<br>
+可以认为这两种分布是独立的，也就是说，我测量的精度和预测的状态以及精度没有啥关系。<br>
+我们可以重新计算出一个状态分布，根据最大似然估计，把两者在每一个状态的概率相乘，然后做归一化。
+
+<br><br>
+
+<img src="./kalman_filter/gaussian_joint.png">
+<br><br>
+
+以一维的state 为例，如果独立的到了两个分布，
+<br><br>
+<img src="./kalman_filter/eqn06.jpg">
+
+<br><br>
+
+<img src="./kalman_filter/eqn07.jpg">
+<br><br>
+
+<img src="./kalman_filter/eqn08.jpg">
+<br><br>
+
+在多维的 state 上，公式就变成为了：
+<br><br>
+<img src="./kalman_filter/eqn09.jpg">
+<br><br>
+
+
+以上，我们把所有的公式何在一起，得到了： <br><br>
+<img src="./kalman_filter/eqn10.jpg" width = '360'> <br>
+<img src="./kalman_filter/eqn11.jpg" width = '360'>
+<br><br>
+<!-- 
+假设目标的状态是它的位置信息 x, <br>
+对于一个目标物体，一开始有一个状态分布（比如位置分布），为正态分布，分布的参数为 mu1, sigma1<br>
+随后这个物体进行了移动 movement，但是这个movement 并不是百分之一百确定的，而是处于一个正态分布，参数为
+mu2, sigma2<br>
+经过这个移动之后，新的状态也是一个新的正态分布，均值为 mu1 + mu2, 方差为 sigma1 + sigma2
+
+<br><br>
+
+如果这个我们对这个物体进行测量，测量得到的是一个正态分布，参数为 mu3, sigma3<br>
+那么我们可以更新这个物体的状态，新的正态分布， 均值为 (sigma1 * mu2 + sigma2 * mu1) / (sigma1 + sigma2)，<br>
+
+方差为 1.0 / ( 1.0 / sigma1 + 1.0 / sigma2)
+<br><br>
+
+可以看到，经过movement， 不确定性增加<br>
+经过measurment， 不确定性减小了。
+ -->
+<!-- 
+<pre>
+def update(mean1, var1, mean2, var2):
+    new_mean = float(var2 * mean1 + var1 * mean2) / (var1 + var2)
+    new_var = 1./(1./var1 + 1./var2)
+    return [new_mean, new_var]
+
+def predict(mean1, var1, mean2, var2):
+    new_mean = mean1 + mean2
+    new_var = var1 + var2
+    return [new_mean, new_var]
+
+</pre>
+一是 measurement，二是 prediction。
+
+比如我们对于一个物体处于的状态，我们一开始假定 处于状态 A，
+然后这个物体有所变动，变动完了之后及继续测量，
+
+先手动来做个计算，看看 measurement 如何影响了分布：
+如果一个物体，可以存在的分布位置有
+p = 1，2，3, 4, 5, 6, 7, 8, 9, 10
+每一处 的概率是 0.1, 0.8, 0.1, 0.0, 0, 0, 0, 0, 0, 0, -->
+
+
+<!-- 现在我对他做了测量，发现测量得到的位置是 2， 当然这个测量不是百分之一百准的，
+测量得到的位置是 2， 但是 处于2 的概率是 0.6， 处于 1 的概率是 0.2， 处于 3 的概率是 0.2
+也就是：
+0, 0, 0, 0.2, 0.5, 0.2, 0, 0, 0, 0
+
+问题来了，这个时候，在得知了这样一个测量结构的情况下，如何推测物体的位置分布的概率？
+position = 001, 001, 002, 003, 004, 005, 006, 007, 008, 009, 010
+pre-meas = 0.1, 0.8, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+measures = 0.0, 0.0, 0.0, 0.2, 0.6, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0
+
+这里有一个假定，测量与 pre-meas 是互相独立的。
+也就是说， 测量得到的总是一个 0.0 - 0.5 -0.2 这样的分布，与 0.5 处于哪个位置无关（先不考虑边缘状态）
+
+我们计算物体处于 p0 的概率有:
+pre-meas: 0.1 * measures 0.0 = 0.0
+我们计算处于
+根据贝叶斯定律，
+ -->
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-28 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

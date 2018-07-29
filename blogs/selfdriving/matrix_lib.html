@@ -257,7 +257,22 @@ value 应该是一个二位数组。
         return res
 </pre>
 <br><br>
-利用计算逆矩阵，矩阵必须是方阵
+
+cholesky 分解来计算逆矩阵，矩阵必须是正定矩阵。
+
+<a href="https://en.wikipedia.org/wiki/Cholesky_decomposition"> Cholesky 矩阵分解 </a>
+<a href="https://blog.csdn.net/billbliss/article/details/78559387"> 另外一个中文的文档</a>
+<br><br>
+
+A = L * L.T <br>
+这里 L 是一个下三角矩阵，而且矩阵的对角元都是正的。
+
+比如，<br>
+<img src="cholesky_decomposition_sample1" width = "480">
+<br><br>
+Cholesky() 可以得到一个分解之后的下三角矩阵。<br>
+之后通过这个下三角矩阵，来计算原本矩阵的逆矩阵。 中间用到了对三角矩阵的求逆运算。
+
 
 <br><hr>
 

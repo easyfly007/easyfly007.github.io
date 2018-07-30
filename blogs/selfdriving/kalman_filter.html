@@ -91,7 +91,8 @@ x_k = [p_k, v_k], <br>
 # k means the time point k 
 <br><br>
 
-<img src="./kalman_filter/gauss_0.png"><img src="./kalman_filter/gauss_1.png" width = "360">
+<img src="./kalman_filter/gauss_0.png" height = "360"> &nbsp;&nbsp;
+<img src="./kalman_filter/gauss_1.png" height = "360">
 <br><br>
 一开始假设小车处于状态 x0, 对于 位置p 和速度 v， 存在分布 mu_p0, sigma_p0 以及 mu_v0, sigma_v0。<br>
 这里 mu 和 sigma 都是正态分布的参数，均值和方差。<br>
@@ -105,7 +106,7 @@ x_k = [p_k, v_k], <br>
 如下图所示。
 
 <br><br>
-<img src="./kalman_filter/gauss_2.png">
+<img src="./kalman_filter/gauss_2.png" height = "360">
 <br><br>
 
 这个时候位置和速度的分布就不是互相独立的，而是相关的。<br>
@@ -127,7 +128,7 @@ v_k2 =             v_k1
 <br><br>
 
 我们定义这个转换矩阵为 F_k <br><br>
-<img src="./kalman_filter/eqn01.jpg">
+<img src="./kalman_filter/eqn01.jpg" height = "360">
 
 <br><br>
 如果在 k1 时刻的协方差矩阵为 P，根据下面的公式，可知 k2 时刻的协方差矩阵为  F_k * P_k * F_k.T
@@ -143,14 +144,14 @@ v_k2 =             v_k1
 比方说，小车可能在加速或者减速，有一个加速度 a<br>
 那么公式就要变为：<br>
 <br><br>
-<img src="./kalman_filter/eqn03.jpg">
+<img src="./kalman_filter/eqn03.jpg" height = "240">
 <br><br>
 这里 B 定义为控制矩阵，当然这个控制过程也会带来误差，比如说加速度 a，就可能处于一个高斯分布，
 <br><br>
 
 a 会带来新的不确定性，导致最终的不确定性增加 <br>
 <br><br>
-<img src="./kalman_filter/eqn04.jpg">
+<img src="./kalman_filter/eqn04.jpg" height = "120">
 <br><br>
 这里 Q 是 control 带来的不确定性 variance
 <br><br>
@@ -162,7 +163,7 @@ a 会带来新的不确定性，导致最终的不确定性增加 <br>
 
 <br><br>
 
-<img src="./kalman_filter/eqn05.jpg">
+<img src="./kalman_filter/eqn05.jpg" height = "120">
 
 <br><br>
 
@@ -171,7 +172,7 @@ a 会带来新的不确定性，导致最终的不确定性增加 <br>
 
 但是测量本身是带有误差的，比如 GPS 的精度是若干米。
 <br><br>
-<img src="./kalman_filter/gauss_6a.png">
+<img src="./kalman_filter/gauss_6a.png" height = "360">
 <br><br>
 
 那么现在的问题变成了，我们发现新的状态有了两种分布，一种是我们预测得到的，一种是我们测量得到的。<br>
@@ -180,30 +181,30 @@ a 会带来新的不确定性，导致最终的不确定性增加 <br>
 
 <br><br>
 
-<img src="./kalman_filter/gaussian_joint.png">
+<img src="./kalman_filter/gauss_joint.png" height = "360">
 <br><br>
 
 以一维的state 为例，如果独立的到了两个分布，
 <br><br>
-<img src="./kalman_filter/eqn06.jpg">
+<img src="./kalman_filter/eqn06.jpg" height = "60">
 
 <br><br>
 
-<img src="./kalman_filter/eqn07.jpg">
+<img src="./kalman_filter/eqn07.jpg" height = "180">
 <br><br>
 
-<img src="./kalman_filter/eqn08.jpg">
+<img src="./kalman_filter/eqn08.jpg" height = "240">
 <br><br>
 
 在多维的 state 上，公式就变成为了：
 <br><br>
-<img src="./kalman_filter/eqn09.jpg">
+<img src="./kalman_filter/eqn09.jpg" height = "120">
 <br><br>
 
 
 以上，我们把所有的公式何在一起，得到了： <br><br>
-<img src="./kalman_filter/eqn10.jpg" width = '360'> <br>
-<img src="./kalman_filter/eqn11.jpg" width = '360'>
+<img src="./kalman_filter/eqn10.jpg" height = '60'> <br><br>
+<img src="./kalman_filter/eqn11.jpg" height = '200'>
 <br><br>
 <!-- 
 假设目标的状态是它的位置信息 x, <br>

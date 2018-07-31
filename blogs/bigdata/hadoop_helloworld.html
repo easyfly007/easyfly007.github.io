@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> hadoop 第一个程序 hello world </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> hadoop 第一个程序 </h2>
+              <p class ='card-text'>
+
+我们来用 hadoop 实现第一个功能，统计一个文档中每个单词出现的次数。
+
+<br><br><br><hr>
+常用文件处理步骤：
+
+<br><br>
+1. 下载 txt 文档：<br>
+https://ocw.mit.edu/ans7870/6/6.006/s08/lecturenotes/files/t8.shakespeare.txt
+
+<br><br>
+
+2. 文件另存为 words.txt
+
+<br><br>
+
+3. 启动一个 terminal
+
+<br><br>
+
+4. 把本地文件 words.txt 复制到 hadoop 系统中 <br>
+>> hadoop fs -copyFromLocal words.txt 
+
+<br><br>
+
+5. 可以在 hadoop 中复制 <br>
+>> hadoop fs -cp words.txt words2.txt
+
+<br><br>
+
+6. 查看 hadoop 系统的文件 <br>
+>> hadoop fs -ls
+
+<br><br>
+
+7. 把 hadoop 系统的文件 复制到本地 <br>
+>> hadoop fs -copyToLocal words.txt local_words.txt
+
+<br><br>
+
+8. 删除 hadoop 文档 <br> 
+>> hadoop fs -re words2.txt
+
+<br><br>
+
+<br><br><hr>
+wordcount 的基本操作：
+
+<br><br>
+
+1. 把文档复制到 hdfs 系统 <br>
+>> hadoop fs -copyFromLocal words.txt words3.txt
+
+<br><br>
+
+2. 查看 jar 所提供的一些工具，运行 jar 文件 <br>
+>> hadoop jar /usr/jars/hadoop-examples.jar <br>
+查看可以运行的程序
+
+<br><br>
+
+3. 运行 wordcount <br>
+>> hadoop jar /usr/jars/hadoop-examples.jar wordcount words3.txt out3
+
+<br><br>
+
+4. 查看结果 <br>
+>> hadoop fs -ls <br>
+>> hadoop fs -ls out3
+
+<br><br>
+
+5. 把结果复制到本地 <br>
+>> hadoop fs -copyToLocal out3/part-r-00000 local_out.txt
+
+<br><br>
+
+6. 查看结果 <br>
+>> more local_out.txt 
+
+<br><br>
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-07-31 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

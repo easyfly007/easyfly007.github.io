@@ -64,57 +64,35 @@
 
 
 Vector Space Model
-<br><br>
-操作：
-<br>
-1. 获取文件 <br>
-cd $HOME/Downloads
-wget http://archive.apache.org/dist/lucene/java/5.5.0/lucene-5.5.0.tgz
-tar -xvzf lucene-5.5.0.tgz
 
-<br><br>
-2. cd Downloads/big-data-2/vector
+<br>
+Step 1. Open a terminal shell. 
+Open a terminal shell by clicking on the square black box on the top left of the screen.
+
+>> cd Downloads/big-data-2/sensor
 
 <br><br>
-3. run command
->> ./runLuceneQuery.sh data
+Step 2. View streaming weather station data. 
+Run stream-data.py to see streaming data from the weather station:
 
->>./runLuceneTFIDF.sh data
-
-
-
-
-
-Graph Data Model
-
-<br>
-
-Import a CSV file into Gephi
-Perform statistical operations and layout algorithms on graph data in Gephi
-NOTE: Gephi should be run on your native hardware, not in the Cloudera VM. Instructions for downloading, installing, and running Gephi can be found at https://gephi.org/users/install.
+>> ./stream-data.py
 
 <br><br>
-Step 1. Download and import CSV file. In your web browser, go to the following link:
-<br>
-https://raw.githubusercontent.com/words-sdsc/coursera/master/big-data-2/graph/diseaseGraph.csv
-<br>
-Click on File, and choose Save as to download the file
-<br>
-In Gephi, click on File, and choose Import spreadsheet:
+Step 3. View key for measurements. 
+Run more wxt-520-format.txt to see the key for the measurement fields.
+
+>> more wxt-520-format.txt
 
 <br><br>
-Step 2. Examine graph properties. 
-<br>
-In the middle pane, Gephi displays the graph. 
-<br>
-The black circles are the nodes, and the lines between them are the edges.
 
-<br><br>
-Step 3. Perform statistical operations. 
-<br>
-Below the Context pane, is the Statistics pane, where you can perform various statistical calculations. 
-<br>
-We can calculate the average degree by clicking on Run next to Average Degree.
+Step 4. Create plot of streaming data. 
+We can plot the streaming data by running stream-plot-data.py:
+
+>> ./stream-plot-data.py Sm
+>> ./stream-plot-data.py Ta
+
+
+ 
 
               </p>
               

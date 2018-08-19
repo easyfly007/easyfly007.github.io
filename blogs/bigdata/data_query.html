@@ -62,10 +62,163 @@
               <h2 class="card-title"> BDMS 的数据访问 </h2>
               <p class ='card-text'>
 <br><br>
+<h4>
+SQL 的 query  
+</h4>
 
 
+假设你有这么几个 data table: <br><br>
+
+<hr>
+1. Bar <br>
+&nbsp;&nbsp;name(primary key)<br>
+&nbsp;&nbsp;addr<br>
+&nbsp;&nbsp;license
+
+<br><br><hr>
+
+2. Beers <br>
+&nbsp;&nbsp; name(primary key) <br>
+&nbsp;&nbsp; manf
+
+<br><br><hr>
+
+3. Sells<br>
+&nbsp;&nbsp; bar<br>
+&nbsp;&nbsp; beer<br>
+&nbsp;&nbsp; price<br>
+
+<br><br><hr>
+
+4. Drinkers<br>
+&nbsp;&nbsp; name<br>
+&nbsp;&nbsp; addr<br>
+&nbsp;&nbsp; phone<br>
+
+<br><br><hr>
+
+5. Frequents<br>
+&nbsp;&nbsp; drinker<br>
+&nbsp;&nbsp; beer<br>
+
+<br><br><hr>
+
+6. Likes<br>
+&nbsp;&nbsp; drinker<br>
+&nbsp;&nbsp; beer<br>
+
+<hr>
+
+利用 SQL 我们可以 <br>
+1. 获取 heineken 生产的所有啤酒产品<br>
+<pre>
+  
+SELECT name FROM Beer WHERE manf = 'heineken'
+</pre>
+
+<br><br>
+
+2. 获取所有的高价啤酒 <br>
+<pre>
+  
+SELECT DISTINCT beer, price FROM Sells WHERE price > 15
+</pre>
+
+<br><br>
+
+3. 获取所有在 San Diago 以及执照上时间为32 的酒吧 <br>
+<pre>
+  
+SELECT name FROM Bars WHERE addr LIKE '%SD%' AND license LIKE '32%' LIMIT 5
+</pre>
 
 
+<h4>
+BDMS query
+</h4>
+但是 BDMS 中，数据会非常多，而且会被划分到不同的机器上去，这时如何进行查询？
+
+<br><br>
+Beers table 被按照一定的序列分配在了不同的机器上（range partition），比如，<br>
+以字母A - B 打头的分配在第一台机器，C - D 分配到第二台机器，E 分配到了第三台、第四台机器上
+
+<br><br>
+1. 获取所有以Am 打头的 Beer 产品 <br>
+由于我们已经知道了 partitioning 的规则，我们知道以A 打头的 beer 都在partition 1，所以我们只要在partition 1 进行querey
+
+<br><br>
+2. 获取所有 heineken 生产的 啤酒产品 <br>
+我们对每一个parition 进行query，然后把所有的结果合起来。
+
+<br><br>
+
+3. 找到 那些最喜欢 Great American Bar 的客户最常喝的啤酒 <br>
+<pre>
+  
+SELECT DISTINCET beer FROM Likes L, Frequents F WHERE F.bar = 'Great American Bar' AND F.drinker = L.drinker
+</pre>
+
+这里用的是一个临时的 join table 的数据，然后在这个临时的 join 数据上进行下一步操作。
+<br><br>
+
+但是如果是在一个分布式系统中，要用到的是semijoin，完成的操作步骤如下：<br>
+1.<strong> Project </strong> R on attribute A and call it R[A] -- the drinkers column <br>
+2.<strong> Ship </strong> this projection (a semijoin projection) from the site of R to the site of S
+<br>
+3.<strong> Reduce </strong> S to S' by eliminating tuples where attribute A are not matching any value in R[A]
+
+<br><br>
+<pre>  
+SELECT L.beer from Likes L, Frequents F 
+WHERE 
+  F.bar = 'Great American Bar' 
+  AND F.drinker = L.drinker
+</pre>
+
+<br>
+<img src="./data_query/semijoin.jpg">
+<br><br>
+这里完成的是 F.drinker = L.drinker 一步。<br>
+因为 F 和 L 在不同的机器上，<br>
+1. 从 F 当中 project 出一个 drinker 的 子 table <br>
+2. 把来自于 F 的 drinker 子数据table 从 F 所在的机器上转移到 Likes 所在的机器上 <br>
+3. 对 L table 完成 = 的比较操作，获得进一步操作后的数据
+
+<br><br>
+
+<h4> sub query</h4>
+
+我们要是想要完成一个查询：<br>
+找到符合条件的酒吧，在这些酒吧里，他们卖的miller 啤酒的价钱要比 TBAG酒吧里 bud 的售价便宜。 <br>
+我们可以分两步完成这个查询：<br>
+1. 找到 TBAG 酒吧的 bud的售价 <br>
+2. 找到 符合条件的酒吧（miller 售价比1 要便宜） 
+
+<br><br>
+
+<pre>
+  
+SELECT bar FROM Ssells 
+WHERE 
+  beer = 'Miller' 
+  AND
+  price <= (
+    SELECT price FROM Ssells WHERE bar = 'TBAG' AND beer = 'bud')
+</pre>
+
+
+<br><br>
+再来一个较为复杂的例子：<br>
+找到酒吧里那些售价高于该酒吧啤酒售价平均值的酒和价格
+<br>
+<pre>
+  
+SELECT beer, price FROM Ssells s1
+WHERE price > 
+  (SELECT AVG(price) FROM Sells s2
+  WHERE s1.bar = s2.bar)
+
+</pre>
 
               </p>
               

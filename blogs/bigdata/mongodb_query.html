@@ -216,6 +216,85 @@ db.collection.find(<query filter>, <projection>).<cursor modifier>
 
 </pre>
 
+<h4> aggregation </h4>
+<pre>
+  获取 drinker 总和数目
+  db.Drinkers.count()
+
+  获取 drinker 的 addr 的数目
+  db.Drinkers.count(addr:{$exists: true})
+
+  获取distinct 的数目
+  // raw data
+  Data :{_id: 1, places: [USA, France, USA, Spain, UK, Spain]
+  }
+
+  db.countryDB.distinct(places)
+    ==> return [USA, France, Spain, UK]
+  db.countryDB.distinct(places).length
+    ==> return 4
+</pre>
+
+<br><br>
+
+aggregation 有 Grouping，aggregate，functions，以及 sorting 等
+
+<br>
+
+<img src="./mongodb_query/aggregation.jpg">
+
+<br>
+
+<br>
+<pre>
+db.computers.aggregate(
+  [
+    {
+      $group : {
+        _id: {brand: "$brand", title: "$title", category: "$category", code: "$code"},
+        count: {$sum: 1}
+      }
+    }
+    {
+      $sort: {count: 1, category: -1}
+    }]
+)
+</pre>
+<br><br>
+
+<br><hr>
+文本检索：<br>
+<pre>
+db.articles.aggregate(
+  [
+    {$match: {$text: {$search: "Hillary Democrat"}}},
+    {$sort: {score: {$meta: "textScore"}}},
+    {$project: {title: 1, _id: 0}}])
+</pre>
+
+<br><br><hr>
+JOIN
+<br>
+<img src="./mongodb_query/join.jpg">
+<br>
+<pre>
+  db.orders.aggregate([
+    {$loopup: {
+      from:"inventory",
+      localField:"item",
+      foreignField:"sku",
+      as:"inventory_docs"
+    }}]
+  )
+</pre>
+
+<br>
+得到的结构应该是：<br>
+<img src="mongodb_query/join_result.jpg">
+<br><br>
+其中要注意的是，对于 _id = 3 的order，默认的 item 是 null，在 inventory中也是存在的（5， 6）。 
+
+
               </p>
               
             </div>

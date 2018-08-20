@@ -141,6 +141,45 @@ db.collection.find(<query filter>, <projection>).<cursor modifier>
     </td>
   </tr>
 
+  <tr>
+    <td>
+      <pre>
+        
+      </pre>
+    </td>
+    <td>
+      <pre>
+  sb.Beers.find(
+    name: {$regex: /am/i}).count()
+      </pre>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <pre>
+        
+      </pre>
+    </td>
+    <td>
+      <pre>
+  db.Beers.find(
+    name: {$regex: /^Am/}).count()
+      </pre>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <pre></pre>
+    </td>
+    <td>
+      <pre>
+  db.Beers.count(name: {$regex: /^Am.*corp$/})
+      </pre>
+    </td>
+  </tr>
+
 </table>
 
 <br><br>
@@ -149,7 +188,33 @@ db.collection.find(<query filter>, <projection>).<cursor modifier>
   https://docs.mongodb.com/manual/reference/operator/query/
 </a>
  
+对于 array 的操作：
+<img src="mongodb_query/JSON>jpg">
+<br><br>
+<pre>
+  // find items which are tagged as 'popular' or 'organic'
+  db.inventory.find({tags: {$in: ["popular", "organic"]}})
 
+  // find items which are not tagged as 'popular' nor 'organic'
+  db.inventory.find({tags: {$nin: ["popular", "organic"]}})
+
+  // find the 2nd and 3rd elements of tags
+  db.inventory.find({}, {tags: {$slice: [1,2]}})
+  db.inventory.find({}, tags: {$slice: -2})
+
+  // find a document whose 2nd element in tags is 'summer'
+  db.inventory.find(tags.1: "summer")
+
+  db.inventory.find({
+    $and: [
+      {$or: [{price: 3.99}, {price: 4.99}]},
+      {$or: [{rating: good}, {qty: {$lt: 20}}]}
+      {item: {$ne: "Coors"}}
+    ]
+  })
+
+
+</pre>
 
               </p>
               

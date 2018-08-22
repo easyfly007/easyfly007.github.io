@@ -62,40 +62,147 @@
               <h2 class="card-title"> AeroSpike query data </h2>
               <p class ='card-text'>
 <br><br>
-AeroSpike 获取数据
-<a href="http://www.infoq.com/cn/articles/aerospike-qa">aeroSpike 的一篇介绍的文章 </a>
-<br><br>
+<h4> 获取虚拟机</h4>
 
-Aerospike是一个开源的分布式键－值NoSQL数据库。它支持灵活的数据模式，并且支持满足ACID特性的事务。其架构包括如下三层：
-<br>
-客户端层：这一层包括带有Aerospike API的开源客户端库和能够感知数据在Aerospike集群中位置的追踪节点。<br>
-集群和数据分布层：这一层监控集群通讯并提供一些自动化功能，比如故障转移、数据复制和跨数据中心同步。<br>
-数据存储层：这一层负责在 DRAM（动态随机存取存储器）和 Flash（闪存）中存储数据。
-<br><br>
+<h4> 下载数据</h4>
 
-可以用 javascript 等语言来进行比如这样：
+<h4> 实际操作</h4>
+
+1. Start MongoDB server and MongoDB shell. <br>
+Open a terminal window by clicking on the square black box on the top left of the screen.
+
+
+
+2. Next, change to the mongodb directory, and start the server:
 
 <pre>
-public final IndexTask createIndex(Policy policy, String namespace, String setName, String indexName,
-  String binName, IndexType indexType) throw AerospikeException
-{
-  AerospikeClient client = new AerospikeClient("10.128.5.181", 3000);
-  IndexTask IndexTask = client.createIndex(policy, namespace, setName, "TestIndex", binName, indexType);
-  client.close();
-  return IndexTask;
-  // return client.createIndex(policy, "example", "twitter", "Test Index", "user_name", IndexType.STRING);
-}
+  cd Downloads/big-data-3/mongodb
+  ./mongodb/bin/mongod --dbpath db
+
 </pre>
 
-<pre>
-  
-aql >> show index
+The arguments --dbpath db specify that the directory db should be used for the MongoDB directory for datafiles. After starting the MongoDB server, you will see the following lines indicating that the server is running:
 
+
+3. Next, let's run the MongoDB shell so that we can query the server. Open a new terminal shell window, change to the mongodb directory, and start the shell:
+<pre>
+  cd Downloads/big-data-3/mongodb
+  ./mongodb/bin/mongo
 
 </pre>
 
 
+4. Show Databases and Collections. Run the show dbs command to see the databases:
+<pre>
+  > show dbs
+</pre>
 
+The database named sample has been created and loaded with Twitter JSON data. Let's switch to that database by running the use command:
+<pre>
+  >> use sample
+</pre>
+
+We can see the collections in the sample database by running show collections:
+
+<pre>
+  >> show collections
+</pre>
+The Twitter data is stored in the users collection. We can run db.users.count() to count the number of documents:
+<pre>
+  >> db.users.count()
+</pre>
+
+5. Look at document and find distinct values. We can examine the contents of one of the documents by running db.users.findOne():
+
+<pre>
+  >> db.users.findOne()
+</pre>
+
+The document has several fields, e.g., user_name, retweet_count, tweet_ID, etc., and nested fields under user, e.g., CreatedAt, UserId, Location, etc.
+
+We can find the distinct values for a specific field by using the distinct() command. For example, let's find the distinct values for user_name:
+
+<pre>
+  >> db.users.distinct("user_name")
+</pre>
+
+6. Search for specific field value. We can search for fields with a specific value using the find() command. For example, let's search for user_name with the value ActionSportsJax:
+<pre>
+  >> db.users.find({user_name: "ActionSportsJax"})
+</pre>
+
+By appending .pretty() to the end of the find command, the results will be formatted:
+<pre>
+  >> db.users.find({user_name: "ActionSportsJax"}).pretty()
+</pre>
+
+7. Filter fields returned by query. We can specify a second argument to the find() command to only show specific field(s) in the result. Let's repeat the previous search, but only show the tweet_ID field:
+<pre>
+  >> db.users.find({user_name: "ActionSportsJax"}, {tweet_ID: 1})
+  >> db.users.find({user_name: "ActionSportsJax"}, {tweet_ID: 1, _id: 0})
+</pre>
+
+
+The _id field is primary key for every document, and we can remove it from the results with the following filter:
+
+
+8. Perform regular expression search. MongoDB also supports searching documents with regular expressions. If we search for the value FIFA in the tweet_text field, there are no results:
+
+<pre>
+  >> db.users.find({tweet_text: "FIFA"})
+</pre>
+However, if we search using a regular expression, there are many results:
+
+<pre>
+  >> db.users.find({tweet_text: /FIFA/})
+</pre>
+The difference between the queries is that the first searched for where the tweet_text field value was exactly equal to FIFA, and the second searched for where the field value contained FIFA.
+
+We can append .count() to the command to count the number of results:
+
+<pre>
+  >> db.users.find({tweet_text: /FIFA/}).count()
+</pre>
+
+9. Search using text index. A text index can be created to speed up searches and allows advanced searches with $text. Let's create the index using createIndex():
+
+<pre>
+  >> db.users.createIndex({"tweet_text": "text"})
+</pre>
+
+The argument tweet_text specifies the field on which to create the index.
+
+10, we can use the $text operator to search the collection. We can perform the previous query to find the documents containing FIFA:
+<pre>
+  >> db.users.find({$text:{$search: "FIFA"}}).count()
+</pre>
+
+We can also search for documents not containing a specific value. For example, let's search for documents containing FIFA, but not Texas:
+
+<pre>
+  >> db.users.find({$text:{$search:"FIFA -Texas"}}).count()
+</pre>
+
+11. Search using operators. MongoDB can also search for field values matching a specific criteria. For example, we can find where the tweet_mentioned_count is greater than six:
+<pre>
+  >> db.users.find({tweet_mentioned_count: {$gt: 6}})
+</pre>
+
+The $gt operator search for values greater than a specific value. We can use the $where command to compare between fields in the same document. For example, the following searches for tweet_mentioned_count is greater than tweet_followers_count:
+
+<pre>
+  >> db.users.find({$where: "this.tweet_mentioned_count>this.tweet_followers_count"}).count()
+</pre>
+
+Note that the field names for $where are required to be prefixed with this, which represent the document.
+
+We can combine multiple searches by using $and. For example, let's search for tweet_text containing FIFA and tweet_mentioned_count greater than four:
+
+<pre>
+  >> db.users.find({$and: [{tweet_text:/FIFA/}, {tweet_mentioned_count: {$gt: 4}}]}).count()
+</pre>
+
+When you are done querying MongoDB, run exit in the MongoDB shell, and Control-C in the terminal window running the server.
  
  
 

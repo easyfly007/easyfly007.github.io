@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Pandas 基本操作 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> Pandas 基本操作 </h2>
+              <p class ='card-text'>
+<br><br>
+下面是 pandas 的练习操作 <br><br>
+通过这些操作，我们能够：<br>
+1. 读入一个 csv 文件到 Pandas DataFrame <br>
+2. 显示该 Pandas DataFrame 的内容以及数据 shape <br>
+3. 对行和列进行筛选 <br>
+4. 计算列的avg 和 sum <br>
+5. 合并两个 Pandas DataFrame <br>
+
+<br><hr><br><br>
+1. 启动 jupyter notebook
+<pre>
+  >> jupyter notebook
+</pre>
+
+你可以在以下网页找到 关于 pandas 的基本操作的列表：<br>
+http://pandas.pydata.org/pandas-docs/stable/api.html#computations-descriptive-stats
+
+<br><br>
+
+2. 在 jupyter notebook 中的操作
+<br><br>
+<pre>
+import pandas as pd
+buyclicksDF = pd.read_csv('buy-clicks.csv')
+# print(buyclicksDF)
+
+# to show the top 5 items
+buyclicksDF.head(5)
+
+# to show the data shape
+buyclicksDF.shape
+
+buyclicksDF[['price', 'userId']].head(5)
+buyclicksDF[buyclicksDF['price'] < 3.].head(5)
+
+buyclicksDF['price'].sum()
+
+buyclicksDF['price'].mean()
+
+adclickDF = pd.read_csv('ad-clicks.csv')
+
+adclickDF.head(5)
+mergeDF = adclickDF.merge(buyclicksDF, on = 'userId')
+mergeDF.head(5)
+
+</pre>
+
+你可以亲自操作一下，看看结果是什么
+
+
+ 
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-08-23 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

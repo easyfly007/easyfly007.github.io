@@ -62,19 +62,107 @@
               <h2 class="card-title"> Splunk 基础 </h2>
               <p class ='card-text'>
 <br><br> 
-<h4> splunk 的安装 </h4>
-
+0. Splunk 的安装
+<br><br>
 可以从下面地址来下载 Splunk，版本是 6.2.2 <br>
 
 https://www.splunk.com/page/previous_releases
 
 <br><br>
+
 splunk tutorial： <br>
 http://docs.splunk.com/Documentation/Splunk/latest/SearchTutorial/WelcometotheSearchTutorial
 
+<br><br>
+
 比较建议在你自己的 PC 上面安装 Splunk。
 
+<br><br>
 
+安装好之后，会提示你需要更换用户名
+
+<br><hr><br>
+
+1. 启动并登录 Splunk <br>
+打开浏览器输入 localhost:8000
+
+<br><br>
+
+2. 载入文件 <br>
+载入的 csv 文件可以在下面找到
+<a href="./splunk/census.csv"> csv</a>
+<br>
+选择 source type 为 csv
+<br>
+选择 next，直到 submit
+
+<br><br>
+
+3. 搜索 <br>
+Splunk 为你写了一条默认的 search 语句 <br>
+
+<pre>
+source="census.csv" host="DESKTOP-K1NJT4U" sourcetype="csv"
+</pre>
+<br>
+会显示如下的内容： <br>
+<img src="./splunk/search01.jpg" width = "1000">
+
+<br><br>
+
+4. 过滤 <br>
+你可以在 search 语句中添加： <br>
+
+<pre>
+STNAME = "Texas"
+</pre>
+<br>
+或者
+<br>
+<pre>
+STNAME = "Califonia" OR STNAME = "Texas"
+</pre>
+
+<br>
+对于输出的内容，我们可以用管道 | 来进行管理，这里 | 的含义和 linux 命令中的管道差不多
+
+<br>
+<pre>  
+source="census.csv" host="DESKTOP-K1NJT4U" sourcetype="csv" STNAME = "Texas" | table CTYNAME
+</pre>
+
+<br>
+这样只显示 CTYNAME 这个条目了。
+
+<br><br>
+5. 排序
+可以添加更多的操作，比如排序
+<pre>
+CENSUS2010POP > 10000 | sort CENSUS2010POP desc | table CENSUS2010POP, STNAME
+CENSUS2010POP > 10000 | sort -CENSUS2010POP | table CENSUS2010POP, STNAME
+</pre>
+
+<br> 
+这里 desc 与 -的作用是一样的
+
+<br><br>
+6. 图表 <br>
+点击 visulization 可以输出图 <br>
+<img src="./splunk/visual01.jpg" width = "1000">
+
+<br><br>
+7. 统计分析 <br>
+比如计算 count， 输出 data 的数目 <br>
+<pre>
+ | stats count 
+</pre>
+
+<br><br>
+统计总和以及均值<br>
+<pre>
+| stats sum(CENSUS2010POP)
+| stats mean(CENSUS2010POP)
+</pre>
 
  
 

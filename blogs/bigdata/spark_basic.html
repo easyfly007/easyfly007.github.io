@@ -62,7 +62,58 @@
               <h2 class="card-title"> Spark 基础练习 </h2>
               <p class ='card-text'>
 <br><br> 
+1. 下载 cloudera 的虚拟机：
+<a href="https://downloads.cloudera.com/demo_vm/virtualbox/cloudera-quickstart-vm-5.4.2-0-virtualbox.zip"> cloudera</a>
+<br>
+下载并且安装 virtualBox，导入这个解压好的虚拟机
 
+<br><br>
+
+2. 我们利用 spark 来完成下列任务：<br>
+通过 Spark 读入 text 文本文件到 HDFS
+
+
+3. 利用Spark Python 实现 单词记数功能
+
+3.1 加载 wordcount.txt 到 HDFS
+<pre>
+  $ hadoop fs -ls
+</pre>
+请确保 words.txt 已经在 hadoop 的HDFS 中了。
+如果没有的话，需要载入。
+
+<pre>
+  $ hadoop fs -put words.txt
+  $ hadoop fs -ls
+</pre>
+
+3.2 在 ipython notebook 完成
+
+<pre>
+  from pyspark import SparkContext as sc
+
+  lines = sc.textFile('hdfs:/user/cloudera/words.txt')
+  lines.count()
+</pre>
+
+<pre>
+  words = lines.flatMap(lambda line: line.split(" "))
+</pre>
+
+<pre>
+  tuples = words.map(lambda word :(word, 1))
+</pre>
+
+<pre>
+  sounts = tuples.reduceByKey(lambda a, b: (a + b))
+</pre>
+
+<pre>
+  counts.coalesce(1).saveAsTextFile('hdfs:/user/cloudera/wordcount/outputDir')
+</pre>
+
+$ hadoop fs -copyToLocal wordcount/outputDir/part-0000 count.txt
+$ more count.txt
 
 
               </p>

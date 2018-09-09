@@ -69,7 +69,88 @@
 3. 聚合操作 <br>
 4. Join 操作 <br>
 
- 
+<br><hr><br>
+1. 启动 PySpark，<br>
+在网页访问： localhost:8889/tree/Downloads/big-data-3/spark-sql
+
+<br><br>
+2. 连接数据 <br>
+<pre>
+  from pyspark.sql import SQLContext
+  sqlsc = SQLContext(sc)
+  df = sqlsc.read.format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost/cloudera?user=cloudera") \
+    .option("dbtable", gameclocks) \
+    .load()
+
+</pre>
+<br><br>
+这里，<br>
+format("jdbc") 意味着，DataFrame 源将会使用一个 Java 数据库连接，<br>
+url 选项将会通过该 url 连接到 Postgres 数据库， <br>
+dtable 选项 表示选择 gameclocks table。 
+
+<br>
+
+3. 概览数据 <br>
+<pre>
+  df.printSchema()
+  df.count()
+</pre>
+
+<br><br>
+
+4. 查看数据 <br>
+<pre>
+  df.show(5)
+</pre>
+
+<br><br>
+
+5. 列选择<br>
+<pre>
+  df.select("userid","teamlevel").show(5)
+</pre>
+
+<br><br>
+
+6. 行选择 <br>
+<pre>
+  df.filter(df["teamlevel"] >1 ).select("userid", "teamlevel").show(5)
+</pre>
+
+<br><br>
+
+7. group <br>
+<pre>
+  df.groupBy("ishit").count().show()
+</pre>
+
+<br><br>
+
+8. avg 和 sum <br>
+<pre>
+  from pyspark.sql.function import mean, sum
+  df.select(mean("ishit"), sum("ishit")).show()
+</pre>
+
+<br><br>
+
+9. join <br>
+<pre>
+  df2= sqlsc.read.format("jdbc")\
+    .option("url", "jdbc:postgresql://localhost/cloudera?user=cloudera") \
+    .option("dbtable", "adclocks") \
+    .load()
+
+    df2.printSchema()
+    merge = df.join(df2, "userid")
+    merge.printSchema()
+    merge.show(5)
+
+</pre>
+
+
 
               </p>
               

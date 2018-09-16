@@ -95,6 +95,12 @@ cdls() {
 alias cd='cdls'
 </pre>
 
+4. 在特定后缀的文件名中检索
+<br>
+<pre>
+  alias cha 'find . name "*" -print | xargs grep -n -i'
+  alias chacc 'find . name "*.cc" -print | xargs grep -n -i'
+</pre>
 
 
               </p>

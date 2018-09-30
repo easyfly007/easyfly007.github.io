@@ -70,138 +70,195 @@
 
 1. 启动 MongoDB 服务器以及 MongoDB shell. <br>
 
-
-
-2. Next, change to the mongodb directory, and start the server:
-
 <pre>
-  cd Downloads/big-data-3/mongodb
-  ./mongodb/bin/mongod --dbpath db
+  $ cd Downloads/big-data-3/mongodb
+  $ ./mongodb/bin/mongod --dbpath db
 
 </pre>
 
-The arguments --dbpath db specify that the directory db should be used for the MongoDB directory for datafiles. After starting the MongoDB server, you will see the following lines indicating that the server is running:
+--dbpath db 指定了哪个数据库需要运行，而这个数据库的内容存放在一个文件夹里面。
 
+<br><br>
 
-3. Next, let's run the MongoDB shell so that we can query the server. Open a new terminal shell window, change to the mongodb directory, and start the shell:
+2. 启动另外一个 terminal，运行 MongoDB shell，我们所有的操作都在 shell 中完成。
+
+<br><br>
+
 <pre>
-  cd Downloads/big-data-3/mongodb
-  ./mongodb/bin/mongo
+  $ cd Downloads/big-data-3/mongodb
+  $ ./mongodb/bin/mongo
 
 </pre>
 
+<br><br>
 
-4. Show Databases and Collections. Run the show dbs command to see the databases:
+3. 查看 database 和 collections
+<br><br>
+
 <pre>
-  > show dbs
+  $ show dbs
 </pre>
 
-The database named sample has been created and loaded with Twitter JSON data. Let's switch to that database by running the use command:
+<br><br>
+我们要用到的是名字叫做 sample 的数据库。
+它里面包含了很多 Twitter JSON 数据。
+<br>
+我们进入这个数据库。
 <pre>
-  >> use sample
+  $ use sample
 </pre>
 
-We can see the collections in the sample database by running show collections:
+我们可以查看这个数据库下面的 collections
 
 <pre>
   >> show collections
 </pre>
-The Twitter data is stored in the users collection. We can run db.users.count() to count the number of documents:
+Twitter 数据都保存在 users collection 下面。 一个collection 有点像 SQL 中的table。
+
+我们看一下 users 下面有多少数据（也就是有多少 document）
+
 <pre>
   >> db.users.count()
 </pre>
+<br><br>
 
-5. Look at document and find distinct values. We can examine the contents of one of the documents by running db.users.findOne():
+4. 查看一个数据
 
+<br><br>
 <pre>
   >> db.users.findOne()
 </pre>
 
-The document has several fields, e.g., user_name, retweet_count, tweet_ID, etc., and nested fields under user, e.g., CreatedAt, UserId, Location, etc.
+<br>
+你能发现 这个document 有多个 fields，比如 user_name, retweet_count, tweet_ID 等。
+以及，对于 user，还有更深层次的 item，比如 CreateAt, UserId, Location 等等。
 
-We can find the distinct values for a specific field by using the distinct() command. For example, let's find the distinct values for user_name:
+<br><br>
+我们可以用 distinct 命令来获取一些 item
+
+<br><br>
 
 <pre>
   >> db.users.distinct("user_name")
 </pre>
 
-6. Search for specific field value. We can search for fields with a specific value using the find() command. For example, let's search for user_name with the value ActionSportsJax:
+<br><br>
+
+5. 查找，用的最多的是 find 命令，
+比如我们要招 user_name 为 ActionSportsJax 的那个 item
+
+<br><br>
+
 <pre>
   >> db.users.find({user_name: "ActionSportsJax"})
 </pre>
-
-By appending .pretty() to the end of the find command, the results will be formatted:
+<br><br>
+利用 pretty() 命令，我们更够以可读性更强的方式展现结果。
+<br><br>
 <pre>
   >> db.users.find({user_name: "ActionSportsJax"}).pretty()
 </pre>
+<br><br>
 
-7. Filter fields returned by query. We can specify a second argument to the find() command to only show specific field(s) in the result. Let's repeat the previous search, but only show the tweet_ID field:
+6. 筛选 <br><br>
+在 find 命令可以包含两个参数，第一个表示筛选的条件，第二个表示筛选的 item
+<br><br>
+
 <pre>
   >> db.users.find({user_name: "ActionSportsJax"}, {tweet_ID: 1})
   >> db.users.find({user_name: "ActionSportsJax"}, {tweet_ID: 1, _id: 0})
 </pre>
 
+默认的，有一个 _id 会被筛选显示，你可以设置 _id:0 来丢弃它。  
 
-The _id field is primary key for every document, and we can remove it from the results with the following filter:
 
-
-8. Perform regular expression search. MongoDB also supports searching documents with regular expressions. If we search for the value FIFA in the tweet_text field, there are no results:
-
+7. 正则匹配
+利用 regex 来匹配含有通配符的表达式。
+比如下面这样，你是用来查找 tweet_text 完全匹配为 FIFA 的，没有找到。
 <pre>
   >> db.users.find({tweet_text: "FIFA"})
 </pre>
-However, if we search using a regular expression, there are many results:
+
+<br><br>
+但是你可以检索包含有 FIFA 字眼的，利用通配符表达式。
+
+<br><br>
 
 <pre>
   >> db.users.find({tweet_text: /FIFA/})
 </pre>
-The difference between the queries is that the first searched for where the tweet_text field value was exactly equal to FIFA, and the second searched for where the field value contained FIFA.
 
-We can append .count() to the command to count the number of results:
+<br><br>
+我们可以用 count() 对 find 的结果统计数目。
+
+<br><br>
 
 <pre>
   >> db.users.find({tweet_text: /FIFA/}).count()
 </pre>
 
-9. Search using text index. A text index can be created to speed up searches and allows advanced searches with $text. Let's create the index using createIndex():
+<br><br>
+
+8. 利用文本索引 text index。
+可以创建一个文本索引，用来加速查找，以及允许更加高级的查找
+
+我们先来创建一个 index 索引，用 createIndex() 命令就好。
+
+<br><br>
 
 <pre>
   >> db.users.createIndex({"tweet_text": "text"})
 </pre>
+<br><br>
+这样我们对 tweet_index 创建了 text 索引，叫做 text
 
-The argument tweet_text specifies the field on which to create the index.
+<br><br>
 
-10, we can use the $text operator to search the collection. We can perform the previous query to find the documents containing FIFA:
+9. 利用我们已经建立好的索引，我们进一步进行检索。
+注意这里的 search 相当于 /FIFA/
+<br><br>
+
 <pre>
   >> db.users.find({$text:{$search: "FIFA"}}).count()
 </pre>
 
-We can also search for documents not containing a specific value. For example, let's search for documents containing FIFA, but not Texas:
+<br><br>
+我们同时可以做相反的事情，返回哪些不匹配的。
+比如包含 FIFA 但是不包含 Texas 的
 
+<br><br>
 <pre>
   >> db.users.find({$text:{$search:"FIFA -Texas"}}).count()
 </pre>
 
-11. Search using operators. MongoDB can also search for field values matching a specific criteria. For example, we can find where the tweet_mentioned_count is greater than six:
+<br><br>
+
+10. 其他的逻辑表达式，比如 与 或 非等等。以及 逻辑判断符号，>,<,==, >=, <= 等等。
+
+<br><br>
+
 <pre>
   >> db.users.find({tweet_mentioned_count: {$gt: 6}})
 </pre>
 
-The $gt operator search for values greater than a specific value. We can use the $where command to compare between fields in the same document. For example, the following searches for tweet_mentioned_count is greater than tweet_followers_count:
+<br><br>
+$gt 表示 >, $lt 表示 <，下面就是返回那些数据，他的twette_mentioned_count 大于 它的 tweet_followers_count
 
+<br><br>
 <pre>
   >> db.users.find({$where: "this.tweet_mentioned_count>this.tweet_followers_count"}).count()
 </pre>
 
-Note that the field names for $where are required to be prefixed with this, which represent the document.
+<br><br>
 
-We can combine multiple searches by using $and. For example, let's search for tweet_text containing FIFA and tweet_mentioned_count greater than four:
+当然也可以加上更加复杂的逻辑表达式咯。
+
+<br><br>
 
 <pre>
   >> db.users.find({$and: [{tweet_text:/FIFA/}, {tweet_mentioned_count: {$gt: 4}}]}).count()
 </pre>
-
-When you are done querying MongoDB, run exit in the MongoDB shell, and Control-C in the terminal window running the server.
+<br><br>
  
  
 

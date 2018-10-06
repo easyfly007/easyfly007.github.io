@@ -63,21 +63,23 @@
               <p class ='card-text'>
 <br><br>
 
-启动 Spark Streaming 需要至少两个 CPU 处理器内核。
+启动 Spark Streaming 需要至少两个 CPU 处理器内核。 <br><br>
 
-接下来我们要完成以下操作：
-1. 读取 streaming 数据到 Spark 中
-2. 基于时间窗口的数据获取和处理
+接下来我们要完成以下操作：<br>
+1. 读取 streaming 数据到 Spark 中 <br>
+2. 基于时间窗口的数据获取和处理 <br>
 
 <br><hr><br>
 
-1. 启动 PySpark 和 streaming
+1. 启动 PySpark 和 streaming <br><br>
 
-pyspark，启动 浏览器，输入 
-localhost:8889/tree/coursera/big-data=3/spark-streaming
+pyspark，启动 浏览器，输入 <br>
+localhost:8889/tree/coursera/big-data=3/spark-streaming <br>
 打开 Spark-Streaming.ipynb 文件
 
-2. 定义一个辅助函数
+<br><br>
+
+2. 定义一个辅助函数 <br>
 <pre>
   import re
   def parse(line):
@@ -87,6 +89,8 @@ localhost:8889/tree/coursera/big-data=3/spark-streaming
       return [int(val)]
     return []
 </pre>
+
+<br><br>
 
 3.
 <pre>

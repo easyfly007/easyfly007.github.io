@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> bigdata machine learning - KNIME </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> KNIME 的安装和使用 </h2>
+              <p class ='card-text'>
+<br><br>
+1. 下载并安装 KNIME，在你的 windows PC 上就可以。
+<br>
+<a href="https://www.knime.com/downloads?quicktabs_knimed=1#quicktabs-knimed">
+  https://www.knime.com/downloads?quicktabs_knimed=1#quicktabs-knimed
+</a>
+
+<br><br>
+2. 启动 KNIME，你会看到界面：<br>
+<img src="./machine_learning_knime/workbench-descriptions.png" width = "680">
+
+<br><br>
+3. 下载原始文件 <br>
+<a href="./machine_learning_knime/iris.csv">iris.csv</a>
+<a href="./machine_learning_knime/Example-Workflow.zip"> example workflow.zip</a>
+我们利用提供的 sample workflow来作为示例，在这个样本 workfolw 中，将会完成：<br>
+> 1. 一个 File Readere node，用来导入 iris dataset<br>
+> 2. 一个 Color Manager node 来可视化的显示属性<br>
+> 3. 一个 statistics node 来计算一些统计信息<br>
+> 4. 一个 Partitioning node 来把 dataset 分成训练集和测试集<br>
+> 5. 一个 Decision Tree Learner 会利用训练数据集来生成一个预测模型<br>
+> 6. 一个 Ddecision Tree Predictor 会在测试机上进行过测试。<br>
+> 7. 一个 Score node 用来衡量 model 的性能<br>
+> 8. 一个 Interactive Table node 用来遍历那些分错的样本<br>
+> 9. 一个 Scattere Plot node 用来展示这些样本。<br>
+
+
+<br><br>
+4. 
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-10-06 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

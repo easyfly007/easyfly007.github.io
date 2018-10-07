@@ -69,13 +69,15 @@
 </a>
 
 <br><br>
-2. 启动 KNIME，你会看到界面：<br>
+2. 启动 KNIME，你会看到界面：<br><br>
 <img src="./machine_learning_knime/workbench-descriptions.png" width = "680">
 
 <br><br>
-3. 下载原始文件 <br>
+3. 下载原始文件 <br><br>
 <a href="./machine_learning_knime/iris.csv">iris.csv</a>
 <a href="./machine_learning_knime/Example-Workflow.zip"> example workflow.zip</a>
+<br><br>
+
 我们利用提供的 sample workflow来作为示例，在这个样本 workfolw 中，将会完成：<br>
 > 1. 一个 File Readere node，用来导入 iris dataset<br>
 > 2. 一个 Color Manager node 来可视化的显示属性<br>
@@ -89,7 +91,66 @@
 
 
 <br><br>
-4. 
+4. 导入已经生成好的 KNIME work flow，也就是那个 Example-Workflow.zip 文件。
+
+<br><br>
+
+5. 在 node repository 中找到 Column Filter node，拖拽到 workflow 主窗口<br>
+用过鼠标将 COlulmn Filter node 的输入与 Filer Reader node 的输出相连。
+<br> <br>
+<img src="./machine_learning_knime/adding-a-node.png" width = "480">
+<img src="./machine_learning_knime/module2_drag.png" width = "240"> <br>
+
+<br><br>
+
+6. 设置 Column Filter node 的 config <br>
+我们只要保留 petal length 和 petal width 就好，把 sepal length 和 sepal width 去掉。 <br><br>
+<img src="./machine_learning_knime/module2_configure.png" width = "680">
+
+<br><br>
+
+7. 由于我们要从 Column Filter 来进行 color manager，删掉一根连线 connection，同时生成一根新的连线 <br><br>
+<img src="./machine_learning_knime/module2_delete.png" width = "680">
+
+<br><br>
+
+8. node 的状态，我们看到每个node 下面都有三个灯，示意如下：<br><br>
+<img src="./machine_learning_knime/states.png" width = "680">
+
+<br><br>
+
+9. 我们execute 一下 Column Filter node，然后右键点击 filtered table，可以看到筛选后的数据。
+
+<br><br>
+
+10. 在对应的node 都execute 之后，我们可以对最后的 scatter plot 右键点击下 View: Scatter Plot
+<br><br>
+<img src="./machine_learning_knime/module2_viewgraph.png" width = "680"> <br>
+<img src="./machine_learning_knime/scatter.png" width = "680">
+
+<br><br>
+
+11. 保存你的结果
+
+<br><br><br>
+有很多的参考资料可以看： <br><br>
+<a href="www.knime.org"> KNIME website</a>
+<br>
+<a href="https://tech.knime.org/knime">KNIME Getting Started</a>
+<br>
+<a href="https://www.knime.org/knime-online-self-training">KNIME Online Self-Training</a>
+<br>
+<a href="https://tech.knime.org/files/KNIME_quickstart.pdf">KNIME Quickstart Guide</a>
+<br>
+<a href="https://www.knime.org/files/node-documentation/index.html">KNIME Node Documentation</a>
+<br>
+<a href="https://www.knime.org/learning-hub">KNIME Learning Hub</a>
+<br>
+<a href="https://tech.knime.org/knime-community">KNIME Community</a>
+<br>
+<a href="http://tech.knime.org/knime-labs">KNIME Labs</a>
+
+
 
               </p>
               

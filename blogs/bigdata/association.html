@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> 关联分析 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title">  关联分析 </h2>
+              <p class ='card-text'>
+在机器学习中，我们对回归和分类会比较了解，对于无监督学习的聚类分析也会有所了解，而在这里，我要简单介绍一下关联分析的算法。
+<br><br>
+关联分析最有名的例子，是从客户的购买列表中找出规律，发现买了啤酒的人往往也买了尿布，于是把这两者放在一起，结果同时增加了尿布和啤酒的销量。
+
+<br><br>
+
+从原始数据出发，也就是很多组购物清单，我们如何从中找出规律呢？
+<br>
+
+比如，我们有
+<br>
+< 啤酒，尿布，牛奶><br>
+< 啤酒，尿布><br>
+< 啤酒，牛奶><br>
+< 面包，尿布，牛奶><br>
+< 花生，啤酒><br>
+。。。
+
+<br><br>
+
+1. 首先我们从中列出哪些一元组、二元组、三元组
+<br><br>
+
+比如一元组<br>
+ <啤酒>, < 尿布>, <牛奶>
+
+<br><br>
+二元组<br>
+<啤酒，尿布> <啤酒，牛奶> <面包，牛奶>...
+
+<br><br>
+三元组<br>
+<啤酒，尿布，牛奶> <面包，尿布，牛奶>
+<br><br>
+
+2. 删除出现次数少于给定阈值的，比如不得少于两次，那么二元组里面的 <啤酒，牛奶> 会保留下来，而有些出现次数太少的会被除去。<br>
+这是因为，我们会有非常多的商品，如果两两组合，会是一个非常大的数字
+
+<br><br>
+
+3. 计算每个 n元组出现的概率，p 等于 出现的清单数目除以总共的清单数目
+<br><br>
+
+4. 如果我们要计算，在购买了 啤酒的情况下，购买尿布的概率，那么等于 p(啤酒，尿布) / p(啤酒)
+<br><br>
+就是这么简单。
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-08-02 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> c 语言中的 const 的用法 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> c 语言中的 const 关键字用法 </h2>
+              <p class ='card-text'>
+<br><br>
+在 c 语言中，对于 const 关键字，很容易记错，我做了一下小小的总结：
+<br><br>
+
+1. 定义一个整数变量 <br>
+
+<pre>
+int a;
+int b = 6;
+</pre>
+
+<br><br>
+
+2. 定义一个指向整数变量的指针：<br>
+
+<pre>
+int a = 6;
+int * pa = &a;
+</pre>
+<br><br>
+
+3. 定义一个常量，并且在申明的时候给定值的大小。（在申明了之后我们无法赋值了）
+<pre>
+int const a = 5;
+const int b = 6;
+</pre>
+
+这里，const 关键字 位于 int 左边还是右边，都是同样的效果。
+
+<br><br>
+
+4. 定义一个指针，这个指针指向一个整数常量 <br>
+我们只要在 3 的基础上写一个 * 就好了
+<br>
+<pre>
+int const a = 5;
+int const b = 6;
+int const * pa = &a;
+pa = &b;
+
+const int *pb = &b;
+pb = &b; 
+</pre>
+<br><br>
+
+5. 定义一个常量指针，这个指针指向一个整数。
+也就是说，这个指针永远指向一块固定的内存，不能改变这个指针使得它指向别的地址。
+但是我们可以改变这块内存的内容。
+
+<pre>
+
+int a = 5;
+int * const pa = &a;
+
+*pa = 6;
+// 此时 a 被改变为6
+</pre>
+<br><br>
+
+6. 定义一个 function，他的参数是 const 的 <br>
+这表示，在function 内部，参数是不能被改变的。<br>
+一般我们往往和 引用一起使用，使得在参数被调用的时候，不必要重新copy 参数，而是直接利用参数，同时又保证不改变参数。
+
+<br><br>
+
+<pre>
+Pointer center(const Pointer &a, const Pointer &b)
+{
+  Pointer p = (a + b) / 2;
+  return p;
+}
+</pre>
+<br><br>
+这里利用 引用避免了复杂的数据结构 Pointer a 和 b 在函数调用过程中的复制开销，又避免了在函数内部 a 和 b 被一不小心改变掉。
+
+<br><br>
+7. 定义一个 类的成员函数，该成员函数是 const 的 <br>
+表示这个成员函数的调用，不会改变类的成员的大小，比如说，该函数是一个 get 类型的函数而不是一个 set 类型的函数。
+<br>
+<pre>
+class Cls{
+  public:
+    Cls(int d = 0){_d = d;}
+    int get() const {return _d;}
+    void set(int d) {_d = d;}
+}
+</pre>
+<br><br>
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-12-06 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

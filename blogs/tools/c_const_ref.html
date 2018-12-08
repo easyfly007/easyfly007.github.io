@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> c 语言中的 const 和引用 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> c 语言中对于引用的一点理解 </h2>
+              <p class ='card-text'>
+<br><br>
+
+先看一段代码：
+
+<pre>
+#include <iostream>
+#include "stdlib.h"
+using namespace std;
+
+class Cls{
+public:
+  int val;
+};
+
+Cls operator+(Cls a, int val){
+  Cls b;
+  b.val = a.val + val;
+  return b;
+}
+
+void func01(Cls a){
+  cout <<"func01" << endl;
+  cout "val = " << a.val << endl;
+}
+
+void func02(Cls &a){
+  cout <<"func02" << endl;
+  cout "val = " << a.val << endl;
+}
+
+void func03(const Cls &a){
+  cout <<"func03" << endl;
+  cout "val = " << a.val << endl;
+}
+
+int main(){
+  Cls a;
+  a.val = 4;
+  
+  // func01(a);
+  // func01(a+2);
+
+  // func02(a);
+  // func02(a+2);
+
+  // func03(a);
+  // func03(a+2)；
+
+  return 0;
+}  
+</pre>
+<br><br>
+
+当我们依次打开调用 func01， func02， func03 的时候，会发现 func01 和 func03 编译通过，输出正确，而 func02 编译出错，出错信息：<br>
+ cannot bind non-const lvalue reference of type 'Cls&' to an rvalue of type 'Cls'
+
+ <br>
+这是为什么？
+<br><br>
+
+我们知道，运算符重载，你也可以看作是一种函数调用，只不过这个函数的形式看上去像一个运算符而已，其实它就是函数调用，两个参数是 a 和 2。
+运算符函数的返回值是一个 Cls 的对象。
+
+<br><br>
+
+问题在于，这个对象存放在哪里？它的生存的时间是多少？
+<br><br>
+
+由于我们并没有把这个返回的对象赋给某个变量，所以这是一个临时的对象。<br><br>
+
+这个临时的对象在 operator + 返回的时候生成，然后传递给func01 或者 func02 或者func03（用某种方式），然后释放掉。
+<br><br>
+
+具体而言，对于 func01， 传递进来的参数是传值进来的，也就是说，func01 里面的 a 和外面的临时对象不是同一个，而是复制了一份。
+
+<br><br>
+
+这个时候，哪怕外边的 临时对象被释放掉了，里面的 a 还是有效存在的。所以 func01 能够编译通过。
+
+<br><br>
+
+对于 func02 就不一样了，func02 通过引用传进来 a，函数里面的 a 和外面的临时对象其实是同一个东西。
+<br>
+当外面的临时对象被释放的时候，里边的 a 也就不存在了，因此编译出错。
+<br><br>
+
+对于 func03， 由于我们对 func03 的参数 a 采用了常量引用，而常量引用是可以绑定一个临时变量的。
+<br><br>
+
+请参考： <br>
+https://blog.galowicz.de/2016/03/23/const_reference_to_temporary_object/
+<br><br>
+
+在 the C++ Programming Language 一书中讲到： <br>
+A temporary created to hold a reference initializer persists until the end of its reference’s scope.
+
+<br><br>
+因此我们的 func03 函数在 cout 输出 a 的时候，这个 a 还是存在的。
+
+
+<br><br>
+有一个另外的例子，
+<pre>
+  
+int a = 1;
+const double & b1 = a;
+cout << "b1 = " << b1 << endl;
+
+double & b2 = a;
+</pre>
+
+<br><br>
+这里 b1 是对的，b2 是错的。 <br>
+因为把一个 int 赋值给 double，中间有一个隐式转换的过程，生成了一个临时的 double 类型的变量，b1 是对这个这个临时的 double 变量进行了引用，而不是整形变量 a 的引用。
+<br><br>
+const ref 是可以作为左值被 link 到一个临时变量的，double 不能被link 到一个临时变量。
+
+<br><br>
+
+再来做一个小练习，你觉得下面的代码会输出什么？<br>
+<pre>
+
+int a = 1;
+int &b = a;
+const int &c = a;
+const double &d = a;
+cout << "a = " << a << endl;
+cout << "b = " << b << endl;
+cout << "c = " << c << endl;
+cout << "d = " << d << endl;
+a = 2;
+cout << "a = " << a << endl;
+cout << "b = " << b << endl;
+cout << "c = " << c << endl;
+cout << "d = " << d << endl;
+</pre>
+
+我跑了一下，输出是：
+<br>
+<pre>
+  
+d = 1
+e = 1
+f = 1
+d = 
+e = 
+f =
+</pre>
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-12-06 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2018</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

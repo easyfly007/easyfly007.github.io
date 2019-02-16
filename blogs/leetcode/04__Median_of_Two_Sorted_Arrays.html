@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 04: median of two sorted array </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 004: Median of Two Sorted Arrays </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/median-of-two-sorted-arrays/
+
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>  
+There are two sorted arrays nums1 and nums2 of size m and n respectively.
+
+Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+
+You may assume nums1 and nums2 cannot be both empty.
+
+Example 1:
+
+nums1 = [1, 3]
+nums2 = [2]
+
+The median is 2.0
+Example 2:
+
+nums1 = [1, 2]
+nums2 = [3, 4]
+
+The median is (2 + 3)/2 = 2.5
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        
+    }
+};
+
+
+</pre>
+
+<hr><hr>
+<strong>
+solution 1:
+</strong>
+
+我的思路：<br>
+不失一般性，我们可以认为 vec a1 较短，长度为 m1，vec a2 较长，长度为 m2 <br>
+我们的目标是，找到一个 median 的数，这个数字把 a1 分成两组，我们称为 a1_left, a1_right, 使得所有的 a1_left <= median <= a1_right <br>
+同时，median 也把 a2 分成两组，我们称之为 a2_left, a2_right, 使得 a2_left <= median <= a2_right <br>
+并且也要满足，a1_left.size() + a2_left.size() == a1_right.size() + a2_right.size()<br><br>
+
+如何找到这个 median 呢？<br>
+我们先从 size 入手，先找一个 a1 和 a2 的左右分组，使得 a1_left.size() + a2_left.size() == a1_right.size() + a2_right.size() <br><br>
+
+1. 计算 a1 的中位数，a1_median, 它把 a1 分成两组，a1_left, a1_right, 两边大小相等。<br>
+2. 计算 a2 的中位数，a2_median, 它把 a2 分成两组，a2_left, a2_right, 两边大小相等。<br><br>
+
+如果，很巧的，a1_median 和 a2_median 相等，那么我们的问题已经解决了。 <br><br>
+
+如果不巧的，两者不相等，那么不失一般性，假设 a1_median < a2_median, <br>
+我们要做的事情是，在 a1 里面，把这个 a1_median 适当右移，使之增大。<br>
+同时在 a2 里面，把这个 a2_median 适当左移，使之减小。<br>
+我们在 a1 和 a2 里面移动的数目应该是相等的，这样才能始终保证，a1_left.size() + a2_left.size() == a1_right.size() + a2_right.size() <br>
+在某个恰当的移动的数目 (我们称之为 x) 的时候，我们能够使得 a1_median == a2_mdian <br><br>
+
+那么问题现在变成为：<br>
+我们怎么找到这个 x？ <br>
+x 可以选择的大小为 0 到 a1_size() / 2 <br>
+我们用两分法，就可以很快找到这个恰当的 x 了。 耗费的时间，应该正比于 lg(a1_size) = lg(m1) = lg(min(m1,m2)) <br>
+
+
+
+
+
+<hr>
+<pre>
+
+</pre>
+
+
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-16 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

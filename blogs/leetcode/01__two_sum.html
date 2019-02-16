@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 01: two sum </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 001: two sum </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/two-sum/
+
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>  
+Given an array of integers, return indices of the two numbers such that they add up to a specific target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+Example:
+
+Given nums = [2, 7, 11, 15], target = 9,
+
+Because nums[0] + nums[1] = 2 + 7 = 9,
+return [0, 1].
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+    }   
+};
+</pre>
+
+<hr><hr>
+<strong>
+solution 1:
+</strong>
+
+<hr>
+最简单的是对每一个元素，去查看他的对应的元素是不是在 vec 里面 <br>
+这里 i1 表示返回的第一个 index （较小的哪一个），i2 表示返回的第二个 index （较大的那一个），i2 的遍历可以从 i1 + 1 开始。 <br>
+算法复杂度 n^2
+<hr>
+<pre>
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        int i1, i2;
+        int found = 0;
+        for (i1 = 0; i1 < nums.size(); i1 ++){
+            int val1 = nums[i1];
+            int val2 = target - val1;
+            for (i2 = i1+1; i2 < nums.size(); i2 ++){
+                if (nums[i2] == val2){
+                    found = 1;
+                    break;
+                }
+            }
+            if (found == 1)
+                break;
+        }
+        vector<int> solution;
+        solution.push_back(i1);
+        solution.push_back(i2);
+        return solution;
+    }
+};
+</pre>
+
+<hr>
+<strong>
+solution 2:
+</strong>
+<hr>
+我们可以对数组排序，然后从两边往中间推进。<br>
+具体来讲，对于一个从大到小排好序的数组，从最左边取一个数 a1 (最小的)，从最右边取一个数 b1 (最大的)。<br>
+如果 a1 + b1 > target, 那么不可能存在一个数，使之和 b1 相加等于 target, 丢弃 b1，然后继续判断剩下的最大的数和最小的数。<br>
+如果 a1 + b1 < target, 那么不可能存在一个数，使之和 a1 相加等于 target, 丢弃 a1，然后继续判断剩下的最大的数和最小的数。<br>
+如果 a1 + b1 = target, 那么 a1 和 b1 就是我们的求解。 <br>
+
+这样遍历一遍的时间复杂度是线性的为 n，但是问题麻烦的地方在于 排序，以及，要求返回索引号，我们在排序之后失去了数字的原始索引号，<br>
+所以需要额外的空间保存排序之后的序列。<br>
+另外一个需要注意的情况是，如果target 是6，里面有两个 3，我们需要返回这两个不同位置的 3 的 index
+<br><br>
+<pre>
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        vector<int> nums_sorted = nums;
+        std::sort(nums_sorted.begin(), nums_sorted.end());
+        int i1 = 0;
+        int i2 = nums_sorted.size() -1;
+        while (i2 > i1){
+            int sum = nums_sorted[i1] + nums_sorted[i2];
+            if (sum == target)
+                break;
+            if (sum > target)
+                i2 --;
+            else
+                i1 ++;
+        }
+        int val1 = nums_sorted[i1];
+        int val2 = nums_sorted[i2];
+        
+        i1 = -1;
+        i2 = -1;
+        for (int i = 0; i < nums.size(); i ++){
+            if (i1 > -1 && i2 > -1)
+                break;
+            
+            if (i1 == -1 && nums[i] == val1)
+                i1 = i;
+            else if (i2 == -1 && nums[i] == val2)
+                i2 = i;
+        }
+        vector<int> solution;
+        solution.push_back(i1);
+        solution.push_back(i2);
+        return solution;
+    }
+};
+</pre>
+
+<hr>
+
+<strong> solution 3</strong>
+<br>
+最后一种方法用到了 hash table 或者 map, 
+利用hash table 他的优点在于插入和判断只要常数的时间 <br>
+或者我们用 map，用 val => index 来匹配，map 的背后是红黑树结构。<br>
+我们只用了一次遍历来查找并且构建 这个 map，每次查找或者插入 一个元素的用时是 lg N, 整体复杂度为 NlgN
+但是需要占用额外的两倍以上的空间。（分别用来保存 val，idx，以及一些 map 内部的指针）
+<br><br>
+
+<pre>
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        # first check if there's 2 target/2 element in the vector
+        vector<int> solution;
+        map<int, int> map_val_idx;
+        for (int idx1 = 0; idx1 < nums.size(); idx1 ++){
+            int val1 = nums[idx1];
+            int val2 = target - val1;
+            map<int, int>::iterator it = map_val_idx.find(val2);
+            if (it != map_val_idx.end()){
+                solution.push_back(idx1);
+                solution.push_back(it->second);
+                break;
+            }else{
+                map_val_idx.insert(std::pair<int, int>(val1, idx1) );
+            }
+        }
+        return solution;
+    }
+};
+
+</pre>
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-16 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

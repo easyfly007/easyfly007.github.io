@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 01: two sum </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 002: add two numbers </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/add-two-numbers/
+
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>  
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+
+Example:
+
+Input: (2 -> 4 -> 3) + (5 -> 6 -> 4)
+Output: 7 -> 0 -> 8
+Explanation: 342 + 465 = 807.
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        
+    }
+};
+
+
+</pre>
+
+<hr><hr>
+<strong>
+solution 1:
+</strong>
+
+<hr>
+<pre>
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* l3 = NULL;
+        int carry = 0;
+        while (l1 || l2 || carry){
+            int d1 = l1 ? l1->val : 0;
+            int d2 = l2 ? l2->val : 0;
+            int d3 = d1 + d2 + carry;
+            if (d3 >= 10){
+                d3 -= 10;
+                carry = 1;
+            }else{
+                carry = 0;
+            }
+            
+            ListNode* temp = new ListNode(d3);
+            temp->next = l3;
+            l3 = temp;
+            if (l1)
+                l1 = l1->next;
+            if (l2)
+                l2 = l2->next;
+        }
+        
+        # reverse l3
+        ListNode *l4 = NULL;
+        while (l3){
+            ListNode* temp = l3;
+            l3 = l3->next;
+            temp->next = l4;
+            l4 = temp;
+        }
+        return l4;
+    }
+};
+</pre>
+
+<hr>
+<strong>
+solution 2:
+</strong>
+<hr>
+
+<br><br>
+<pre>
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* head = NULL;
+        ListNode* tail = head;
+        int carry = 0;
+        while (l1 || l2 || carry){
+            int d1 = l1 ? l1->val : 0;
+            int d2 = l2 ? l2->val : 0;
+            int d3 = d1 + d2 + carry;
+            if (d3 >= 10){
+                d3 -= 10;
+                carry = 1;
+            }else{
+                carry = 0;
+            }
+            
+            ListNode* l3 = new ListNode(d3);
+            if (tail == NULL){
+                head = l3;
+                tail = l3;
+            }else{
+                tail->next = l3;
+                tail = l3;
+            }
+            if (l1)
+                l1 = l1->next;
+            if (l2)
+                l2 = l2->next;
+        }
+        return head;
+    }
+};
+</pre>
+
+<hr>
+
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-16 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

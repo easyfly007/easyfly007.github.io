@@ -106,7 +106,7 @@ public:
 <strong>
 solution 1:
 </strong>
-
+<br><br>
 我的思路：<br>
 不失一般性，我们可以认为 vec a1 较短，长度为 m1，vec a2 较长，长度为 m2 <br>
 我们的目标是，找到一个 median 的数，这个数字把 a1 分成两组，我们称为 a1_left, a1_right, 使得所有的 a1_left <= median <= a1_right <br>
@@ -125,14 +125,14 @@ solution 1:
 我们要做的事情是，在 a1 里面，把这个 a1_median 适当右移，使之增大。<br>
 同时在 a2 里面，把这个 a2_median 适当左移，使之减小。<br>
 我们在 a1 和 a2 里面移动的数目应该是相等的，这样才能始终保证，a1_left.size() + a2_left.size() == a1_right.size() + a2_right.size() <br>
-在某个恰当的移动的数目 (我们称之为 x) 的时候，我们能够使得 a1_median == a2_mdian <br><br>
+在某个恰当的移动的数目 (我们称之为 x) 的时候，我们能够使得 a1_median == a2_median <br><br>
 
 那么问题现在变成为：<br>
 我们怎么找到这个 x？ <br>
 x 可以选择的大小为 0 到 a1_size() / 2 <br>
-我们用两分法，就可以很快找到这个恰当的 x 了。 耗费的时间，应该正比于 lg(a1_size) = lg(m1) = lg(min(m1,m2)) <br>
+我们用两分法，就可以很快找到这个恰当的 x 了。 耗费的时间，应该正比于 lg(a1_size) = lg(m1) = lg(min(m1,m2)) <br><br>
 
-
+在写代码的时候，要非常小心边界情况，并且考虑到数组长度为偶数和奇数的不同情况。
 
 
 

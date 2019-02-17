@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 05: longest palindromic substring </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 005: longest palindromic substring </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/longest-palindromic-substring/
+
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>  
+Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
+
+Example 1:
+
+Input: "babad"
+Output: "bab"
+Note: "aba" is also a valid answer.
+Example 2:
+
+Input: "cbbd"
+Output: "bb"
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        
+    }
+};
+
+</pre>
+
+<hr><hr>
+<strong>
+solution 1:
+</strong>
+<br><br>
+我的思路：<br>
+
+如果我们取查找 从第 N 个字符开始的回文字符串，是非常困难的。<br>
+所以我们换个思路，利用潜在的回文字符串的中间位置开始遍历。 <br>
+我们查找以字符 N 为回文字符串中间值的最大串，从左到右遍历 N，找到最大的回文字符串。 <br>
+<hr>
+<pre>
+
+</pre>
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        if (s.size() <=1)
+            return s;
+        int longestSiz = 1;
+        int longestBeg = 0;
+        int longestEnd = 0;
+        for (int i = 0; i < s.size() -1; i ++){
+            
+            # consider the palindromic sub string using s[i] as the center
+            int j = 1;
+            while ((i -j) >=0 && (i + j) < s.size()){
+                if (s[i -j] == s[i +j])
+                    j ++;
+                else
+                    break;
+            }
+            int localLongestSiz = 1 + 2 * (j -1);
+            int localLongestBeg = i - j +1;
+            int localLongestEnd = i + j -1;
+            if (localLongestSiz > longestSiz){
+                longestSiz = localLongestSiz;
+                longestBeg = localLongestBeg;
+                longestEnd = localLongestEnd;
+            }
+            
+            # consider the palindromic sub string has even characters and s[i] is the on the left half ner the middle
+            if (s[i] == s[i+1]){
+                j = 1;
+                while ( (i-j) >= 0 && (j+1 + j) < s.size()){
+                    if (s[i -j] == s[i +1 + j])
+                        j ++;
+                    else
+                        break;
+                }
+                localLongestSiz = 2 * j;
+                localLongestBeg = i - j + 1;
+                localLongestEnd = i + 1 + j -1;
+                if (localLongestSiz > longestSiz){
+                    longestSiz = localLongestSiz;
+                    longestBeg = localLongestBeg;
+                    longestEnd = localLongestEnd;
+                }
+            }
+        }
+        return s.substr(longestBeg, longestSiz);
+        
+    }
+};
+
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-16 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

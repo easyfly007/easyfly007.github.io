@@ -115,13 +115,66 @@ solution 1:
 </strong>
 <br><br>
 我的思路：<br>
+我们首先可以把 zigzag 改写一下，好用来判断
 
+<br><br>
+
+<pre>
+00      12
+01  11  13
+02  10  14
+03  09  15  21
+04  08  16  20
+05  07  17  19
+    06      18
+</pre>
+
+<br><br>
+总体而言，有两种思路，一种是对于 solutionStr 的 charIdx 进行遍历，填充 <br>
+另外一种是对于 s 的 charIdx 进行遍历，<br>
+相对而言，前面一种略微简单一点，我们可以对于 solution 按照行进行处理，除了开头一行和最后亚航有点特殊需要单独处理之外，中间的行可以统一处理。 <br>
 <hr>
 <pre>
 class Solution {
 public:
     string convert(string s, int numRows) {
+        if (numRows == 1){
+            return s;
+        }
+        string solution = s;
+        int solutionIdx = 0;
+        int period = numRows -1;
         
+        int charIdx = 0;
+        while (charIdx < s.size()){
+            solution[solutionIdx] = s[charIdx];
+            solutionIdx ++;
+            charIdx += period * 2;
+        }
+        
+        for (int rowIdx = 1; rowIdx < numRows -1; rowIdx ++){
+            charIdx = rowIdx;
+            while (charIdx < s.size()){
+                solution[solutionIdx] = s[charIdx];
+                solutionIdx ++;
+                int charIdx2 = charIdx + 2 * (numRows -1 - rowIdx) ;
+                if (charIdx2 < s.size()){
+                    solution[solutionIdx] = s[charIdx2];
+                    solutionIdx ++;
+                }
+                charIdx += period * 2;
+            }
+        }
+        
+        charIdx = numRows -1;
+        while (charIdx < s.size()){
+            solution[solutionIdx] = s[charIdx];
+            solutionIdx ++;
+            charIdx += period * 2;
+        }
+        assert(solutionIdx == s.size());
+        assert(solution.size() == s.size());
+        return solution;
     }
 };
 

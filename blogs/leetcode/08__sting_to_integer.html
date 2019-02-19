@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> leetcode 007: reverse integer </title>
+    <title> leetcode 008: string to integer (atoi) </title>
 
     <!-- Bootstrap core CSS -->
     <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -59,7 +59,7 @@
           <!-- Blog Post -->
           <div class="card mb-4">
             <div class="card-body">
-              <h2 class="card-title"> leetcode 007: reverse integer </h2>
+              <h2 class="card-title"> leetcode 008: string to integer (atoi)  </h2>
               <p class ='card-text'>
 <br><br>
 https://leetcode.com/problems/string-to-integer-atoi/
@@ -136,7 +136,53 @@ solution 1:
 <hr>
 <pre>
 </pre>
-
+class Solution {
+public:
+    int myAtoi(string str) {
+        const int MIN = -2147483648;
+        const int MAX = 2147483647;
+        int charIdx = 0;
+        while (charIdx < str.size()){
+            if (str[charIdx] == ' ')
+                charIdx ++;
+            else
+                break;
+        }
+        
+        if (charIdx == str.size())
+            return 0;
+        
+        int sign = 1;
+        if (str[charIdx] == '-'){
+            sign = -1;
+            charIdx ++;
+        }else if (str[charIdx] == '+'){
+            sign = 1;
+            charIdx ++;
+        }
+        
+        int result = 0;
+        for (charIdx; charIdx < str.size(); charIdx ++){
+            if (str[charIdx] > '9' || str[charIdx] < '0')
+                break;
+                
+            int digit = str[charIdx] - '0';
+            if (sign == 1){
+                if ( (result > MAX / 10) || (result * 10 > MAX - digit)){                
+                    result = MAX;
+                    break;
+                }
+            }else{
+                if ( (result < MIN / 10) || (result * 10 < MIN + digit)){
+                    result = MIN;
+                    break;
+                }
+            }
+            result = result * 10 + sign * digit;
+        }
+        return result;
+    }
+};
 
 <hr>
               </p>

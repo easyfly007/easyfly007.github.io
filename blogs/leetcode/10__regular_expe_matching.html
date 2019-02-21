@@ -145,25 +145,31 @@ class Solution:
         if len(p) >= 2 and p[1] == '*':
             if p[0] == '.':
                 # pattern of '.*'
-                for i in range(len(s) +1):
-                    if i == len(s):
-                        return self.isMatch('', p[2:])
-                    if self.isMatch(s[i:], p[2:]):
-                        return True
+                if len(s) == 0:
+                    return self.isMatch('', p[2:])
+                else:
+                    for i in range(len(s)+1):
+                        if self.isMatch(s[len(s)-i  : ], p[2:]):
+                            return True
                 return False
             else:
                 # pattern of 'x*'
                 x = p[0]
                 i = 0
-                for i in range(len(s) + 1):
-                    if i == len(s):
-                        return self.isMatch('', p[2:])
-                    if self.isMatch(s[i:], p[2:]):
-                        return True
-                    if s[i] != x:
-                        break
+                # first calculate the max heading x in s
+                if len(s) == 0:
+                    return self.isMatch('', p[2:])
+                else:
+                    xs = 0
+                    for i in range(len(s)):
+                        if s[i] == x:
+                            xs +=1
+                        else:
+                            break
+                    for i in range(xs, -1, -1):
+                        if self.isMatch(s[i:], p[2:]):
+                            return True
                 return False
-                
         else:
             # consider one char matching
             if p[0] == '*':
@@ -175,8 +181,7 @@ class Solution:
                 # match for a-z
                 return len(s) > 0 and s[0] == p[0] and self.isMatch(s[1:], p[1:])
         return False
-    
-    
+
 </pre>
 
 

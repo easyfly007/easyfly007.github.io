@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 010: regular expression matching </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 010: regular expression matching </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/regular-expression-matching/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*'.
+
+'.' Matches any single character.
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+
+Note:
+
+s could be empty and contains only lowercase letters a-z.
+p could be empty and contains only lowercase letters a-z, and characters like . or *.
+Example 1:
+
+Input:
+s = "aa"
+p = "a"
+Output: false
+Explanation: "a" does not match the entire string "aa".
+Example 2:
+
+Input:
+s = "aa"
+p = "a*"
+Output: true
+Explanation: '*' means zero or more of the precedeng element, 'a'. Therefore, by repeating 'a' once, it becomes "aa".
+Example 3:
+
+Input:
+s = "ab"
+p = ".*"
+Output: true
+Explanation: ".*" means "zero or more (*) of any character (.)".
+Example 4:
+
+Input:
+s = "aab"
+p = "c*a*b"
+Output: true
+Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore it matches "aab".
+Example 5:
+
+Input:
+s = "mississippi"
+p = "mis*is*p*."
+Output: false
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre> 
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        
+    }
+};
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：<br>
+这里我用 python 来实现了，主要是 python 的对于字符串的操作更加方便一点，当然下面的代码也可以很轻松改写成 C++ 格式的。
+<br><br>
+<hr>
+<pre>
+class Solution:
+    def isMatch(self, s: 'str', p: 'str') -> 'bool':
+        print('s='+s+', p='+p)
+        if len(p) == 0:
+            return len(s) == 0
+
+        if len(p) >= 2 and p[1] == '*':
+            if p[0] == '.':
+                # pattern of '.*'
+                for i in range(len(s) +1):
+                    if i == len(s):
+                        return self.isMatch('', p[2:])
+                    if self.isMatch(s[i:], p[2:]):
+                        return True
+                return False
+            else:
+                # pattern of 'x*'
+                x = p[0]
+                i = 0
+                for i in range(len(s) + 1):
+                    if i == len(s):
+                        return self.isMatch('', p[2:])
+                    if self.isMatch(s[i:], p[2:]):
+                        return True
+                    if s[i] != x:
+                        break
+                return False
+                
+        else:
+            # consider one char matching
+            if p[0] == '*':
+                # not valid pattern
+                return False
+            elif p[0] == '.':
+                return len(s) > 0 and self.isMatch(s[1:], p[1:])
+            else:
+                # match for a-z
+                return len(s) > 0 and s[0] == p[0] and self.isMatch(s[1:], p[1:])
+        return False
+    
+    
+</pre>
+
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-19 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

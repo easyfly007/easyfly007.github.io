@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 009: palindrome number </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 009: palindrome number  </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/palindrome-number
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Determine whether an integer is a palindrome. An integer is a palindrome when it reads the same backward as forward.
+
+Example 1:
+
+Input: 121
+Output: true
+Example 2:
+
+Input: -121
+Output: false
+Explanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.
+Example 3:
+
+Input: 10
+Output: false
+Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+Follow up:
+
+Coud you solve it without converting the integer to a string?
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre> 
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        
+    }
+};
+</pre>
+
+<hr><hr>
+<strong>
+solution 1:
+</strong>
+<br><br>
+我的思路：<br>
+很容易想到的是，比如对于 123456,我们可以很方便从右到左取出每一位数字，6 5 4 3 2 1，然后生成一个新的数字 654321，
+比较 654321 与 123456 是否相等。
+但是这里要注意到一个问题，int 的大小是有限制的，你在生成 654321 的时候，有可能会产生溢出。
+我这里的思路是，对于 123456，我们首先去除 最右边的 6，同时去除最左边的 1，然后采用 1 == 6 && 2345 == 5432 来比较，
+这样由于我们比原来的数至少缩小了 100 倍，肯定不会溢出的。
+<br><br>
+<hr>
+<pre>
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x < 0)
+            return false;
+        if (x < 10)
+            return true;
+
+        // for example x = 12345,
+        // finally, rightDigit = 5, 
+        // x = 1,
+        // x1 = 234,
+        // x2 = 432
+        int rightDigit = x % 10;
+        x = x / 10;
+        int x2 = 0;
+        int x1 = 0;
+        int base = 1;
+        while (x > 9){
+            int digit = x % 10;
+            x = x / 10;
+            x2 = x2 * 10 + digit;
+            x1 = x1 + digit * base;
+            base *= 10;
+        }
+        return x == rightDigit && x1 == x2;
+    }
+};
+</pre>
+
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-19 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

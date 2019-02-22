@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 011: container with most water </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 011: container with most water </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/container-with-most-water/submissions/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+
+Given n non-negative integers a1, a2, ..., an , where each represents a point at coordinate (i, ai). 
+n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). 
+Find two lines, which together with x-axis forms a container, such that the container contains the most water.
+
+Note: You may not slant the container and n is at least 2.
+</pre>
+ 
+<img src="https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/17/question_11.jpg">
+<pre>
+  
+The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.
+
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre> 
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        
+    }
+};
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：<br>
+i 从左往右遍历，j 从右往左遍历。<br>
+在 i 遍历过程当中，记录到目前为止的最大的 height[i], 然后忽略掉所有小于该值的 i 作为容器的左边栏。<br>
+在 j 遍历当中，记录到目前为止最大的 height[j], 然后忽略掉所有小于该值的 j 作为容器的右边栏。 <br>
+同时对于 j， 如果出现了 某个 height[j] > height[i],那么可以忽略剩下的 j 的遍历了。 <br>
+
+<br><br>
+<hr>
+<pre>
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int maxVol = 0;
+        int leftBarIdx = 0;
+        int rightBarIdx = 0;
+
+        // loop i from the left to right, j from right to left
+        int highestI = 0;
+        for (int i = 0; i < height.size() -1; i ++){
+            if (highestI >= height[i])
+                continue;
+            highestI = height[i];
+            int highestJ = -1;
+            int noMoreCheck = 0;
+            for (int j = height.size() -1; j > i; j--){
+                if (noMoreCheck)
+                    break;
+                if (highestJ > height[j])
+                    continue;
+                highestJ = height[j];
+                int vol;
+                if (highestJ > height[i])
+                    vol = (j -i) * height[i];
+                else
+                    vol = (j -i) * highestJ;
+                if (maxVol < vol){
+                    maxVol = vol;
+                    leftBarIdx = i;
+                    rightBarIdx = j;
+                }
+                if (height[j] >= height[i])
+                    noMoreCheck = 1;
+            }
+        }
+        return maxVol;
+        
+    }
+};
+
+</pre>
+
+另外一种巧妙的解法：<br>
+从两头逼近。<br>
+
+<pre>
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int l = 0;
+        int h = height.size() -1;
+        int max = 0;
+        while (l < h){
+            int vol = h - l;
+            if (height[l] < height[h]){
+                vol = vol * height[l];
+                l ++;
+            }else{
+                vol = vol * height[h];
+                h --;
+            }
+            if (max < vol)
+                max = vol;
+        }
+        return max;
+    }
+};
+
+</pre>
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-21 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

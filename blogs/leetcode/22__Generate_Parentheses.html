@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 022: Generate Parentheses
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 022: Generate Parentheses
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/generate-parentheses/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+For example, given n = 3, a solution set is:
+
+[
+  "((()))",
+  "(()())",
+  "(())()",
+  "()(())",
+  "()()()"
+]
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        
+    }
+};
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：<br>
+这里可以利用闭包，然后利用全局变量，还是递归调用，就可以避免返回一个新的串了
+<br><br>
+<hr>
+<pre>  
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        def gen(n, usedLeftCntList, usedRightCntList, prevStrList):
+            if usedLeftCntList[0] + usedRightCntList[0] == n + n:
+                return prevStrList
+            
+            newUsedLeftCntList = []
+            newUsedRightCntList = []
+            newPrevStrList = []
+            
+            for i, s in enumerate(prevStrList):
+                if usedLeftCntList[i] < n:
+                    # we can add a '('
+                    newUsedLeftCntList.append(usedLeftCntList[i] +1)
+                    newUsedRightCntList.append(usedRightCntList[i])
+                    newPrevStrList.append(prevStrList[i] + '(')
+                if usedRightCntList[i] < n and usedRightCntList[i] < usedLeftCntList[i]:
+                    newUsedLeftCntList.append(usedLeftCntList[i])
+                    newUsedRightCntList.append(usedRightCntList[i] +1)
+                    newPrevStrList.append(prevStrList[i] + ')')
+            return gen(n, newUsedLeftCntList, newUsedRightCntList, newPrevStrList)
+    
+        if n == 0:
+            return []
+        
+        return gen(n, [0,],[0,], ['',])
+            
+        
+        
+
+</pre>
+
+
+<pre>
+
+</pre>
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-02-24 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

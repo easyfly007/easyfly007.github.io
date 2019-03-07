@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 031: Next Permutation
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 031. Next Permutation
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/sudoku-solver/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Write a program to solve a Sudoku puzzle by filling the empty cells.
+
+A sudoku solution must satisfy all of the following rules:
+
+Each of the digits 1-9 must occur exactly once in each row.
+Each of the digits 1-9 must occur exactly once in each column.
+Each of the the digits 1-9 must occur exactly once in each of the 9 3x3 sub-boxes of the grid.
+Empty cells are indicated by the character '.'.
+
+
+A sudoku puzzle...
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Sudoku-by-L2G-20050714.svg/250px-Sudoku-by-L2G-20050714.svg.png">
+
+...and its solution numbers marked in red.
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Sudoku-by-L2G-20050714_solution.svg/250px-Sudoku-by-L2G-20050714_solution.svg.png">
+
+Note:
+
+The given board contain only digits 1-9 and the character '.'.
+You may assume that the given Sudoku puzzle will have a single unique solution.
+The given board size is always 9x9.
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+  }
+}
+        
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：<br>
+<br><br>
+<hr>
+<pre>
+typedef struct POS_t{
+    int x;
+    int y;
+}POS_t;
+
+class Solution {
+public:
+    void solveSudoku(vector < vector < char>>& board) {
+        solving(board);
+    }
+    bool solving(vector< vector< char>> & board){
+        POS_t nextPos = getNextEmptyPos(board);
+        // no more filling needed, sudoku solved
+        if (nextPos.x == -1)
+            return true;
+        
+        for (char val = '1'; val <= '9'; val ++){
+            int x = nextPos.x;
+            int y = nextPos.y;
+            if (isValid(board, x, y, val)){
+                board[x][y] = val;
+                if (solving(board))
+                    return true;
+                else
+                    board[x][y] = '.';
+                
+            }
+        }
+        return false;
+    }
+
+    bool isValid(vector< vector< char>> & board, int x, int y, char v){
+        // check if we can fill board[x][y] = v
+        // 1. check row
+        for (int i = 0; i < 9; i ++){
+            if (board[x][i] == v)
+                return false;
+        }
+        // 2. check col
+        for (int i = 0; i < 9; i ++){
+            if (board[i][y] == v)
+                return false;
+        }
+        // 3. check block
+        int x_block = x / 3;
+        int y_block = y / 3;
+        for (int i = x_block * 3; i < x_block * 3 + 3; i ++){
+            for (int j = y_block * 3; j < y_block * 3 + 3; j ++ ){
+                if (board[i][j] == v)
+                    return false;
+            }
+        }
+        return true;
+    }
+    
+    POS_t getNextEmptyPos(vector< vector< char>> & board){
+        POS_t temp;
+        temp.x = -1;
+        temp.y = -1;
+        for (int x = 0; x < 9; x ++){
+            for (int y = 0; y < 9; y ++)
+            {
+                if (board[x][y] == '.'){
+                    temp.x = x;
+                    temp.y = y;
+                    return temp;
+                }
+            }
+        }
+        return temp;
+    }
+};
+
+
+</pre>
+
+
+<pre>
+
+</pre>
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-03-01 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

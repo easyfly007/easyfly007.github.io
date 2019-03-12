@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 41. first missing positive
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 041. first missing positive
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/first-missing-positive/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Given an unsorted integer array, find the smallest missing positive integer.
+
+Example 1:
+
+Input: [1,2,0]
+Output: 3
+Example 2:
+
+Input: [3,4,-1,1]
+Output: 2
+Example 3:
+
+Input: [7,8,9,11,12]
+Output: 1
+Note:
+
+Your algorithm should run in O(n) time and uses constant extra space.
+
+
+</pre>
+
+<hr><hr>
+<strong>start code (python) </strong>
+<hr>
+<pre>
+class Solution:
+    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：<br>
+<br><br>
+<hr>
+<pre>
+class Solution {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        // first loop will make pos value not changed, and negative value to 0
+        // by this change we will get the same result
+        cout << " nums 1 = ";
+        for (int i = 0; i < nums.size(); i ++){
+            cout << nums[i] << " ";
+        }
+        cout << endl;
+        
+        int anyPos = 0;
+        for (int i = 0; i < nums.size(); i ++){
+            if (nums[i] > 0)
+                anyPos = nums[i];
+            if (nums[i] < 0)
+                nums[i] = 0;
+        }
+        
+        cout << " nums 2 = ";
+        for (int i = 0; i < nums.size(); i ++){
+            cout << nums[i] << " ";
+        }
+        cout << endl;
+        
+        // second loop, set sign for each value index
+        nums.push_back(0);
+        for (int i =0; i < nums.size(); i ++){
+            int val = nums[i];
+            if (val != 0){
+                if (val < 0)
+                    val = - val;
+                if (val < nums.size()){
+                    if (nums[val] == 0)
+                        nums[val] = - anyPos;
+                    else if (nums[val] > 0)
+                        nums[val] = - nums[val];
+                }
+            }
+        }
+        cout << " nums 3 = ";
+        for (int i = 0; i < nums.size(); i ++){
+            cout << nums[i] << " ";
+        }
+        cout << endl;
+        
+        // third loop, check the sign for each index
+        int not_exist = 1;
+        for (; not_exist < nums.size(); not_exist ++ ){
+            if (nums[not_exist] >= 0)
+                break;
+        }
+        
+        return not_exist;
+    }
+};
+
+</pre>
+
+
+<pre>
+
+</pre>
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-03-09 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 43. multiply strings
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> 043. multiply strings
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/multiply-strings/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string.
+
+Example 1:
+
+Input: num1 = "2", num2 = "3"
+Output: "6"
+Example 2:
+
+Input: num1 = "123", num2 = "456"
+Output: "56088"
+Note:
+
+The length of both num1 and num2 is < 110.
+Both num1 and num2 contain only digits 0-9.
+Both num1 and num2 do not contain any leading zero, except the number 0 itself.
+You must not use any built-in BigInteger library or convert the inputs to integer directly.
+
+</pre>
+
+<hr><hr>
+<strong>start code (python) </strong>
+<hr>
+<pre>
+class Solution {
+public:
+    string add(string num1, string num2){
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：<br>
+问题的本质就是利用一个 string 来 表示数字（该 string 能够的容纳数值范围要远远大于普通的 int）
+
+<br>
+我们需要基于 string 的表示，实现数学运算，我们能够提供的基本工具，就是个位数的加减乘除的运算。
+
+为了实现 string 的乘法，我们需要先实现 string 的加法，以及 string 和digit 的乘法。
+
+<br><br>
+<hr>
+<pre>
+class Solution {
+public:
+    string add(string num1, string num2){
+        // please note, num1 = '123' means value 321, in reverse order
+        int size1 = num1.size();
+        int size2 = num2.size();
+        string num3;
+        int carry = 0;
+        int idx = 0;
+        while (idx < num2.size() || idx < num1.size()){
+            int val3 = carry;
+            if (idx < num1.size())
+                val3 += num1[idx] - '0';
+            if (idx < num2.size())
+                val3 += num2[idx] - '0';
+            if (val3 >= 10){
+                carry = 1;
+                val3 -= 10;
+            }else{
+                carry = 0;
+            }
+            num3.push_back('0' + val3);
+            idx ++;
+        }
+        if (carry == 1)
+            num3.push_back('1');
+        return num3;
+    }
+    
+    string reverse(string str){
+        for (int i = 0; i < str.size() / 2; i ++){
+            char temp = str[i];
+            str[i] = str[str.size() -1 - i];
+            str[str.size() -1 -i] = temp;
+        }
+        return str;
+    }
+    
+    string multiplyStrDig(string num1, int dig){
+        // dig can be only 0 - 9
+        if (dig == 0)
+            return "0";
+        if (dig == 1)
+            return num1;
+        if (dig == 2)
+            return add(num1, num1);
+        if (dig == 3)
+            return add(add(num1, num1), num1);
+        if (dig == 4){
+            string num2 = add(num1, num1);
+            return add(num2, num2);
+        }
+        if (dig == 5){
+            string num2 = add(num1, num1);
+            string num4 = add(num2, num2);
+            return add(num1, num4);
+        }
+        if (dig == 6){
+            string num2 = add(num1, num1);
+            string num4 = add(num2, num2);
+            return add(num4, num2);
+        }
+        if (dig == 7){
+            string num2 = add(num1, num1);
+            string num4 = add(num2, num2);
+            string num6 = add(num2, num4);
+            return add(num1, num6);
+        }
+        if (dig == 8){
+            string num2 = add(num1, num1);
+            string num4 = add(num2, num2);
+            return add(num4, num4);
+        }
+        if (dig == 9){
+            string num2 = add(num1, num1);
+            string num4 = add(num2, num2);
+            string num8 = add(num4, num4);
+            return add(num8, num1);
+        }
+        return num1;// dummy
+    }
+        
+    string multiplyByTen(string num1){
+        if (num1 == "0")
+            return "0";
+        return "0" + num1;
+    }
+    string multiplyStrStr(string num1, string num2){
+        string result = "0";
+        for (int i = 0; i < num2.size(); i ++){
+            string temp = multiplyStrDig(num1, num2[i] - '0');
+            for (int j = 0; j < i; j ++)
+                temp = multiplyByTen(temp);
+            result = add(result, temp);
+        }
+        return result;
+    }
+
+    string multiply(string num1, string num2) {
+        num1 = reverse(num1);
+        num2 = reverse(num2);
+        return reverse(multiplyStrStr(num1, num2));
+    }
+};
+
+</pre>
+
+
+<pre>
+
+</pre>
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-03-09 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

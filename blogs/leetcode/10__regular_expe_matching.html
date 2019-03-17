@@ -133,6 +133,10 @@ solution:
 <br><br>
 我的思路：<br>
 这里我用 python 来实现了，主要是 python 的对于字符串的操作更加方便一点，当然下面的代码也可以很轻松改写成 C++ 格式的。
+<br>
+递归算法的问题在于，有一些 substr 我们会反复计算是否 match。
+我们可以利用动态规划，把已经计算出来的 substr是否match，用一个dict 记录下来。
+
 <br><br>
 <hr>
 <pre>
@@ -184,7 +188,26 @@ class Solution:
 
 </pre>
 
+solution 2:
+这个的算法复杂度是： N*M，N 和 M 为 str 和 pattern 的长度
 
+<pre>
+class Solution(object):
+    def isMatch(self, text, pattern):
+        dp = [[False] * (len(pattern) + 1) for _ in range(len(text) + 1)]
+
+        dp[-1][-1] = True
+        for i in range(len(text), -1, -1):
+            for j in range(len(pattern) - 1, -1, -1):
+                first_match = i < len(text) and pattern[j] in {text[i], '.'}
+                if j+1 < len(pattern) and pattern[j+1] == '*':
+                    dp[i][j] = dp[i][j+2] or first_match and dp[i+1][j]
+                else:
+                    dp[i][j] = first_match and dp[i+1][j+1]
+
+        return dp[0][0]
+
+</pre>
 <hr>
               </p>
               

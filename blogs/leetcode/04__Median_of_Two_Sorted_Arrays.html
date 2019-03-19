@@ -134,11 +134,43 @@ x 可以选择的大小为 0 到 a1_size() / 2 <br>
 
 在写代码的时候，要非常小心边界情况，并且考虑到数组长度为偶数和奇数的不同情况。
 
-
+<br>
+以下的代码可能是编译不通过的，但是大致意思是这样的
 
 <hr>
 <pre>
-
+class Solution(object):
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        if len(nums1) > len(nums2):
+            nums1, nums2 = nums2, nums1
+        # nums1 always longer than nums2
+        if len(nums1) == 1:
+            if len(nums2) % 2 == 0:
+                return nums2[len(nums2) / 2] /2 + nums2[len(nums2)/2 -1] /2 
+        l1 = 0
+        h1 = len(nums1) -1
+        l2 = len(nums2) / 2 - len(nums1) / 2
+        h2 = len(nums2) / 2 + len(nums1) / 2
+        m1 = (l1 + h1) / 2
+        m2 = (l2 + h2) / 2
+        while (h1 > l1):
+            m1 = (l1 + h1) / 2
+            m2 = (l2 + h2) / 2
+            if nums1[m1] == nums2[m2]:
+                return nums1[m1]
+            elif nums1[m1] < nums2[m2]:
+                l1 = m1 + 1
+                h2 = m2 - 1
+            else:
+                h1 = m1 -1
+                l2 = m2 + 1
+        return (nums1[m1] + nums2[m2]) / 2
+        
 </pre>
 
 

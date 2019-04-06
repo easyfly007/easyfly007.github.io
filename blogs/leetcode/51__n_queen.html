@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 51: N queen
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 51: n queen
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/n-queens/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+The n-queens puzzle is the problem of placing n queens on an n×n chessboard such that no two queens attack each other.
+
+<img src="https://assets.leetcode.com/uploads/2018/10/12/8-queens.png">
+
+Given an integer n, return all distinct solutions to the n-queens puzzle.
+
+Each solution contains a distinct board configuration of the n-queens' placement, where 'Q' and '.' both indicate a queen and an empty space respectively.
+
+Example:
+
+Input: 4
+Output: [
+ [".Q..",  // Solution 1
+  "...Q",
+  "Q...",
+  "..Q."],
+
+ ["..Q.",  // Solution 2
+  "Q...",
+  "...Q",
+  ".Q.."]
+]
+Explanation: There exist two distinct solutions to the 4-queens puzzle as shown above.
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution(object):
+    def solveNQueens(self, n):
+        """
+        :type n: int
+        :rtype: List[List[str]]
+        """
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+利用深度优先遍历
+
+<br><br>
+<hr>
+<pre>
+class Solution(object):
+    def solveNQueens(self, n):
+        """
+        :type n: int
+        :rtype: List[List[str]]
+        """
+        
+        self.solutions = []
+        self.queen_cnt = 0
+        self.n = n
+        board = [['.', ] * n for i in range(n)]
+        # board
+        # 'Q' for queen
+        # '.' for no queen
+        self.filling_from_pos(board, 0, 0)
+        results = []
+        for x in self.solutions:
+            results.append([''.join(y) for y in x])
+        return results
+
+    def filling_from_pos(self, board, i, j):
+        # got a solution, no need to do more
+        if self.queen_cnt == self.n:
+            temp = [x[:] for x in board]
+            self.solutions.append(temp)
+            return
+        if i >= self.n or j >= self.n:
+            return
+
+        for x in ['Q', '.']:
+            queen_cnt = self.queen_cnt
+            board[i][j] = x
+            if self.is_valid(board, i, j):
+                if x == 'Q':
+                    self.queen_cnt += 1
+                i2, j2 = self.get_next_pos(board, i, j, x)
+                self.filling_from_pos(board, i2, j2)
+                self.queen_cnt = queen_cnt
+            board[i][j] = '.'
+            
+
+    def is_valid(self, board, i, j):
+
+        i0, j0 = i, j
+
+        row_queen_cnt = 0
+        for x in range(self.n):
+            if board[i][x] == 'Q':
+                row_queen_cnt += 1
+        if row_queen_cnt > 1:
+            return False
+
+        if j == self.n - 1 and row_queen_cnt == 0:
+            return False
+
+        col_queen_cnt = 0
+        for x in range(self.n):
+            if board[x][j] == 'Q':
+                col_queen_cnt += 1
+        if col_queen_cnt >1:
+            return False
+
+        tri_queen_cnt = 0
+        while i >=0 and j >= 0:
+            if board[i][j] == 'Q':
+                tri_queen_cnt += 1
+            i -= 1
+            j -= 1
+        if tri_queen_cnt >1:
+            return False
+
+        i,j = i0, j0
+        tri_queen_cnt = 0
+        while i >=0 and j < self.n:
+            if board[i][j] == 'Q':
+                tri_queen_cnt += 1
+            i -= 1
+            j += 1
+        if tri_queen_cnt > 1:
+            return False
+        return True
+
+
+    def get_next_pos(self, board, i, j, x):
+        if x == 'Q' or j == self.n - 1:
+            return i +1, 0
+        return i, j+1
+
+
+
+</pre>
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-04-06 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

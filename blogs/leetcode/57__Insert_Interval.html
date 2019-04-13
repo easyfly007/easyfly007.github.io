@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 57. insert interval
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 57. insert interval
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/insert-interval/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Given a set of non-overlapping intervals, insert a new interval into the intervals (merge if necessary).
+
+You may assume that the intervals were initially sorted according to their start times.
+
+Example 1:
+
+Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+Output: [[1,5],[6,9]]
+Example 2:
+
+Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+Output: [[1,2],[3,10],[12,16]]
+Explanation: Because the new interval [4,8] overlaps with [3,5],[6,7],[8,10].
+
+
+</pre>
+
+<hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+# Definition for an interval.
+# class Interval(object):
+#     def __init__(self, s=0, e=0):
+#         self.start = s
+#         self.end = e
+
+class Solution(object):
+    def insert(self, intervals, newInterval):
+        """
+        :type intervals: List[Interval]
+        :type newInterval: Interval
+        :rtype: List[Interval]
+        """
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+我的思路：
+利用 merge sort 的方法来处理
+而且我这里采用了一种更加通用的解法，能够处理把两个 interval list merge 在一起的情况
+<br><br>
+<hr>
+<pre>
+# Definition for an interval.
+# class Interval(object):
+#     def __init__(self, s=0, e=0):
+#         self.start = s
+#         self.end = e
+
+class Solution(object):
+    def insert(self, intervals, newInterval):
+        """
+        :type intervals: List[Interval]
+        :type newInterval: Interval
+        :rtype: List[Interval]
+        """
+        # intervals = sorted(intervals, key = lambda x: x.start, reverse = False)
+        if len(intervals) == 0:
+            return [newInterval,]
+        
+        results = []
+        l1 = intervals
+        l2 = [newInterval,]
+        i1 = 0 # i for intervals
+        i2 = 0 # j for newInterval
+        n1 = len(l1)
+        n2 = len(l2)
+        while i1 < n1 or i2 < n2:
+            if len(results) == 0:
+                obj1 = l1[i1]
+                obj2 = l2[i2]
+                if obj1.start < obj2.start:
+                    results.append(obj1)
+                    i1 += 1
+                else:
+                    results.append(obj2)
+                    i2 += 1
+            else:
+                obj3 = None
+                if i1 == n1:
+                    obj3 = l2[i2]
+                    i2 += 1
+                else:
+                    if i2 == n2:
+                        obj3 = l1[i1]
+                        i1 += 1
+                    else:
+                        if l1[i1].start < l2[i2].start:
+                            obj3 = l1[i1]
+                            i1 += 1
+                        else:
+                            obj3 = l2[i2]
+                            i2 += 1
+                # merge int3 with results[-1]
+                if obj3.start > results[-1].end:
+                    results.append(obj3)
+                else:
+                    if obj3.end > results[-1].end:
+                        results[-1].end = obj3.end
+        return results
+                    
+              
+</pre>
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-04-06 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

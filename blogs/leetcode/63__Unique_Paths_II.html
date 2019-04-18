@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 63. Unique Paths II
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 63. Unique Paths II
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/unique-paths-ii/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
+
+The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
+
+Now consider if some obstacles are added to the grids. How many unique paths would there be?
+
+<img src="https://assets.leetcode.com/uploads/2018/10/22/robot_maze.png">
+
+An obstacle and empty space is marked as 1 and 0 respectively in the grid.
+
+Note: m and n will be at most 100.
+
+Example 1:
+
+Input:
+[
+  [0,0,0],
+  [0,1,0],
+  [0,0,0]
+]
+Output: 2
+Explanation:
+There is one obstacle in the middle of the 3x3 grid above.
+There are two ways to reach the bottom-right corner:
+1. Right -> Right -> Down -> Down
+2. Down -> Down -> Right -> Right
+
+</pre>
+
+1. <hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+ 
+class Solution(object):
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        """
+        :type obstacleGrid: List[List[int]]
+        :rtype: int
+        """
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+
+我的思路：<br>
+利用递归，每次计算出最开始的一个数字
+
+<br><br>
+<hr>
+<pre>
+class Solution(object):
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        """
+        :type obstacleGrid: List[List[int]]
+        :rtype: int
+        """
+        m = len(obstacleGrid)
+        n = len(obstacleGrid[0])
+        results = [[0 for x in range(n)] for i in range(m)]
+        print('m, n  = ', m, n)
+        print(results)    
+        if obstacleGrid[0][0] == 0:
+            results[0][0] = 1
+        else:
+            results[0][0] = 0
+            
+        for i in range(1, m):
+            if obstacleGrid[i][0] == 1:
+                results[i][0] = 0
+            else:
+                results[i][0] = results[i-1][0]
+                
+        for j in range(1, n):
+            if obstacleGrid[0][j] == 1:
+                results[0][j] = 0
+            else:
+                results[0][j] = results[0][j-1]
+        
+        for i in range(1, m):
+            for j in range(1, n):
+                if obstacleGrid[i][j] == 1:
+                    results[i][j] = 0
+                else:
+                    results[i][j] = results[i-1][j] + results[i][j-1]
+        return results[m-1][n-1]
+                    
+        
+
+</pre>
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-04-11 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

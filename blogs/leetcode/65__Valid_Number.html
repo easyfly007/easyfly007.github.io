@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 65. Valid Number
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 65. Valid Number
+              </h2>
+              <p class ='card-text'>
+<br><br>
+https://leetcode.com/problems/valid-number/
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Validate if a given string can be interpreted as a decimal number.
+
+Some examples:
+"0" => true
+" 0.1 " => true
+"abc" => false
+"1 a" => false
+"2e10" => true
+" -90e3   " => true
+" 1e" => false
+"e3" => false
+" 6e-1" => true
+" 99e2.5 " => false
+"53.5e93" => true
+" --6 " => false
+"-+3" => false
+"95a54e53" => false
+
+Note: It is intended for the problem statement to be ambiguous. You should gather all requirements up front before implementing one. However, here is a list of characters that can be in a valid decimal number:
+
+Numbers 0-9
+Exponent - "e"
+Positive/negative sign - "+"/"-"
+Decimal point - "."
+Of course, the context of these characters also matters in the input.
+
+Update (2015-02-10):
+The signature of the C++ function had been updated. If you still see your function signature accepts a const char * argument, please click the reload button to reset your code definition.
+
+ 
+</pre>
+
+1. <hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution(object):
+    def minPathSum(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+
+我的思路：<br>
+
+
+<br><br>
+<hr>
+<pre>
+class Solution(object):
+    def isNumber(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        beg = 0
+        for i in range(len(s)):
+            if s[i] != ' ':
+                beg = i
+                break
+        end = len(s) -1
+        for i in range(len(s) -1, -1, -1):
+            if s[i] != ' ':
+                end = i
+                break
+        s = s[beg: end +1]
+                
+        pos_e = s.find('e')
+        if pos_e == -1:
+            return self.isNumberFirst(s)
+        else:
+            return self.isNumberFirst(s[:pos_e]) and self.isNumberSecond(s[pos_e+1:])
+    
+    def isNumberFirst(self, s):
+        print('is number first : >' + s + '<')
+        if len(s) == 0:
+            return False
+        # only accept ([+-] xx.xx)
+        if s[0] in '-+':
+            s = s[1:]
+        if len(s) == 0:
+            return False
+        pos_dot = s.find('.')
+        if pos_dot != -1:
+            s1 = s[:pos_dot]
+            s2 = s[pos_dot +1 :]
+            if len(s1) == 0 and len(s2) == 0:
+                return False
+            for i in s1:
+                if i not in '0123456789':
+                    return False
+            for i in s2:
+                if i not in '0123456789':
+                    return False
+        else:
+            for i in s:
+                if i not in '0123456789':
+                    return False
+        return True
+    
+    def isNumberSecond(self, s):
+        print('is number second: >' + s + '<')
+        if len(s) == 0:
+            return False
+        if s[0] in '-+':
+            s = s[1:]
+        if len(s) == 0:
+            return False
+        for x in s:
+            if x not in '0123456789':
+                return False
+        return True
+
+
+</pre>
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-04-11 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> leetcode 68. Text Justification
+    </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> leetcode 68. Text Justification
+              </h2>
+              <p class ='card-text'>
+<br><br>
+
+https://leetcode.com/problems/text-justification/
+
+<hr><hr>
+<strong>problem:</strong>
+<hr>
+<pre>
+Given an array of words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
+
+You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters.
+
+Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line do not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+
+For the last line of text, it should be left justified and no extra space is inserted between words.
+
+Note:
+
+A word is defined as a character sequence consisting of non-space characters only.
+Each word's length is guaranteed to be greater than 0 and not exceed maxWidth.
+The input array words contains at least one word.
+Example 1:
+
+Input:
+words = ["This", "is", "an", "example", "of", "text", "justification."]
+maxWidth = 16
+Output:
+[
+   "This    is    an",
+   "example  of text",
+   "justification.  "
+]
+Example 2:
+
+Input:
+words = ["What","must","be","acknowledgment","shall","be"]
+maxWidth = 16
+Output:
+[
+  "What   must   be",
+  "acknowledgment  ",
+  "shall be        "
+]
+Explanation: Note that the last line is "shall be    " instead of "shall     be",
+             because the last line must be left-justified instead of fully-justified.
+             Note that the second line is also left-justified becase it contains only one word.
+Example 3:
+
+Input:
+words = ["Science","is","what","we","understand","well","enough","to","explain",
+         "to","a","computer.","Art","is","everything","else","we","do"]
+maxWidth = 20
+Output:
+[
+  "Science  is  what we",
+  "understand      well",
+  "enough to explain to",
+  "a  computer.  Art is",
+  "everything  else  we",
+  "do                  "
+]
+
+</pre>
+
+1. <hr><hr>
+<strong>start code (c++) </strong>
+<hr>
+<pre>
+class Solution(object):
+    def fullJustify(self, words, maxWidth):
+        """
+        :type words: List[str]
+        :type maxWidth: int
+        :rtype: List[str]
+        """
+
+
+</pre>
+
+<hr><hr>
+<strong>
+solution:
+</strong>
+<br><br>
+
+我的思路：<br>
+1. 利用递归，一步一步来。
+2. 首先在 list 当中插入 ' '
+   然后计算出每一行有哪些 words
+   再把每一个空格扩充
+
+<br><br>
+<hr>
+<pre>
+class Solution(object):
+    def fullJustify(self, words, maxWidth):
+        """
+        :type words: List[str]
+        :type maxWidth: int
+        :rtype: List[str]
+        """
+        self.results = []
+        self.build_lines(words, maxWidth)
+        return self.results
+    
+    def build_lines(self, words, maxWidth):
+        if len(words) == 0:
+            return
+        n = self.get_n_words_for_one_line(words, maxWidth)
+        one_line = ''
+        if n == len(words):
+            # last line
+            one_line = self.build_last_line(words[:n+1], maxWidth)
+        else:    
+            one_line = self.build_one_line(words[:n +1], maxWidth)
+        self.results.append(one_line)
+        self.build_lines(words[n+1:], maxWidth)
+    
+    def build_last_line(self, words, maxWidth):
+        line = ''
+        for word in words:
+            line += word
+            if len(line) < maxWidth:
+                line += ' '
+        if len(line) < maxWidth:
+            line += ' ' * (maxWidth - len(line))
+        return line
+    
+    def get_n_words_for_one_line(self, words, maxWidth):
+        char_cnt = -1
+        i = 0
+        while i < len(words):
+            word_len = len(words[i])
+            char_cnt += (1 + word_len)
+            if char_cnt > maxWidth:
+                char_cnt -= (1 + word_len)
+                i -= 1
+                break
+            i += 1
+        return i
+    
+    def build_one_line(self, words, maxWidth):
+        print('to build one line from: ' + str(words))
+        line = ''
+        word_cnt = len(words)
+        char_cnt = sum([len(x) for x in words])
+        space_cnt = maxWidth - char_cnt
+        if word_cnt == 1:
+            line = words[0]
+            line += ' ' * space_cnt
+            return line
+        avg_space = space_cnt / (word_cnt -1)
+        print('space_cnt = ', space_cnt)
+        print('avg_space = ', avg_space)
+        print('word_cnt = ', word_cnt)
+
+        
+        for i in range(int(space_cnt - avg_space * (word_cnt -1))):
+            line += words[i]
+            line += ' ' * int(avg_space +1)
+        print('line = >'+ line + "<")
+        for i in range(int(space_cnt - avg_space * (word_cnt -1)), word_cnt-1):
+            line += words[i]
+            line += ' '* int(avg_space)
+        line += words[-1]
+        return line
+    
+
+</pre>
+
+<hr>
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2019-04-06 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">Yifei Huang 2019</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

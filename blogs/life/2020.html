@@ -112,6 +112,40 @@ https://ptolemy.berkeley.edu/projects/embedded/pubs/downloads/spice/
 https://pan.baidu.com/s/1EhToFLBNuq9-xRVFZUHAWA 提取码: 9xf3
 
 
+http://www.useful2you.com/spice-tutorial/
+
+论文：In a Nutshell: How SPICE Works
+作者：Colin Warwick博士，Agilent公司(现更名为Keysight)
+
+课件：Semiconductor Modelling in SPICE
+作者：Paul D. Mitcheson教授，帝国理工大学
+
+教材：Fundamentals of Computer-Aided Circuit Simulation
+作者：William J. McCalla博士 （@Hewlett-Packard）
+
+UC Berkeley博士论文
+【1】Nagel L W. SPICE2: A computer program to simulate semiconductor circuits. 1975.
+【2】Quarles T L. Analysis of performance and convergence issues for circuit simulation. 1989.
+点评：这两篇博士论文分别凝聚着SPICE2和SPICE3的技术精华，其中Nagel实现了SPICE的“从无到有”，经典技术包括改进的节点分析法（ModifiedNodal Analysis），稀疏矩阵解法（Sparse Matrix Solver），牛顿-拉夫逊迭代（Newton-Raphson Iteration），隐性数值积分（Implicit Numerical Integration），动态时间步控制（Dynamic Time Step Control），局部截断误差（LocalTruncation Error）等等；在此基础之上，Quarles对SPICE进行了功能升级，从电路仿真速度、精度以及规模三个方面，对仿真性能、算法收敛以及程序架构进行了优化和改进，大大提升了SPICE用户的体验。
+如果想深入学习SPICE，请将Nagel论文打印出来，然后画上两三天的时间仔细研读，保证读完后受益匪浅，再次进行SPICE仿真时，不再会对各种各样的选项所困惑，反而会由衷赞叹程序设计的巧妙。
+
+SPICE编程手册
+
+【1】Cohen E. Program reference for SPICE2. 1976.
+【2】Quarles T L. The SPICE3 implementation guide[M]. 1989.
+点评：编程手册更类似于程序注释，但是描述更加系统规范。其中SPICE2编程手册作者Cohen是个计算机高手，被Nagel称为SPICE之“无名英雄”，经典的SPICE2G6版就是在他手里完成的；后来由于C语言的流行，Quarles 被委以重任，将SPICE用C语言重写，并且增加用户界面，为软件的商业化打下了坚实的基础。
+
+SPICE2是基于Fortran77语言开发的，总代码接近两万行，感兴趣的朋友可以看看代码，看看手册，学到真本领。对于SPICE3，如果编程基础不坚实，那么大致浏览一下编程手册就好，不要过于痴迷技术。
+
+开源代码：Fortran版本(SPICE2)+C版本(SPICE2, SPICE3)
+
+SPICE电路仿真入门与提高（附80M经典教程、论文、手册与源代码）
+百度云链接：http://pan.baidu.com/s/1dEJnxvV 密码：ne6z
+
+
+MNA：
+https://pdfs.semanticscholar.org/4c44/1f155d616d1f4ea63c1fc67c20716f4e1297.pdf?_ga=2.114057921.754736826.1585645911-1975646525.1585645911
+
 <br><br><hr><hr><br>
 2020-03-15 周日， <br><br>
 周三的时候去了 复鹄，上午的时候做了关于《how a SPICE simulator work》的报告，下午听取了他们关于团队目前的项目开展情况的报告。

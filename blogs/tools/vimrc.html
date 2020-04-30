@@ -183,12 +183,12 @@ else
 endif
 
 " Buffers操作快捷方式!
-nnoremap <C-RETURN> :bnext<CR>
-nnoremap <C-S-RETURN> :bprevious<CR>
+" nnoremap <C-RETURN> :bnext<CR>
+" nnoremap <C-S-RETURN> :bprevious<CR>
 
 " Tab操作快捷方式!
-nnoremap <C-TAB> :tabnext<CR>
-nnoremap <C-S-TAB> :tabprev<CR>
+" nnoremap <C-TAB> :tabnext<CR>
+" nnoremap <C-S-TAB> :tabprev<CR>
 
 "于tab的快捷
 " map tn :tabnext<cr>
@@ -200,10 +200,10 @@ nnoremap <C-S-TAB> :tabprev<CR>
 "窗口分割,行切的按需要接次,比如从下方窗口移
 "光到上方窗口,需要<c-w><c-w>k,非常麻,在重映射<c-k>,切的
 "候会得非常方便.
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
+" nnoremap <C-h> <C-w>h
+" nnoremap <C-j> <C-w>j
+" nnoremap <C-k> <C-w>k
+" nnoremap <C-l> <C-w>l
 
 "一些不的映射法（如果在一个文件中混合了不同言有用）
 "nnoremap <leader>1 :set filetype=xhtml<CR>
@@ -231,7 +231,7 @@ autocmd FileType python set tabstop=4 shiftwidth=4 expandtab
 autocmd FileType python map <F12> :!python %<CR>
 
 " 中状下 Ctrl+c 制
-vmap <C-c> "+y
+" vmap <C-c> "+y
 
 "" 打javascript折
 "let b:javascript_fold=1
@@ -258,7 +258,7 @@ if MySys() == "windows"                " 定windows系中ctags程序的位置
 elseif MySys() == "linux"              " 定windows系中ctags程序的位置
     let Tlist_Ctags_Cmd = '/usr/bin/ctags'
 endif
-nnoremap <silent><F4> :TlistToggle<CR>
+" nnoremap <silent><F4> :TlistToggle<CR>
 let Tlist_Show_One_File = 1            " 不同示多个文件的tag，只示当前文件的
 let Tlist_Exit_OnlyWindow = 1          " 如果taglist窗口是最后一个窗口，退出vim
 let Tlist_Use_Right_Window = 1         " 在右窗口中示taglist窗口
@@ -293,8 +293,8 @@ let Tlist_Compact_Format = 1
 " r 刷新当前目             R 刷新当前根目
 "-----------------------------------------------------------------
 " F3 NERDTree 切
-map <F3> :NERDTreeToggle<CR>
-imap <F3> <ESC>:NERDTreeToggle<CR>
+" map <F3> :NERDTreeToggle<CR>
+" imap <F3> <ESC>:NERDTreeToggle<CR>
 
 
 "-----------------------------------------------------------------
@@ -314,10 +314,10 @@ let NERDCompactSexyComs=1   " 多行注子更好看
 "-----------------------------------------------------------------
 let g:DoxygenToolkit_authorName="Asins - asinsimple AT gmail DOT com"
 let g:DoxygenToolkit_briefTag_funcName="yes"
-map <leader>da :DoxAuthor<CR>
-map <leader>df :Dox<CR>
-map <leader>db :DoxBlock<CR>
-map <leader>dc a /*  */<LEFT><LEFT><LEFT>
+" map <leader>da :DoxAuthor<CR>
+" map <leader>df :Dox<CR>
+" map <leader>db :DoxBlock<CR>
+" map <leader>dc a /*  */<LEFT><LEFT><LEFT>
 
 
 "-----------------------------------------------------------------
@@ -348,9 +348,9 @@ let g:NeoComplCache_EnableSkipCompletion = 1
 let g:NeoComplCache_SkipInputTime = '0.5'
 let g:NeoComplCache_SnippetsDir = $VIMFILES.'/snippets'
 " <TAB> completion.
-inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+" inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 " snippets expand key
-imap <silent> <C-e> <Plug>(neocomplcache_snippets_expand)
+" imap <silent> <C-e> <Plug>(neocomplcache_snippets_expand)
 "smap <silent> <C-e> <Plug>(neocomplcache_snippets_expand)
 
 

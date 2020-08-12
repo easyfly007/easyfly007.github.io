@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> python 01 - 列表的复制 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title">python： 利用pickle进行对象永久序列化</h2>
+              <p class ='card-text'>
+                <br>
+  <pre>
+
+numpy 学习
+1.  ndarray
+  
+  1. ndarray 概念
+    NumPy 最重要的一个特点是其 N 维数组对象 ndarray，它是一系列同类型数据的集合，以 0 下标为开始进行集合中元素的索引。
+    ndarray 对象是用于存放同类型元素的多维数组。
+    ndarray 中的每个元素在内存中都有相同存储大小的区域。
+    ndarray 内部由以下内容组成：
+      一个指向数据（内存或内存映射文件中的一块数据）的指针。
+        数据类型或 dtype，描述在数组中的固定大小值的格子。
+      一个表示数组形状（shape）的元组，表示各维度大小的元组。
+      一个跨度元组（stride），其中的整数指的是为了前进到当前维度下一个元素需要"跨过"的字节数。
+
+  2. np.dtype(np.int32)
+    用来创建或者使用一种数据类型
+
+  3. 数组属性
+    ndarray.ndim    秩，即轴的数量或维度的数量
+    ndarray.shape   数组的维度，对于矩阵，n 行 m 列
+    ndarray.size    数组元素的总个数，相当于 .shape 中 n*m 的值
+    ndarray.dtype   ndarray 对象的元素类型
+    ndarray.itemsize  ndarray 对象中每个元素的大小，以字节为单位
+    ndarray.flags   ndarray 对象的内存信息
+    ndarray.real    ndarray元素的实部
+    ndarray.imag    ndarray 元素的虚部
+    ndarray.data    包含实际数组元素的缓冲区，由于一般通过数组的索引获取元素，所以通常不需要使用这个属性。
+
+  4. 创建数组
+    numpy.empty(shape, dtype = float, order = 'C')
+      numpy.empty 方法用来创建一个指定形状（shape）、数据类型（dtype）且未初始化的数组
+    numpy.zeros(shape, dtype = float, order = 'C')
+      创建指定大小的数组，数组元素以 0 来填充：
+    numpy.ones(shape, dtype = None, order = 'C')
+      创建指定形状的数组，数组元素以 1 来填充
+
+  5. 利用已有的数据创建数组
+    numpy.asarray(a, dtype = None, order = None)
+      从数组创建 ndarray
+    numpy.frombuffer(buffer, dtype = float, count = -1, offset = 0)
+      从一段 buffer 当中创建 ndarray，dtype 为 s 的时候 buffer 要加 b，也就是 b'this is some string'
+    numpy.fromiter(iterable, dtype, count=-1)
+      可迭代对象中建立 ndarray 对象，返回一维数组。
+
+  6. 从数值范围创建数组
+    numpy.arange(start, stop, step, dtype)
+
+    np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)
+      创建一个一维数组，数组是一个等差数列构成的，
+    np.logspace(start, stop, num=50, endpoint=True, base=10.0, dtype=None)
+      创建一个于等比数列
+
+  7. 切片
+    一维数组
+      x = np.arange(10)
+      s = slice(2, 7, 3)
+      a = x[s]
+      b = x[2:7:3]
+    多维数组
+      x = np.asarray([[1,2,3], [4,5,6], [7,8,9]])
+      a = x[1:]
+      b = x[..., 1:]
+      c = x[..., 1]
+    选取特定索引元素
+      x = np.array([[1,2], [3,4], [5,6]])
+      a = x[[0,1,2], [0,1,1]]
+      # [0, 1, 2] 选择第一维度， [0,1,1] 选择第二维度
+    选取符合布尔条件的元素， 返回一维数组
+      x = np.array([[1,2,3], [4,5,6], [7,8,9]])
+      a = x[x > 5]
+      x = np.array([np.nan, 1, 2, np.nan])
+      a = x[~np.isnan(x)]
+
+      x = np.array([1, 2+6j, 6, 3+7j])
+      a = x[np.iscomplex(x)]
+
+  8. 广播
+    shape 相同，对于 * 是相同位置的元素的 *
+      x = np.asarray([[1,2,3], [4,5,6], [7,8,9]])
+      y = np.asarray([[1,2,3], [4,5,6], [7,8,9]])
+      z = x * y
+    shape 不同，从最小的维度开始，需要最小的维度相同
+      x = np.asarray([[1,2,3, 4], [4,5,6, 7], [7,8,9, 10]])
+      y = np.asarray([1,2,3, 0])
+      z = x * y
+  9. 迭代
+    可以对ndarray 直接进行迭代, 按照维度顺序
+      x = np.arange(12).shape(3, 4)
+      for i in x:
+        print(i)
+
+    nditer: 按照内存数据访问元素, 与行列和 shape 无关，哪怕你 reshape 了之后
+      x = np.arange(6).reshape(2,3)
+      for a in np.nditer(x):
+        print(a)
+
+      x = np.arange(6).reshape(2,3)
+      for a in np.nditer(x.T):
+        print(a)
+
+      x = np.arange(6).reshape(2,3)
+      for a in np.nditer(x.T.copy()):
+        print(a)
+    利用 nditer(order = 'C' ) 或者 order = 'F'
+      order = 'C': 先遍历内部的维度，再遍历外部的维度
+      order = 'F': 先遍历外部的维度，再遍历内部的维度
+
+    同时迭代两个 ndarray，支持广播
+      x = np.arange(0, 60, 5).reshape(3,4)
+      y = np.array([1,2,3,4])
+      for xi, yi in np.nditer([x, y]):
+        print(xi,yi)
+
+    flat: 按照维度顺序平坦化之后进行对每个元素数据进行迭代
+      for i in x.T.flat:
+        print(i)
+  10. 数组操作
+    reshape: 改变形状，不改变数据
+      x = np.arange(12).reshape(3,4)
+      y = x.reshape(4,3)
+    
+    flatten: 考贝返回一份平坦化的数组
+    flat: 返回原有数据的按照维度的平坦化迭代
+
+  11. 数组转置
+    x.T
+    x.transpose()
+
+  12. 数组拼接, 不改变 ndim
+    x = np.arange(12).reshape(3,4)
+    y = x + x
+    z = np.concatenate([x, y], axis = 0)
+    print(z)
+
+  13. 数组拼接，增加一个 ndim
+    x = np.arange(12).reshape(3,4)
+    y = x + x
+    z = np.stack([x,y])
+    print(z)
+
+    vstack() 等效于 concatenate(axis = 0)
+    hstack() 等效于 concatenate(axis = 1)
+  
+  14. split: 分割数组
+    split 之后， ndim 不变，但是 shape 会改变，返回多个 ndarray 组合的 ndarray
+
+    np.split(x, split_count, axis = 0)
+    x = np.arange(24).reshape(2,3,4)
+    y = np.split(x, 3, axis = 1)
+    print(y)
+    
+    hsplit 与 split(axis = 1 ) 等效
+    vsplit 与 split(axis = 0 ) 等效
+
+  15. 复制数组
+    resize(arr, shape) 
+      返回一个reshape 之后的新的数组
+      他们在内存上的排列是相同的
+      如果 新的 shape 大于原有的 shape，那么重复内存上的排列
+      如果 新的 shape 小于原有的 shape，那么多余的被丢弃
+  
+  16. 添加元素 append
+    b = np.append(x, a, axis = 0)
+    如果 axis = 0, 那么 a 的维度可以小于 x 一维度，也就是 0 的维度可以缺失
+    如果 axis > 0, 那么 a 的维度需要与 x 相同，相当于 concatenate
+    返回新的 ndarray
+
+  17. 删除元素
+    delete
+
+  18. 插入元素
+    insert
+
+  19. 位运算
+    a, b = 12, 14
+    print(bin(a))
+    print(bin(b))
+    x = np.bitwise_or(a, b)
+    x = np.bitwise_and(a, b)
+    x = np.invert(a)
+    x = np.left_shirt(a)
+    x = np.right_shift(a)
+
+  20. 字符串操作
+
+  21. 三角函数
+    np.sin()
+    np.cos()
+    np.tan()
+    np.arcsin()
+    np.arccos()
+    np.degrees()
+    np.arctan()
+    输入输出都是弧度，除了 degree 的转换
+
+  22. 数值处理
+    舍入（4 舍 5 入）
+      numpy.around(a,decimals)
+    向下取整
+      numpy.floor()
+    向上取整
+      numpy.ceil()
+
+  23. 数学操作
+    加减乘除取倒数取模
+    add, subtract, multiply, divide,
+
+  24. 统计操作
+    axis min: np.amin(array, axis = )
+    axis max: np.amax(array, axis = )
+    max - min: np.ptp(array, axis = )
+      相当于 np.amax() - np.amin()
+
+    百分位数： np.percentile(a, percentage, axis = None)
+    中位数: np.median(a, axis = None)
+    算术平均值: np.mean(a, axis = None)
+      axis 设置为 None，则为全部数据，否则为某一轴
+    权重平均值: np.average(a, weights = [ ...])
+    标准差: np.std(a, axis = None)
+      std = sqrt(mean((x - x.mean())**2))
+    方差: np.var(a, axis = None)
+      var = mean((x - x.mean())** 2)
+
+  25. 排序
+    np.sort(a, axis, kind, order)
+    kind 可以为： quicksort, mergesort, heapsort
+    order 表示按照数组的字段排序,也就是  ndarray 中的每一个元素，都是你自定义的，可以规定比较的 key
+    如果你的 element 为 (S5，int), 可以按照 S5 排序，要是 S5 相同，那么根据 sort 的类型，不能保证 int 是否稳定
+    mergesort 可以保证稳定，quicksort 和 heapsort 不能保证稳定
+    
+    numpy.argsort() 函数返回的是数组值从小到大的索引值。
+    numpy.lexsort() 多重比较并排序，返回索排序好的索引号
+      id = np.lexsort([value_list, name_list])
+      print(['name: {name}, value: {value}'.format(name = str(name_list[i]), value = str(value_list[i])) for i in id ])
+    msort(a) 等效于 sort(a, axis = 0)
+    sort_complex(a)
+      复数排序，先实部，再虚部
+    numpy.argmax(a, axis) 和 numpy.argmin(a, axis)
+      返回 指定 axis 上的 最大 / 最小的数的索引号
+
+  26. 筛选
+    我们往往先找到符合条件的布尔 array，然后作用于 ndarray
+    对于某些特殊的条件，我们有比较快速的筛选方法
+    1. np.nonzero(): 选择非零元的索引, 有几个维度，就有几个 索引 list
+      x = np.array([[1,2, 0], [0, 0, 1], [1, 0, 0]])
+      a = np.nonzero(x)
+      print('a = ', a)
+      b = x[a]
+      print(b)
+    2. np.where(): 筛选符合条件的数据的索引
+      x = np.arange(12).reshape(3,4)
+      a = np.where(x > 4)
+      b = x[a]
+    3. extract(condition, x): 按照条件筛选符合条件的数据
+      x = np.arange(9.).reshape(3,  3)  
+      condition = np.mod(x,2)  ==  0  
+      print (np.extract(condition, x))
+
+  27. 矩阵计算
+    https://www.runoob.com/numpy/numpy-matrix.html
+  28. 线性代数计算
+    https://www.runoob.com/numpy/numpy-linear-algebra.html
+  
+  29. 硬盘 IO
+    np.save() / np.load()
+    np.savez() / np.loadz()
+    np.savetxt() / np.loadtxt()
+  
+  30 matplotlib:
+    https://www.runoob.com/numpy/numpy-matplotlib.html
+    最简单的例子：
+      import numpy as np 
+      from matplotlib import pyplot as plt 
+       
+      x = np.arange(1,11) 
+      y =  2  * x +  5 
+      plt.title("Matplotlib demo") 
+      plt.xlabel("x axis caption") 
+      plt.ylabel("y axis caption") 
+      plt.plot(x,y) plt.show()
+
+    有subplot 的例子：
+      import numpy as np 
+      import matplotlib.pyplot as plt 
+      x = np.arange(0,  3  * np.pi,  0.1) 
+      y_sin = np.sin(x) 
+      y_cos = np.cos(x)  
+      # 建立 subplot 网格，高为 2，宽为 1  
+      # 激活第一个 subplot
+      plt.subplot(2,  1,  1)  
+      # 绘制第一个图像 
+      plt.plot(x, y_sin) 
+      plt.title('Sine')  
+      # 将第二个 subplot 激活，并绘制第二个图像
+      plt.subplot(2,  1,  2) 
+      plt.plot(x, y_cos) 
+      plt.title('Cosine')  
+      # 展示图像
+      plt.show()
+
+
+      
+  </pre>
+                
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2018-06-22 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">YIfei Huang 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

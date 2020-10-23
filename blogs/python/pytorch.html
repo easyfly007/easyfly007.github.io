@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> PyTorch 使用 </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/blog-home.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">Yifei's homepage</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../cv/index.html">CV</a>
+            </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="../index.html">Blogs</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <div class="row">
+
+        <!-- Blog Entries Column -->
+        <div class="col-md-12">
+
+          <h1 class="my-4"> -- </h1>
+
+          <!-- Blog Post -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 class="card-title"> PyTorch 手册</h2>
+              <p class ='card-text'>
+                <br>
+  <pre>
+
+1. 导入 pytorch
+
+import torch
+import numpy as np
+
+
+2. 创建 tensor
+
+创建一个没有初始化的 tensor
+x = torch.empty(5,3)
+print(x)
+
+创建随机矩阵,0-1 的范围
+x = torch.rand(5,3)
+
+创建全 0 矩阵
+x = torch.zeros(5,3, dtype = torch.long)
+
+创建来自数据的 tensor
+x = torch.tensor([5,0, 3.3])
+
+创建一个和已有的矩阵size 相同的矩阵
+y = x.new_ones(5, 3, dtype = torch.double)
+意思是说，我创建了一个 tensor，但是为了避免重复写 参数，可以用 New_*, 默认用原先的 x，除非重写了
+
+y 的 size 和 x 相同      
+y = otrch.randn_like(x, dtype = torch.float)
+
+获取 tensor 大小
+x.size()
+返回一个 tuple
+
+
+3. tensor 的运算
+
+加法
+z = x + y
+
+z = torch.add(x, y)
+
+result = torch.empty(5,3)
+torch.add(x,y, out=result)
+
++=
+
+x.copy_(y)
+x.add_(y)
+
+获取 tensor 切片
+完全和 numpy 的 nd array 相同
+x[:, 1]
+
+改变 shape，利用 view
+x = torch.randn(4,4)
+y = x.view(16)
+z = x.view(-1, 8)
+
+如果这个 tensor 只有一个 element，那么可以通过 item 求值
+x = torch.randn(2,2)
+y = x[1,0]
+print(y)
+print(y.item())
+
+
+4. torch tensor ==> numpy ndarray 转化 以及 numpy 到 torch
+
+a = torch.ones(5)
+b = a.numpy()
+print(a)
+print(b)
+
+注意，这里 a 和 b 的数值，利用的是相同的 memory，a 变了，b 也会变化
+
+a = np.ones(5)
+b = torch.from_numpy(a)
+print(a)
+print(b)
+
+
+5. cuda 支持
+if torch.cuda.is_available():
+  device = torch.device("cuda")
+  y = torch.ones_like(x, device = device)
+  x = x.to(device)
+  """
+  以下的代码在 gpu 上运算
+  """
+  z = x + y
+  print(z)
+  print(z.to("cpu", torch.double))
+
+
+6. 梯度运算
+x = torch.ones(2,2, requires_grad = True)
+print(x)
+y = x + 2
+print(y)
+print(y.grad_fn)
+z = y * y * 3
+out = z.mean()
+
+利用 .requires_grad_() 改变这个 bool 的 flag
+a = torch.randn(2,2)
+a = ((a * 3) / (a - 1))
+print(a.requires_grad)
+a.requires_grad_(True)
+print(a.requires_grad)
+b = (a * a).sum()
+print(b.grad_fn)
+
+计算梯度，需要进行一次 backward
+out.backward()
+求出导数 d(out) / dx
+print(x.grad)
+https://pytorch.apachecn.org/docs/1.0/blitz_autograd_tutorial.html
+
+x = torch.randn(3, requires_grad=True)
+y = x * 2
+while y.data.norm() < 1000:
+    y = y * 2
+print(y)
+==> tensor([-278.6740,  935.4016,  439.6572], grad_fn=<MulBackward0>)
+
+
+如果不需要 grad，可以利用 with torch.no_grad() 来阻止 autograd 跟踪设置了 .reguires_grad = True 的 tensor 的历史记录
+
+print(x.requires_grad)
+print((x ** 2).requires_grad)
+with torch.no_grad():
+    print((x ** 2).requires_grad)
+
+
+7. 神经网络
+利用 torch.nn 模块, 代码如下：
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class Net(nn.Module):
+
+    def __init__(self):
+        super(Net, self).__init__()
+        # 输入图像channel：1；输出channel：6；5x5卷积核
+        self.conv1 = nn.Conv2d(1, 6, 5)
+        self.conv2 = nn.Conv2d(6, 16, 5)
+        # an affine operation: y = Wx + b
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        # 2x2 Max pooling
+        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
+        # 如果是方阵,则可以只使用一个数字进行定义
+        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
+        x = x.view(-1, self.num_flat_features(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+
+    def num_flat_features(self, x):
+        size = x.size()[1:]  # 除去批处理维度的其他所有维度
+        num_features = 1
+        for s in size:
+            num_features *= s
+        return num_features
+
+net = Net()
+print(net)
+
+params = list(net.parameters())
+print(len(params))
+print(params[0].size())  # conv1's .weight
+
+input = torch.randn(1, 1, 32, 32)
+out = net(input)
+print(out)
+
+net.zero_grad()
+out.backward(torch.randn(1, 10))
+
+
+损失函数
+
+output = net(input)
+target = torch.randn(10)  # 本例子中使用模拟数据
+target = target.view(1, -1)  # 使目标值与数据值形状一致
+criterion = nn.MSELoss()
+
+loss = criterion(output, target)
+print(loss)
+
+  </pre>
+                
+
+
+              </p>
+              
+            </div>
+            <div class="card-footer text-muted">
+              Posted on 2020-10-23 by Yifei
+              <!-- <a href="#">Start Bootstrap</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">YIfei Huang 2017</p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="startbootstrap-blog-post-gh-pages/vendor/jquery/jquery.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/popper/popper.min.js"></script>
+    <script src="startbootstrap-blog-post-gh-pages/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+
+</html>

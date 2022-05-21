@@ -248,6 +248,8 @@ print(out)
 net.zero_grad()
 out.backward(torch.randn(1, 10))
 
+我们只要定义 forward 函数，backward 函数会在使用 autograd 的时候自动定义的。
+
 
 损失函数
 

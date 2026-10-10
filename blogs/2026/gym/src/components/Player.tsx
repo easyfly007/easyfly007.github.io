@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { EXERCISE_BY_ID } from '../data/exercises';
+import { buildCoaching, type CoachEvent } from '../engine/coaching';
 import { buildTimeline, locate, stepStart, totalSeconds } from '../engine/timeline';
 import { formatDuration } from '../labels';
 import { beep, speak, stopSpeaking } from '../speech';
@@ -50,6 +51,7 @@ function useWakeLock(active: boolean) {
 export function Player({ workout, coach, onExit }: Props) {
     const steps = useMemo(() => buildTimeline(workout.blocks), [workout]);
     const total = useMemo(() => totalSeconds(steps), [steps]);
+    const coaching = useMemo(() => buildCoaching(steps), [steps]);
 
     // 用时间戳计时，避免 setInterval 漂移；暂停时把已用时间存进 baseMs
     const [paused, setPaused] = useState(false);
@@ -117,6 +119,45 @@ export function Player({ workout, coach, onExit }: Props) {
         beep();
     }, [remaining, index, finished, paused]);
 
+    // 动作要点和进度提示：到点播报一次，同时在画面上显示
+    const [coachLine, setCoachLine] = useState<(CoachEvent & { index: number }) | null>(null);
+    const lastCoach = useRef('');
+    const sec = Math.floor(intoStep);
+    useEffect(() => {
+        if (finished || paused)
+            return;
+        const ev = coaching[index]?.find((e) => e.at === sec);
+        const key = `${index}:${sec}`;
+        if (!ev || key === lastCoach.current)
+            return;
+        lastCoach.current = key;
+        speak(ev.text);
+        setCoachLine({ ...ev, index });
+    }, [sec, index, finished, paused, coaching]);
+
+    // 全屏：优先用浏览器全屏；不支持时（如 iPhone）铺满窗口
+    const frameRef = useRef<HTMLDivElement>(null);
+    const [full, setFull] = useState(false);
+    useEffect(() => {
+        const onChange = () => {
+            if (!document.fullscreenElement)
+                setFull(false);
+        };
+        document.addEventListener('fullscreenchange', onChange);
+        return () => document.removeEventListener('fullscreenchange', onChange);
+    }, []);
+
+    function enterFull() {
+        setFull(true);
+        void frameRef.current?.requestFullscreen?.().catch(() => undefined);
+    }
+
+    function exitFull() {
+        setFull(false);
+        if (document.fullscreenElement)
+            void document.exitFullscreen().catch(() => undefined);
+    }
+
     // 正常做完时不打断"训练完成"的播报
     const finishedRef = useRef(false);
     finishedRef.current = finished;
@@ -174,12 +215,36 @@ export function Player({ workout, coach, onExit }: Props) {
                 {repNow !== undefined && (
                     <div className="reps">第 {repNow} / {step.reps} 次</div>
                 )}
-                {isWork && clipUrls(step.exerciseId, step.side, coach).length > 0 ? (
-                    <ExerciseVideo step={step} intoStep={intoStep} paused={paused} coach={coach} />
-                ) : hasAnimation(step.exerciseId) && (
-                    // 没有视频时用 3D 人偶动画；休息时预演下一个动作
-                    <ExerciseAnimation step={step} intoStep={intoStep} paused={paused} coach={coach} />
+                {coachLine && coachLine.index === index && (
+                    <div className={`coach-line ${coachLine.kind}`}>{coachLine.kind === 'tip' ? `要点：${coachLine.text}` : coachLine.text}</div>
                 )}
+                <div ref={frameRef} className={full ? 'media-frame full' : 'media-frame'}>
+                    {isWork && clipUrls(step.exerciseId, step.side, coach).length > 0 ? (
+                        <ExerciseVideo step={step} intoStep={intoStep} paused={paused} coach={coach} />
+                    ) : hasAnimation(step.exerciseId) && (
+                        // 没有视频时用 3D 人偶动画；休息时预演下一个动作
+                        <ExerciseAnimation step={step} intoStep={intoStep} paused={paused} coach={coach} />
+                    )}
+                    {!full && (
+                        <button type="button" className="full-btn" aria-label="全屏" title="全屏" onClick={enterFull}>⛶</button>
+                    )}
+                    {full && (
+                        <div className="full-overlay">
+                            <div className="full-top">
+                                <span>{isWork ? ex.name : `下一个：${ex.name}`}{step.side && `（${step.side === 'left' ? '左侧' : '右侧'}）`}</span>
+                                <span className="full-count">
+                                    {repNow !== undefined ? `第 ${repNow} / ${step.reps} 次 · ` : ''}{remaining}
+                                </span>
+                            </div>
+                            {coachLine && coachLine.index === index && <div className="full-coach">{coachLine.text}</div>}
+                            <div className="full-bottom">
+                                <button type="button" className="primary" onClick={() => setPaused(!paused)}>{paused ? '继续' : '暂停'}</button>
+                                <button type="button" onClick={() => jumpTo(index + 1)}>跳过</button>
+                                <button type="button" onClick={exitFull}>退出全屏</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
                 <ul className="cues">
                     {ex.cues.map((c) => (
                         <li key={c}>{c}</li>

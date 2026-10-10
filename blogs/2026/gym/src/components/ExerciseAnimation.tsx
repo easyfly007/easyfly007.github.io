@@ -57,6 +57,10 @@ export function ExerciseAnimation({ step, intoStep, paused, coach }: Props) {
         let last = '';
         const onResize = () => stage.resize();
         window.addEventListener('resize', onResize);
+        // 全屏切换等只改变画布大小、不触发窗口 resize 的情况
+        const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onResize);
+        if (canvasRef.current)
+            observer?.observe(canvasRef.current);
         const loop = () => {
             raf = requestAnimationFrame(loop);
             const c = clock.current;
@@ -71,6 +75,7 @@ export function ExerciseAnimation({ step, intoStep, paused, coach }: Props) {
         return () => {
             cancelAnimationFrame(raf);
             window.removeEventListener('resize', onResize);
+            observer?.disconnect();
         };
     }, [stage, step.exerciseId]);
 

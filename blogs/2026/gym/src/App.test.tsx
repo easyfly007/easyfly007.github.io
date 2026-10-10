@@ -155,6 +155,27 @@ describe('App flow', () => {
         expect(screen.getAllByRole('button', { name: /^移除 / }).length).toBe(before);
     });
 
+    it('speaks short tips during an exercise and supports fullscreen with pause and exit', () => {
+        render(<App />);
+        click('生成训练');
+        click('▶ 开始跟练');
+        click('跳过');
+        act(() => {
+            vi.advanceTimersByTime(5300);
+        });
+        expect(screen.getByText(/^要点：/)).toBeTruthy();
+
+        click('全屏');
+        click('退出全屏');
+        expect(screen.queryByRole('button', { name: '退出全屏' })).toBeNull();
+        click('全屏');
+        const overlay = document.querySelector('.full-overlay') as HTMLElement;
+        fireEvent.click(within(overlay).getByRole('button', { name: '暂停' }));
+        expect(within(overlay).getByRole('button', { name: '继续' })).toBeTruthy();
+        fireEvent.click(within(overlay).getByRole('button', { name: '退出全屏' }));
+        expect(document.querySelector('.full-overlay')).toBeNull();
+    });
+
     it('restores the last conditions on reload', () => {
         const first = render(<App />);
         click('杠铃');

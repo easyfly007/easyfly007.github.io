@@ -694,3 +694,97 @@ button.big {
     line-height: 1.4;
     color: var(--muted);
 }
+
+/* ---------- 跟练：口头提示与全屏 ---------- */
+.coach-line {
+    font-size: 17px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 8px;
+    background: var(--chip);
+}
+
+.coach-line.tip {
+    color: var(--phase);
+}
+
+.media-frame {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+}
+
+.full-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 2px 8px;
+    font-size: 18px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    border: none;
+}
+
+.media-frame.full {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    max-width: none;
+    background: #000;
+}
+
+.media-frame.full .exercise-video {
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+}
+
+.full-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+    color: #fff;
+    padding: 16px;
+}
+
+.full-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.full-count {
+    font-size: 28px;
+    font-variant-numeric: tabular-nums;
+}
+
+.full-coach {
+    align-self: center;
+    font-size: 22px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.full-bottom {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.full-bottom button {
+    font-size: 18px;
+    padding: 10px 20px;
+}

@@ -19,7 +19,8 @@ export interface Stage {
 
 interface Framing {
     target: THREE.Vector3;
-    distance: number;
+    halfV: number;              // 需要看到的半高
+    halfH: number;              // 需要看到的半宽
     views: AnimView[];
 }
 
@@ -65,7 +66,7 @@ export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage
     let figure: Figure | null = null;
     let def: AnimDef | null = null;
     let cycleSec = 2;
-    let framing: Framing = { target: new THREE.Vector3(0, 0.9, 0), distance: 3.4, views: ['front', 'side', 'full'] };
+    let framing: Framing = { target: new THREE.Vector3(0, 0.9, 0), halfV: 1.1, halfH: 0.8, views: ['front', 'side', 'full'] };
 
     function clear() {
         if (!figure)
@@ -91,13 +92,13 @@ export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage
         const size = box.getSize(new THREE.Vector3());
         const target = box.getCenter(new THREE.Vector3());
         target.y = Math.max(0.45, size.y * 0.5);
-        const half = Math.max(size.y * 0.5 + 0.25, (Math.max(size.x, size.z) * 0.5 + 0.3) / (16 / 9));
-        const distance = half / Math.tan((FOV / 2) * Math.PI / 180);
+        const halfV = size.y * 0.5 + 0.25;
+        const halfH = Math.max(size.x, size.z) * 0.5 + 0.3;
         // 站姿先看正面；躺/撑时从能看到身体全长的方向先看（身体沿 z 方向躺就从侧面看，沿 x 方向侧躺就从正面看）
         let views: AnimView[] = ['front', 'side', 'full'];
         if (!upright)
             views = size.x > size.z ? ['front', 'full', 'side'] : ['side', 'full', 'front'];
-        return { target, distance, views };
+        return { target, halfV, halfH, views };
     }
 
     function setExercise(exerciseId: string, side: 'left' | 'right' | undefined, coach: Gender) {
@@ -123,7 +124,8 @@ export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage
     }
 
     function placeCamera(view: AnimView) {
-        const { target: t, distance: d } = framing;
+        const { target: t, halfV, halfH } = framing;
+        const d = Math.max(halfV, halfH / camera.aspect) / Math.tan((FOV / 2) * Math.PI / 180);
         if (view === 'front')
             camera.position.set(t.x, t.y + d * 0.08, t.z + d);
         else if (view === 'side')

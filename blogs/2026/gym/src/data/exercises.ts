@@ -28,7 +28,7 @@ export const EXERCISES: Exercise[] = [
     ex({
         id: 'hip_circles', name: '髋关节绕环', phases: ['warmup'], category: 'mobility',
         muscles: ['glutes'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 30,
-        cues: ['双手叉腰，髋部画大圈', '顺时针、逆时针各做一半时间'],
+        cues: ['双手叉腰，髋部画大圈', '顺时针逆时针各一半'],
     }),
     ex({
         id: 'torso_twist', name: '站姿转体', phases: ['warmup'], category: 'mobility',
@@ -226,7 +226,7 @@ export const EXERCISES: Exercise[] = [
         id: 'burpee', name: '波比跳', phases: ['main'], category: 'cardio',
         muscles: ['full_body'], sweat: 5, intensity: 5, mode: 'time', defaultSeconds: 30,
         needsShoes: true, noisy: true, stresses: ['knee', 'wrist', 'back'],
-        cues: ['下蹲、后跳成平板、收腿、跳起', '落地轻柔，量力而行'],
+        cues: ['下蹲，后跳成平板，收腿跳起', '落地轻柔，量力而行'],
     }),
     ex({
         id: 'high_knees', name: '高抬腿跑', phases: ['main'], category: 'cardio',
@@ -611,7 +611,7 @@ export const EXERCISES: Exercise[] = [
     ex({
         id: 'negative_pullup', name: '离心引体（慢放）', equipment: ['pullup_bar'], phases: ['main'], category: 'strength',
         muscles: ['back', 'arms'], sweat: 2, intensity: 4, defaultReps: 5, secPerRep: 5, stresses: ['shoulder'],
-        cues: ['跳到下巴过杠的位置', '用 3 到 5 秒慢慢放下到手臂伸直'],
+        cues: ['跳到下巴过杠的位置', '用 3 到 5 秒慢放，到手臂伸直'],
     }),
     ex({
         id: 'jump_rope_alt', name: '交替脚跳绳', equipment: ['jump_rope'], phases: ['main'], category: 'cardio',

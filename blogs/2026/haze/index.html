@@ -600,6 +600,75 @@ section.block, section.todo { padding-block: 56px; border-top: 1px solid var(--l
   color: var(--ink);
 }
 .status.bad { background: var(--ember); border-color: var(--ember); color: #fff; }
+
+/* 历史：柱状图 */
+.chartbox {
+  margin-top: 28px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 6px;
+  padding: clamp(16px, 3vw, 24px);
+}
+.chartbox .presets { margin-bottom: 8px; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--font-num); font-size: var(--clbl, 13px); fill: var(--muted); }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .base { stroke: var(--muted); stroke-width: 1; }
+.chart .bar .fillp { transition: opacity 0.2s; }
+.chart .bar rect.hit { fill: transparent; }
+.chart .bar .none { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.chart .bar { cursor: pointer; }
+.chart .bar:focus { outline: none; }
+.chart .bar:hover .fillp, .chart .bar:focus-visible .fillp { opacity: 0.75; }
+.chart .bar:focus-visible .yr { fill: var(--ember); }
+.chart .bar.sel .yr { fill: var(--ember); font-weight: 700; }
+.chart .bar .val { fill: var(--ink); font-weight: 600; }
+.chart .bar .sub { font-family: var(--font-body); font-size: calc(var(--clbl, 13px) * 0.85); }
+
+.yearcard {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  gap: 6px 20px;
+}
+@media (max-width: 600px) { .yearcard { grid-template-columns: minmax(0, 1fr); } }
+.yearcard .yr {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--ember);
+}
+.yearcard h3 { font-size: var(--step-0); margin: 0 0 4px; }
+.yearcard p { margin: 0; font-size: 0.92rem; line-height: 1.7; }
+
+/* 政策：纵向时间轴 */
+.tl { list-style: none; margin: 28px 0 0; padding: 0; position: relative; max-width: 46em; }
+.tl::before { content: ""; position: absolute; left: 7.4rem; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+.tl li { position: relative; display: grid; grid-template-columns: 6.6rem minmax(0, 1fr); gap: 0 2.2rem; padding: 10px 0; }
+.tl li::before {
+  content: "";
+  position: absolute;
+  left: calc(7.4rem - 5px);
+  top: 18px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--muted);
+}
+.tl li.key::before { background: var(--ember); border-color: var(--ember); }
+.tl time { font-family: var(--font-num); font-weight: 700; font-size: 1.05rem; text-align: right; font-variant-numeric: tabular-nums; padding-top: 4px; }
+.tl h3 { font-size: var(--step-0); margin: 0; }
+.tl p { margin: 2px 0 0; font-size: 0.92rem; line-height: 1.7; color: var(--ink); }
+@media (max-width: 600px) {
+  .tl::before { left: 5px; }
+  .tl li { grid-template-columns: minmax(0, 1fr); padding-left: 26px; }
+  .tl li::before { left: 0; }
+  .tl time { text-align: left; }
+}
 h2 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -881,8 +950,43 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       </div>
     </div>
   </section>
-  <section class="todo" id="history"><div class="wrap"><h2><small>历史</small>三十年的烟</h2><p>第 4 步制作中：历次大霾对比。</p></div></section>
-  <section class="todo" id="policy"><div class="wrap"><h2><small>政策</small>从协定到警戒</h2><p>第 4 步制作中：政策时间轴。</p></div></section>
+  <section class="block" id="history">
+    <div class="wrap">
+      <h2><small>历史</small>三十年的烟</h2>
+      <p class="intro">
+        烟霾几乎每年旱季都会来，但只有几年烧成了"大霾"。下面把能找到可靠数字的年份放在一起比较；找不到出处的年份留空，不做估计。点柱子看每一年的情况。
+      </p>
+
+      <div class="chartbox">
+        <div class="presets" id="metric" role="group" aria-label="比较的指标"></div>
+        <div class="chart"><svg id="hist" viewBox="0 0 640 300" role="group" aria-label="历次大霾对比柱状图"></svg></div>
+        <div class="yearcard" id="yearcard" aria-live="polite"></div>
+      </div>
+      <p class="note">
+        1997 年的面积来自联合国的报道（被毁森林面积），2015 年起是印尼官方监测系统 SiPongi 的全年过火面积，统计口径不同，只适合比较量级。2026 年只统计到 7 月，霾季还没有结束。损失都只算印尼一国，不含邻国的损失。
+      </p>
+    </div>
+  </section>
+
+  <section class="block" id="policy">
+    <div class="wrap">
+      <h2><small>政策</small>从协定到警戒</h2>
+      <p class="intro">每一场大霾之后都会多出一份文件。协定、法律、禁令一条条加上去，烟霾还是会回来。</p>
+      <ol class="tl">
+        <li class="key"><time>1997.12</time><div><h3>《区域烟霾行动计划》</h3><p>1997 年大霾之后，首届东盟烟霾部长会议在新加坡通过行动计划，内容是防火、监测和提升灭火能力，但没有法律约束力<a class="src" href="https://cil.nus.edu.sg/databasecil/1997-regional-haze-action-plan-3" target="_blank" rel="noopener">NUS CIL</a>。</p></div></li>
+        <li class="key"><time>2002.6</time><div><h3>签署《东盟跨境烟霾污染协定》</h3><p>东盟环境部长在吉隆坡签署协定<a class="src" href="https://news.un.org/en/story/2002/06/37182-agreement-asian-countries-forest-fire-haze-welcomed-un-environment-agency" target="_blank" rel="noopener">UN News</a>。</p></div></li>
+        <li><time>2003.11</time><div><h3>协定生效</h3><p>泰国交存第六份批准书后，协定于 2003 年 11 月 25 日生效<a class="src" href="https://asean.org/asean-haze-agreement-to-enter-into-force" target="_blank" rel="noopener">ASEAN</a>。</p></div></li>
+        <li><time>2014.8</time><div><h3>新加坡通过《跨境烟霾污染法》</h3><p>造成或助长跨境烟霾污染的企业，最高可罚 200 万新元<a class="src" href="https://www.eco-business.com/news/parliament-passes-transboundary-haze-pollution-bill/" target="_blank" rel="noopener">Eco-Business</a>。</p></div></li>
+        <li class="key"><time>2014.9</time><div><h3>印尼批准协定</h3><p>印尼国会批准协定，距签署已过去 12 年，印尼是最后一个批准的东盟成员国<a class="src" href="https://www.thejakartapost.com/news/2014/09/17/ri-ratifies-haze-treaty.html" target="_blank" rel="noopener">Jakarta Post</a>。</p></div></li>
+        <li><time>2016.1</time><div><h3>印尼成立泥炭地恢复署（BRG）</h3><p>2015 年大火之后成立，目标是恢复 200 万公顷退化泥炭地<a class="src" href="https://blogs.worldbank.org/en/eastasiapacific/controlling-burn-indonesia-s-efforts-prevent-forest-and-land-fire-crisis" target="_blank" rel="noopener">World Bank</a>。</p></div></li>
+        <li class="key"><time>2019.8</time><div><h3>原始林和泥炭地新许可永久禁令</h3><p>佐科总统签署总统指示，把原始林和泥炭地的新许可禁令改为永久，覆盖约 6,600 万公顷<a class="src" href="https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent" target="_blank" rel="noopener">WEF</a>。</p></div></li>
+        <li><time>2023</time><div><h3>东盟烟霾协调中心落户印尼</h3><p>印尼批准设立东盟跨境烟霾污染控制协调中心（ACC THPC）的协定，东盟正式确定中心设在印尼<a class="src" href="https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc" target="_blank" rel="noopener">ANTARA</a>。</p></div></li>
+        <li><time>2024</time><div><h3>泥炭地恢复机构授权到期</h3><p>BRG 后来改为泥炭地与红树林恢复署（BRGM），其临时授权在 2024 年到期<a class="src" href="https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015" target="_blank" rel="noopener">The Vibes</a>。</p></div></li>
+        <li><time>2026.4</time><div><h3>协调中心雅加达办公室启用</h3><p>官员表示，要等各方都批准后中心才能全面运作<a class="src" href="https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc" target="_blank" rel="noopener">ANTARA</a>。</p></div></li>
+        <li class="key"><time>2026.8</time><div><h3>东盟启动 Level 3 警戒</h3><p>8 月 26 日启动最高级别区域警戒，成员国须每天提交态势报告和烟羽轨迹图<a class="src" href="https://en.antaranews.com/news/430264/indonesias-2026-fire-season-strains-asean-haze-response" target="_blank" rel="noopener">ANTARA</a>。</p></div></li>
+      </ol>
+    </div>
+  </section>
   <section class="todo" id="action"><div class="wrap"><h2><small>应对</small>能做什么</h2><p>第 5 步制作中：应急、长期与个人防护。</p></div></section>
   <section class="todo" id="sources"><div class="wrap"><h2><small>来源</small>资料出处</h2><p>第 5 步制作中：来源汇总。</p></div></section>
 </main>
@@ -1844,6 +1948,190 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     setWt(parseInt(wtSlider.value, 10));
   });
   setWt(70);
+
+  // ---------- 历史：柱状图 ----------
+  var HSRC = {
+    un: ["UN News", "https://news.un.org/en/story/2002/06/37182-agreement-asian-countries-forest-fire-haze-welcomed-un-environment-agency"],
+    mg06: ["Mongabay 2006", "https://news.mongabay.com/2006/11/southeast-asian-nations-propose-haze-fund-but-fail-to-address-root-cause/"],
+    nlb: ["NLB Infopedia", "https://eresources.nlb.gov.sg/infopedia/articles/SIP_2013-08-30_185150.html"],
+    wiki13: ["Wikipedia", "https://en.wikipedia.org/wiki/2013_Southeast_Asian_haze"],
+    gs: ["GoodStats / SiPongi", "https://data.goodstats.id/statistic/simak-luas-karhutla-indonesia-2015-2024-ggvhd"],
+    wb: ["World Bank", "https://blogs.worldbank.org/en/eastasiapacific/controlling-burn-indonesia-s-efforts-prevent-forest-and-land-fire-crisis"],
+    phys: ["phys.org", "https://phys.org/news/2019-12-indonesia-billion-forest-fire-losses-world.html"],
+    wef: ["WEF", "https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent"],
+    an26: ["ANTARA", "https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc"],
+    abc: ["ABC", "https://www.abc.net.au/news/2026-09-07/indonesia-wildfires-haze-poor-air-quality-smog-drought-el-nino/107122922"],
+    wiki26: ["Wikipedia", "https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze"]
+  };
+  function hrefs(keys) {
+    return srcLinks(keys.map(function (k) {
+      return HSRC[k];
+    }));
+  }
+
+  // area：万公顷；loss：亿美元；null 表示找不到可靠数字
+  var YEARS = [
+    { y: "1997", area: 1000, loss: 93, approx: true, title: "1997–98：大霾的起点",
+      text: "约 1,000 万公顷印尼森林被毁，2,000 多万人暴露在极高浓度的污染物中，经济损失约 93 亿美元", src: ["un"],
+      more: "这场大霾直接促成了东盟的《区域烟霾行动计划》和 2002 年的跨境烟霾协定。" },
+    { y: "2006", area: null, loss: null, title: "2006：设立烟霾基金",
+      text: "11 月，东盟相关部长会议提出设立烟霾基金，新加坡和印尼出资 10 万美元启动；评论认为它没有触及毁林这个根本原因", src: ["mg06"],
+      more: "这一年没有找到可靠的过火面积和损失数字。" },
+    { y: "2013", area: null, loss: null, title: "2013：新加坡 PSI 破纪录",
+      text: "6 月 21 日中午，新加坡 3 小时 PSI 达到 401，打破 1997 年 226 的纪录", src: ["nlb", "wiki13"],
+      more: "这一年没有找到可靠的过火面积和损失数字。" },
+    { y: "2015", area: 261.1, loss: 161, title: "2015：图中损失最大的一年",
+      text: "全年过火 2,611,411 公顷", src: ["gs"],
+      text2: "世界银行估算印尼的经济损失达 161 亿美元；之后印尼在 2016 年 1 月成立泥炭地恢复署", src2: ["wb"] },
+    { y: "2019", area: 164.9, loss: 52, title: "2019：仅次于 2015",
+      text: "全年过火 1,649,258 公顷，是 2015 年之后最多的一年", src: ["gs"],
+      text2: "世界银行估算损失约 52 亿美元，约占印尼 GDP 的 0.5%", src2: ["phys"],
+      more2: { text: "同年 8 月，原始林和泥炭地新许可禁令改为永久", src: ["wef"] } },
+    { y: "2023", area: 116.1, loss: null, title: "2023：又一个大火年",
+      text: "全年过火 1,161,193 公顷", src: ["gs"],
+      text2: "同年印尼批准设立东盟烟霾协调中心的协定", src2: ["an26"],
+      more: "这一年没有找到可靠的经济损失估算。" },
+    { y: "2026", area: 20.2, loss: null, partial: true, title: "2026：还没结束",
+      text: "1 到 7 月全国过火已超过 20.2 万公顷，8 月以后的数字还没有全年统计", src: ["abc"],
+      text2: "超强厄尔尼诺与正印度洋偶极子同时出现", src2: ["wiki26"],
+      more: "经济损失还没有估算。" }
+  ];
+
+  var METRICS = [
+    { key: "area", label: "过火面积", unit: "万公顷", max: 1080, ticks: [0, 250, 500, 750, 1000] },
+    { key: "loss", label: "经济损失", unit: "亿美元", max: 175, ticks: [0, 50, 100, 150] }
+  ];
+  var metric = METRICS[0];
+  var selYear = "2026";
+
+  var hist = document.getElementById("hist");
+  var metricEl = document.getElementById("metric");
+  var yearCard = document.getElementById("yearcard");
+
+  var CH = { left: 46, right: 632, top: 30, bottom: 250 };
+  var slotW = (CH.right - CH.left) / YEARS.length;
+  var barW = Math.min(46, slotW * 0.55);
+
+  function fmt(v) {
+    return v >= 100 ? String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, ",") : String(v);
+  }
+
+  // 窄屏时把图拉高，免得柱子太扁
+  function histHeight() {
+    return hist.getBoundingClientRect().width < 500 ? 500 : 300;
+  }
+
+  function drawHist() {
+    var H = histHeight();
+    hist.setAttribute("viewBox", "0 0 640 " + H);
+    CH.bottom = H > 300 ? H - 80 : H - 50;
+    var h = [];
+    h.push('<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
+      '<rect width="6" height="6" fill="var(--surface)"/><rect width="3" height="6" fill="var(--ember)"/></pattern></defs>');
+    var span = CH.bottom - CH.top;
+    metric.ticks.forEach(function (t) {
+      var y = f1(CH.bottom - t / metric.max * span);
+      h.push('<line class="' + (t === 0 ? "base" : "grid") + '" x1="' + CH.left + '" x2="' + CH.right + '" y1="' + y + '" y2="' + y + '"/>');
+      h.push('<text x="' + (CH.left - 8) + '" y="' + y + '" dy="0.35em" text-anchor="end">' + fmt(t) + "</text>");
+    });
+    h.push('<text x="0" y="6" text-anchor="start" style="font-family:var(--font-body)">' + metric.label + "（" + metric.unit + "）</text>");
+    YEARS.forEach(function (d, i) {
+      var cx = CH.left + slotW * (i + 0.5);
+      var x = f1(cx - barW / 2);
+      var v = d[metric.key];
+      var cls = "bar" + (d.y === selYear ? " sel" : "");
+      var label = d.y + " 年，" + metric.label + "：" + (v === null ? "无可靠数据" : (d.approx ? "约 " : "") + fmt(v) + " " + metric.unit + (d.partial ? "（1–7 月）" : ""));
+      h.push('<g class="' + cls + '" data-y="' + d.y + '" tabindex="0" role="button" aria-label="' + label + '"><title>' + label + "</title>");
+      h.push('<rect class="hit" x="' + f1(cx - slotW / 2) + '" y="' + CH.top + '" width="' + f1(slotW) + '" height="' + (CH.bottom - CH.top + 46) + '"/>');
+      if (v === null) {
+        h.push('<rect class="none" x="' + x + '" y="' + (CH.bottom - 34) + '" width="' + f1(barW) + '" height="34" rx="4"/>');
+        h.push('<text class="sub" x="' + f1(cx) + '" y="' + (CH.bottom - 42) + '" text-anchor="middle">无数据</text>');
+      } else {
+        var bh = Math.max(2, v / metric.max * span);
+        var y = f1(CH.bottom - bh);
+        // 顶端 4px 圆角、底端贴着基线
+        var path = "M" + x + "," + CH.bottom + "V" + f1(+y + 4) + "Q" + x + "," + y + " " + f1(+x + 4) + "," + y +
+          "H" + f1(+x + barW - 4) + "Q" + f1(+x + barW) + "," + y + " " + f1(+x + barW) + "," + f1(+y + 4) + "V" + CH.bottom + "Z";
+        h.push('<path d="' + path + '" fill="' + (d.partial ? "url(#hatch)" : "var(--ember)") + '" class="fillp"/>');
+        h.push('<text class="val" x="' + f1(cx) + '" y="' + (y - 6) + '" text-anchor="middle">' + (d.approx ? "约" : "") + fmt(v) + (d.partial ? "+" : "") + "</text>");
+      }
+      h.push('<text class="yr" x="' + f1(cx) + '" y="' + CH.bottom + '" dy="1.3em" text-anchor="middle">' + d.y + "</text>");
+      if (d.partial)
+        h.push('<text class="sub" x="' + f1(cx) + '" y="' + CH.bottom + '" dy="2.9em" text-anchor="middle">1–7 月</text>');
+      h.push("</g>");
+    });
+    hist.innerHTML = h.join("");
+    metricEl.querySelectorAll("button").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-k") === metric.key ? "true" : "false");
+    });
+  }
+
+  function drawCard() {
+    var d = null;
+    YEARS.forEach(function (x) {
+      if (x.y === selYear)
+        d = x;
+    });
+    var body = d.text + hrefs(d.src) + "。";
+    if (d.text2)
+      body += d.text2 + hrefs(d.src2) + "。";
+    if (d.more2)
+      body += d.more2.text + hrefs(d.more2.src) + "。";
+    if (d.more)
+      body += d.more;
+    yearCard.innerHTML = '<div class="yr">' + d.y + "</div><div><h3>" + d.title + "</h3><p>" + body + "</p></div>";
+  }
+
+  METRICS.forEach(function (m) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("data-k", m.key);
+    b.innerHTML = "<span>" + m.label + "</span><b>" + m.unit + "</b>";
+    b.addEventListener("click", function () {
+      metric = m;
+      drawHist();
+    });
+    metricEl.appendChild(b);
+  });
+
+  function pickYear(target) {
+    var g = target.closest(".bar");
+    if (!g)
+      return;
+    selYear = g.getAttribute("data-y");
+    hist.querySelectorAll(".bar").forEach(function (b) {
+      b.classList.toggle("sel", b === g);
+    });
+    drawCard();
+  }
+  hist.addEventListener("click", function (ev) {
+    pickYear(ev.target);
+  });
+  hist.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" && ev.key !== " ")
+      return;
+    ev.preventDefault();
+    pickYear(ev.target);
+  });
+
+  function sizeHistLabels() {
+    var w = hist.getBoundingClientRect().width;
+    if (!w)
+      return;
+    hist.style.setProperty("--clbl", f1(Math.max(13, Math.min(30, 14 * 640 / w))) + "px");
+  }
+  var lastHistH = 0;
+  window.addEventListener("resize", function () {
+    sizeHistLabels();
+    if (histHeight() !== lastHistH) {
+      lastHistH = histHeight();
+      drawHist();
+    }
+  });
+  sizeHistLabels();
+  lastHistH = histHeight();
+  drawHist();
+  drawCard();
 })();
 </script>
 </body>

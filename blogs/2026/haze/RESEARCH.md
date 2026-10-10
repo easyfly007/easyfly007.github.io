@@ -97,16 +97,28 @@
 - 非常不健康、危险两档的建议 → 第三方指南转述 NEA 海报（https://littlebigreddot.com/singapore-haze-guide-psi-pm25-30-september-2026/），⚠ 最好换成 haze.gov.sg 的官方页面
 - 2013 年 6 月 21 日中午新加坡 3 小时 PSI 401，此前纪录是 1997 年的 226 → NLB Infopedia、Wikipedia 2013
 
-## 历史数据（第 4 步要用，全部 ⚠ 待找原始出处）
+## 历史数据（第 4 步已用，2026-10-10 核实）
 
-- 1997–98：过火约 970 万公顷，区域经济损失约 90 亿美元
-- 2006、2013（新加坡 3 小时 PSI 401）
-- 2015：过火 260 万公顷，印尼损失 161 亿美元（World Bank）；约 10 万人过早死亡（Koplitz 等 2016）
-- 2019：过火约 165 万公顷（印尼环境林业部 KLHK），损失 52 亿美元（World Bank）
-- 2023：过火约 116 万公顷（KLHK）
+- 1997–98：约 1,000 万公顷印尼国有林被毁，2,000 多万人暴露在极高浓度污染物中，经济损失约 93 亿美元 → UN News 2002-06-10 https://news.un.org/en/story/2002/06/37182-agreement-asian-countries-forest-fire-haze-welcomed-un-environment-agency 。（常见的 970 万公顷出自 CIFOR，原文页未打开，不用）
+- 2006：11 月东盟次区域部长级指导委员会首次会议提出设立烟霾基金，新加坡和印尼出资 10 万美元启动；文章批评没触及毁林这一根本原因；1997–98 年大火造成东南亚经济损失超 90 亿美元 → Mongabay 2006-11 https://news.mongabay.com/2006/11/southeast-asian-nations-propose-haze-fund-but-fail-to-address-root-cause/ 。2006 年过火面积、损失：没找到可靠数字
+- 2013：新加坡 3 小时 PSI 401（已用，见上）。过火面积、损失：没找到
+- 过火面积（SiPongi，经 GoodStats 2025-03-28 整理）https://data.goodstats.id/statistic/simak-luas-karhutla-indonesia-2015-2024-ggvhd ：2015 年 2,611,411 ha；2019 年 1,649,258 ha（仅次于 2015）；2023 年 1,161,193 ha
+- 2015 损失 161 亿美元 → World Bank 博客 2016-10-26 https://blogs.worldbank.org/en/eastasiapacific/controlling-burn-indonesia-s-efforts-prevent-forest-and-land-fire-crisis （同文：2016 年 1 月成立泥炭地恢复署 BRG，目标恢复 200 万公顷退化泥炭地）
+- 2019 损失约 52 亿美元，约占 GDP 0.5%（世界银行《印尼经济季报》）→ phys.org 2019-12-11 https://phys.org/news/2019-12-indonesia-billion-forest-fire-losses-world.html 。该文的 94.2 万公顷是当年季中数字，和 SiPongi 全年数不同，不用
+- 2026：1–7 月全国过火超 20.2 万公顷 → ABC 9/7（见上）
 
-## 政策时间轴（第 4 步要用，全部 ⚠ 待找原始出处）
+## 政策时间轴（第 4 步已用）
 
-1995 东盟跨境污染合作计划 → 1997 区域烟霾行动计划 → 2002 东盟跨境烟霾污染协定（AATHP）签署，2003 年生效 → 2014 印尼批准（最后一个批准的成员国）；新加坡《跨境烟霾污染法》→ 2016 印尼泥炭地恢复署（BRG）；东盟无烟霾路线图（目标 2020 年，未实现）→ 2019 原始林和泥炭地新许可永久禁令 → 2023 ACC THPC 设立协定 → 2026 Level 3
+- 1997 年 12 月：首届东盟烟霾部长会议（新加坡）通过《区域烟霾行动计划》，不具法律约束力 → NUS CIL https://cil.nus.edu.sg/databasecil/1997-regional-haze-action-plan-3 （⚠ 页面抓取为空，内容来自搜索摘要：通过日期 1997-12-23）
+- 2002-06-10：东盟十国环境部长在吉隆坡签署《东盟跨境烟霾污染协定》→ UN News 2002
+- 2003-11-25：协定生效（泰国 2003-09-26 交存第六份批准书）→ ASEAN https://asean.org/asean-haze-agreement-to-enter-into-force （⚠ 页面 307 跳转未打开，内容来自搜索摘要）
+- 2014-08-05：新加坡国会通过《跨境烟霾污染法》，企业最高罚款 200 万新元 → Eco-Business 2014-08-06 https://www.eco-business.com/news/parliament-passes-transboundary-haze-pollution-bill/
+- 2014 年 9 月：印尼国会批准协定，是最后一个批准的东盟成员国 → Jakarta Post 2014-09-17 https://www.thejakartapost.com/news/2014/09/17/ri-ratifies-haze-treaty.html （⚠ 页面未打开，内容来自搜索摘要）
+- 2016 年 1 月：印尼成立泥炭地恢复署（BRG）→ World Bank 博客 2016
+- 2019-08-05：佐科签署第 5/2019 号总统指示，原始林和泥炭地新许可禁令永久化，覆盖约 6,600 万公顷 → WEF 2019-08 https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent （页面未打开，内容来自搜索摘要）
+- 2023：印尼批准东盟跨境烟霾污染控制协调中心（ACC THPC）设立协定，东盟正式确定中心设在印尼（2016 年已被指定为东道国）→ ANTARA 2026-04-22 https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc
+- 2024：BRGM 临时授权到期 → The Vibes 9/20
+- 2026-04-22：ACC THPC 雅加达办公室启用 → ANTARA 2026-04-22
+- 2026-08-26：Level 3 → ANTARA（见上）
 
 泥炭地剖面交互要用的法规：PP 71/2014（经 PP 57/2016 修订）规定泥炭地地下水位低于地表 0.4 米即视为受损 → 已用 Christiawan 2017 作为出处（见"成因"）

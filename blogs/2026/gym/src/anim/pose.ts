@@ -79,7 +79,7 @@ export const STAND: Required<Pick<Pose, 'pitch' | 'roll' | 'yaw' | 'lift' | 'twi
 };
 
 const VECTOR_KEYS = ['spine', 'head', 'armL', 'foreL', 'armR', 'foreR', 'thighL', 'shinL', 'thighR', 'shinR', 'toeL', 'toeR'] as const;
-const NUMBER_KEYS = ['pitch', 'roll', 'yaw', 'lift', 'twist'] as const;
+const NUMBER_KEYS = ['pitch', 'roll', 'yaw', 'lift', 'twist', 'dx', 'dz'] as const;
 
 export function fullPose(p: Pose): Pose {
     return { ...STAND, ...p };
@@ -138,6 +138,7 @@ export function mirrorPose(p: Pose): Pose {
     out.roll = p.roll === undefined ? undefined : -p.roll;
     out.yaw = p.yaw === undefined ? undefined : -p.yaw;
     out.twist = p.twist === undefined ? undefined : -p.twist;
+    out.dx = p.dx === undefined ? undefined : -p.dx;
     return out;
 }
 

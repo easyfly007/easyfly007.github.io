@@ -10,6 +10,8 @@ export interface Pose {
     roll?: number;
     yaw?: number;
     lift?: number;              // 离地高度（跳跃腾空）
+    dx?: number;                // 整个人在水平面上平移（世界坐标，米），如滑冰跳左右跳
+    dz?: number;
     spine?: V3;                 // 胸腔朝上的方向（骨盆坐标系）
     twist?: number;             // 上身相对骨盆的扭转，向左转为正
     head?: V3;                  // 头顶方向（胸腔坐标系）
@@ -41,6 +43,7 @@ export type BodyProp =
     | 'bandKnees'               // 弹力带套在两膝
     | 'bandFeet'                // 两手各拉一根弹力带到同侧脚下
     | 'bandAnchor'              // 两手拉向前方固定点
+    | 'bandBack'                // 弹力带从两手绕过后背（推胸）
     | 'rope';                   // 跳绳
 
 // 固定在场景里的物体：位置在第一帧按身体某处算出后就不再移动
@@ -48,6 +51,7 @@ export interface SceneProp {
     kind: 'chair' | 'bar' | 'wall';
     at: 'hands' | 'handL' | 'footL' | 'footR' | 'back' | 'front';
     offset?: V3;                // 在算出的位置上再平移（世界坐标）
+    turn?: boolean;             // 墙面转 90 度（立在人物侧面）
 }
 
 export type Anchor = 'feet' | 'footL' | 'footR' | 'hands' | 'none';
@@ -57,6 +61,8 @@ export interface AnimDef {
     keys: [number, Pose][];     // [循环内的进度 0..1, 姿态]，第一个必须是 0；最后自动接回第一个
     anchor?: Anchor;            // 哪个部位在水平面上保持不动（默认骨盆不动）
     hang?: boolean;             // 悬垂：手固定在单杠高度，不贴地
+    plant?: { part: 'footL' | 'footR'; y: number };  // 这只脚踩在高处（凳面高度 y），身体其余部分不低于地面
+    repsPerCycle?: number;      // 一个循环包含几次（左右交替的动作 = 2），默认 1
     props?: BodyProp[];
     scene?: SceneProp[];
     linear?: boolean;           // 关键帧之间匀速（跑、跳）；默认缓入缓出

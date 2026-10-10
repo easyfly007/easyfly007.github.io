@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EXERCISE_BY_ID } from '../data/exercises';
+import { EXERCISES, EXERCISE_BY_ID } from '../data/exercises';
 import { createFigure } from './figure';
 import { ANIMATIONS } from './library';
 import { mirrorDef, poseAt } from './pose';
@@ -8,6 +8,10 @@ import { animCycleSec, viewIndexAt } from './schedule';
 const PHASES = Array.from({ length: 16 }, (_, i) => i / 16);
 
 describe('animation library', () => {
+    it('has an animation for every exercise', () => {
+        expect(EXERCISES.filter((e) => !(e.id in ANIMATIONS)).map((e) => e.id)).toEqual([]);
+    });
+
     it('only animates known exercises, with keyframes starting at 0 in order', () => {
         for (const [id, def] of Object.entries(ANIMATIONS)) {
             expect(EXERCISE_BY_ID[id], id).toBeDefined();

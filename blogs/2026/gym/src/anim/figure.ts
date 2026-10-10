@@ -228,12 +228,20 @@ export function createFigure(gender: Gender, def: AnimDef): Figure {
             root.position.set(-hands.x, BAR_HEIGHT - hands.y, -hands.z);
         } else {
             const a = anchorPoint();
-            root.position.y = -bodyMinY() + (p.lift ?? 0);
+            let y = -bodyMinY();
+            if (def.plant) {
+                // 脚踩在凳面上：这只脚的脚底在凳面高度，但身体任何部分都不低于地面
+                const foot = world(legs[def.plant.part === 'footL' ? 'L' : 'R'].foot);
+                y = Math.max(y, def.plant.y + ANKLE - foot.y);
+            }
+            root.position.y = y + (p.lift ?? 0);
             if (a) {
                 root.position.x = -a.x;
                 root.position.z = -a.z;
             }
         }
+        root.position.x += p.dx ?? 0;
+        root.position.z += p.dz ?? 0;
         root.updateMatrixWorld(true);
 
         if (!sceneProps)
@@ -400,6 +408,13 @@ function buildBodyProps(list: BodyProp[], parent: THREE.Group): Updater[] {
                 l(j.handL, j.ankleL);
                 r(j.handR, j.ankleR);
             });
+        } else if (kind === 'bandBack') {
+            const l = strap(parent);
+            const r = strap(parent);
+            out.push((j) => {
+                l(j.handL, j.shoulderL.clone().lerp(j.chestBack, 0.6));
+                r(j.handR, j.shoulderR.clone().lerp(j.chestBack, 0.6));
+            });
         } else if (kind === 'bandAnchor') {
             const l = strap(parent);
             const r = strap(parent);
@@ -460,8 +475,9 @@ function buildSceneProps(list: SceneProp[], parent: THREE.Group, j: Record<strin
             at.add(new THREE.Vector3(...s.offset));
         let o: THREE.Object3D;
         if (s.kind === 'chair') {
-            // 凳面顶部对准指定位置
-            const h = Math.max(0.1, at.y - 0.03);
+            // 凳面顶部对准指定位置（脚：对准脚底）
+            const sole = s.at === 'footL' || s.at === 'footR' ? ANKLE : 0.03;
+            const h = Math.max(0.1, at.y - sole);
             o = new THREE.Mesh(new THREE.BoxGeometry(0.45, h, 0.42), wood);
             o.position.set(at.x, h / 2, at.z);
         } else if (s.kind === 'bar') {
@@ -471,6 +487,8 @@ function buildSceneProps(list: SceneProp[], parent: THREE.Group, j: Record<strin
         } else {
             o = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), wallMat);
             o.position.set(at.x, 1.2, at.z);
+            if (s.turn)
+                o.rotation.y = Math.PI / 2;
         }
         o.castShadow = true;
         o.receiveShadow = true;

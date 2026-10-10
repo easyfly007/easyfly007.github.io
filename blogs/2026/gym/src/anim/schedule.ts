@@ -23,7 +23,7 @@ export function hasAnimation(exerciseId: string): boolean {
 export function animCycleSec(exerciseId: string): number {
     const ex = EXERCISE_BY_ID[exerciseId];
     if (ex.mode === 'reps')
-        return ex.secPerRep;
+        return ex.secPerRep * (ANIMATIONS[exerciseId]?.repsPerCycle ?? 1);
     return ANIMATIONS[exerciseId]?.cycleSec ?? DEFAULT_CYCLE_SEC;
 }
 

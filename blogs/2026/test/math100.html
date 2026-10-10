@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>口算练习 100 题</title>
+<style>
+  :root {
+    --bg: #fdf8ef;
+    --card: #ffffff;
+    --ink: #2d2a26;
+    --muted: #8a8378;
+    --line: #e8dfcf;
+    --accent: #ff8a3d;
+    --accent-ink: #ffffff;
+    --ok: #2f9e5b;
+    --ok-bg: #e6f6ec;
+    --bad: #d6453d;
+    --bad-bg: #fdeceb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
+  }
+  .bar {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  h1 { margin: 0; font-size: 22px; }
+  .score { font-size: 16px; color: var(--muted); }
+  .score b { color: var(--ink); font-size: 20px; }
+  main { max-width: 960px; margin: 0 auto; padding: 16px; }
+  .tip { color: var(--muted); font-size: 14px; margin: 0 0 16px; }
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .group {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px 14px;
+  }
+  .group.allok { border-color: var(--ok); }
+  .group h2 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: normal;
+    display: flex;
+    justify-content: space-between;
+  }
+  .q {
+    display: grid;
+    grid-template-columns: 34px 1fr 72px 26px;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+  }
+  .q .no { font-size: 13px; color: var(--muted); }
+  .q .expr { white-space: nowrap; }
+  .q input {
+    width: 100%;
+    font-size: 22px;
+    padding: 4px 6px;
+    text-align: center;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .q input:focus { outline: none; border-color: var(--accent); }
+  .q .mark { font-size: 20px; text-align: center; }
+  .q.ok { background: var(--ok-bg); }
+  .q.ok input { border-color: var(--ok); }
+  .q.ok .mark { color: var(--ok); }
+  .q.bad { background: var(--bad-bg); }
+  .q.bad input { border-color: var(--bad); }
+  .q.bad .mark { color: var(--bad); }
+  .q .ans { grid-column: 2 / 5; font-size: 14px; color: var(--bad); }
+  .actions { display: flex; gap: 8px; margin-top: 10px; }
+  button {
+    font: inherit;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  button.ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+  button:active { transform: translateY(1px); }
+  .result { font-size: 15px; margin-left: auto; align-self: center; }
+  .done {
+    display: none;
+    text-align: center;
+    font-size: 22px;
+    margin: 24px 0 8px;
+  }
+  @media print {
+    header button, .actions, .tip { display: none; }
+    header { position: static; }
+    .group { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>口算练习 100 题</h1>
+    <div class="score">已检查 <b id="checked">0</b>/100 · 答对 <b id="right">0</b></div>
+    <button class="ghost" id="newSet">换一套题</button>
+  </div>
+</header>
+<main>
+  <p class="tip">九九乘法 40 题 + 两位数加法 30 题 + 两位数减法 30 题，随机混排。每 5 题做完点「检查」，做错的可以改了再检查。输完一题按回车跳到下一题。</p>
+  <div class="groups" id="groups"></div>
+  <div class="done" id="done"></div>
+</main>
+<script>
+function rand(lo, hi) {
+  return lo + Math.floor(Math.random() * (hi - lo + 1));
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// 生成不重复的题目；mul 尽量避开 ×1，add 和 ≤ 99，sub 结果 ≥ 0
+function makeQuestions() {
+  const seen = new Set();
+  const list = [];
+  function add(q) {
+    const key = q.text;
+    if (seen.has(key))
+      return false;
+    seen.add(key);
+    list.push(q);
+    return true;
+  }
+  let n = 0;
+  while (n < 40) {
+    const a = rand(2, 9);
+    const b = rand(2, 9);
+    if (add({ text: a + ' × ' + b, ans: a * b }))
+      n++;
+  }
+  n = 0;
+  while (n < 30) {
+    const a = rand(10, 89);
+    const b = rand(10, 99 - a);
+    if (b < 10)
+      continue;
+    if (add({ text: a + ' + ' + b, ans: a + b }))
+      n++;
+  }
+  n = 0;
+  while (n < 30) {
+    const a = rand(20, 99);
+    const b = rand(10, a);
+    if (add({ text: a + ' − ' + b, ans: a - b }))
+      n++;
+  }
+  return shuffle(list);
+}
+
+const groupsEl = document.getElementById('groups');
+let questions = [];
+const status = [];   // 每题：null 未检查 / true 对 / false 错
+
+function render() {
+  questions = makeQuestions();
+  status.length = 0;
+  for (let i = 0; i < 100; i++)
+    status.push(null);
+  groupsEl.innerHTML = '';
+  for (let g = 0; g < 20; g++) {
+    const box = document.createElement('section');
+    box.className = 'group';
+    box.innerHTML = '<h2><span>第 ' + (g + 1) + ' 组</span><span>' + (g * 5 + 1) + '–' + (g * 5 + 5) + ' 题</span></h2>';
+    for (let k = 0; k < 5; k++) {
+      const i = g * 5 + k;
+      const row = document.createElement('div');
+      row.className = 'q';
+      row.innerHTML =
+        '<span class="no">' + (i + 1) + '.</span>' +
+        '<span class="expr">' + questions[i].text + ' =</span>' +
+        '<input type="text" inputmode="numeric" autocomplete="off" maxlength="3" data-i="' + i + '">' +
+        '<span class="mark"></span>';
+      box.appendChild(row);
+    }
+    const act = document.createElement('div');
+    act.className = 'actions';
+    act.innerHTML =
+      '<button data-check="' + g + '">检查</button>' +
+      '<button class="ghost" data-show="' + g + '">看答案</button>' +
+      '<span class="result"></span>';
+    box.appendChild(act);
+    groupsEl.appendChild(box);
+  }
+  updateScore();
+  window.scrollTo(0, 0);
+}
+
+function rowOf(i) {
+  return groupsEl.querySelector('input[data-i="' + i + '"]').parentElement;
+}
+
+function clearAns(row) {
+  const old = row.querySelector('.ans');
+  if (old)
+    old.remove();
+}
+
+function checkGroup(g) {
+  const box = groupsEl.children[g];
+  let right = 0;
+  let blank = 0;
+  for (let k = 0; k < 5; k++) {
+    const i = g * 5 + k;
+    const row = rowOf(i);
+    const val = row.querySelector('input').value.trim();
+    clearAns(row);
+    row.classList.remove('ok', 'bad');
+    if (val === '') {
+      blank++;
+      status[i] = null;
+      row.querySelector('.mark').textContent = '';
+      continue;
+    }
+    const ok = Number(val) === questions[i].ans;
+    status[i] = ok;
+    row.classList.add(ok ? 'ok' : 'bad');
+    row.querySelector('.mark').textContent = ok ? '✓' : '✗';
+    if (ok)
+      right++;
+  }
+  const res = box.querySelector('.result');
+  if (blank > 0)
+    res.textContent = '还有 ' + blank + ' 题没写哦';
+  else if (right === 5)
+    res.textContent = '全对，太棒了！🎉';
+  else
+    res.textContent = '对了 ' + right + ' 题，改一改再检查';
+  box.classList.toggle('allok', right === 5);
+  updateScore();
+}
+
+function showAnswers(g) {
+  for (let k = 0; k < 5; k++) {
+    const i = g * 5 + k;
+    const row = rowOf(i);
+    clearAns(row);
+    if (status[i] === true)
+      continue;
+    const tip = document.createElement('span');
+    tip.className = 'ans';
+    tip.textContent = '答案：' + questions[i].ans;
+    row.appendChild(tip);
+  }
+}
+
+function updateScore() {
+  let checked = 0;
+  let right = 0;
+  for (const s of status) {
+    if (s !== null)
+      checked++;
+    if (s === true)
+      right++;
+  }
+  document.getElementById('checked').textContent = checked;
+  document.getElementById('right').textContent = right;
+  const done = document.getElementById('done');
+  if (right === 100) {
+    done.style.display = 'block';
+    done.textContent = '🏆 100 题全部答对！真厉害！';
+  } else {
+    done.style.display = 'none';
+  }
+}
+
+groupsEl.addEventListener('click', function (e) {
+  const t = e.target;
+  if (t.dataset.check !== undefined)
+    checkGroup(Number(t.dataset.check));
+  else if (t.dataset.show !== undefined)
+    showAnswers(Number(t.dataset.show));
+});
+
+// 只允许输入数字；回车跳到下一题，每组第 5 题回车直接检查
+groupsEl.addEventListener('input', function (e) {
+  if (e.target.tagName !== 'INPUT')
+    return;
+  e.target.value = e.target.value.replace(/[^0-9]/g, '');
+});
+
+groupsEl.addEventListener('keydown', function (e) {
+  if (e.target.tagName !== 'INPUT' || e.key !== 'Enter')
+    return;
+  e.preventDefault();
+  const i = Number(e.target.dataset.i);
+  if (i % 5 === 4)
+    checkGroup(Math.floor(i / 5));
+  if (i < 99)
+    groupsEl.querySelector('input[data-i="' + (i + 1) + '"]').focus();
+});
+
+document.getElementById('newSet').addEventListener('click', function () {
+  if (confirm('换一套新题？当前的答案会清空。'))
+    render();
+});
+
+render();
+</script>
+</body>
+</html>

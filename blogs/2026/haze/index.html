@@ -344,6 +344,35 @@ input[type="range"] {
 .presets button:hover { border-color: var(--ember); }
 .presets button[aria-pressed="true"] { border-color: var(--ember); background: color-mix(in srgb, var(--ember) 12%, var(--bg)); }
 .caption { font-size: var(--step--1); color: var(--muted); min-height: 2.6em; margin: 0; }
+
+/* 新加坡实时 PSI */
+.livebox {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--lv, var(--line));
+  border-radius: 6px;
+  background: var(--surface);
+  font-size: 0.92rem;
+  min-height: 56px;
+}
+.livebox .live { font-family: var(--font-num); font-weight: 600; letter-spacing: 0.1em; }
+.livebox .lv-k { font-weight: 700; }
+.livebox .lv-num {
+  font-family: var(--font-num);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--lv, var(--ink));
+}
+.livebox .lv-pill { font-weight: 700; font-size: var(--step--1); padding: 1px 10px; border-radius: 999px; color: #fff; background: var(--lv, var(--muted)); }
+.livebox .lv-regions { color: var(--muted); font-variant-numeric: tabular-nums; }
+.livebox .lv-time { font-size: var(--step--1); color: var(--muted); }
 .advice { display: grid; gap: 8px; margin: 0; }
 .advice div {
   display: grid;
@@ -622,6 +651,10 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       东盟在 8 月 26 日启动了最高级别的区域警戒 Level 3<a class="src" href="https://en.antaranews.com/news/430264/indonesias-2026-fire-season-strains-asean-haze-response" target="_blank" rel="noopener">ANTARA</a>。
       10 月 9 日，新加坡中区 24 小时 PSI 升到 192，是今年的最高值<a class="src" href="https://en.tempo.co/read/2121261/singapore-haze-hits-2026-high-as-psi-reaches-192" target="_blank" rel="noopener">Tempo</a>。
     </p>
+
+    <div class="livebox" id="livePsi" aria-live="polite">
+      <span class="lv-time">正在读取新加坡此刻的 PSI…</span>
+    </div>
 
     <div class="station" id="station">
       <div class="window">
@@ -1172,6 +1205,73 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
   render(192, 2);
   resize();
   startAnim();
+
+  // ---------- 新加坡实时 PSI：页面打开时读取一次 ----------
+  var LIVE_API = "https://api-open.data.gov.sg/v2/real-time/api/psi";
+  var LIVE_SRC = [["data.gov.sg", "https://data.gov.sg/datasets/d_fe37906a0182569d891506e815e819b7/view"]];
+  var REGIONS = [["north", "北"], ["south", "南"], ["east", "东"], ["west", "西"]];
+  var liveEl = document.getElementById("livePsi");
+
+  function liveFail() {
+    liveEl.innerHTML = '<span class="lv-time">暂时读不到新加坡的实时 PSI，可以直接去官方网站查看' + srcLinks([["haze.gov.sg", "https://www.haze.gov.sg/"]]) + "</span>";
+  }
+
+  function liveShow(item) {
+    var psi = item.readings.psi_twenty_four_hourly;
+    var v = psi.central;
+    var band = BANDS[bandIndex(v)];
+    var ts = String(item.updatedTimestamp || item.timestamp || "");
+    var when = "";
+    if (/^\d{4}-\d\d-\d\dT\d\d:\d\d/.test(ts))
+      when = parseInt(ts.slice(5, 7), 10) + " 月 " + parseInt(ts.slice(8, 10), 10) + " 日 " + ts.slice(11, 16) + "（新加坡时间）";
+    var others = REGIONS.filter(function (r) {
+      return typeof psi[r[0]] === "number";
+    }).map(function (r) {
+      return r[1] + " " + psi[r[0]];
+    }).join(" · ");
+    liveEl.style.setProperty("--lv", "var(" + band.token + ")");
+    liveEl.innerHTML =
+      '<span class="live">实时</span>' +
+      '<span class="lv-k">新加坡中区 24 小时 PSI</span>' +
+      '<span class="lv-num">' + v + "</span>" +
+      '<span class="lv-pill">' + band.name + "</span>" +
+      (others ? '<span class="lv-regions">' + others + "</span>" : "") +
+      '<span class="lv-time">' + (when ? "更新于 " + when : "") + srcLinks(LIVE_SRC) + "</span>" +
+      '<button type="button" class="back" id="liveGo">放进窗口里看</button>';
+    document.getElementById("liveGo").addEventListener("click", function () {
+      setPsi(v);
+      caption.innerHTML = "新加坡中区此刻的 24 小时 PSI" + (when ? "，" + when : "") + "。" + srcLinks(LIVE_SRC);
+    });
+  }
+
+  (function loadLive() {
+    if (!window.fetch) {
+      liveFail();
+      return;
+    }
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () {
+      if (ctrl)
+        ctrl.abort();
+    }, 8000);
+    fetch(LIVE_API, ctrl ? { signal: ctrl.signal } : {})
+      .then(function (r) {
+        if (!r.ok)
+          throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        clearTimeout(timer);
+        var item = d && d.data && d.data.items && d.data.items[0];
+        if (!item || !item.readings || !item.readings.psi_twenty_four_hourly || typeof item.readings.psi_twenty_four_hourly.central !== "number")
+          throw new Error("unexpected data");
+        liveShow(item);
+      })
+      .catch(function () {
+        clearTimeout(timer);
+        liveFail();
+      });
+  })();
 
   // ---------- 影响范围：地图 + 日期拖动条 ----------
   var SRC = {

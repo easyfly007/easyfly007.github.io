@@ -109,3 +109,18 @@ export function buildTimeline(blocks: Block[]): Step[] {
 export function totalSeconds(steps: Step[]): number {
     return steps.reduce((sum, s) => sum + s.seconds, 0);
 }
+
+// 给定已进行的秒数，定位当前步骤与该步骤已进行的秒数；超出总时长返回 index = steps.length
+export function locate(steps: Step[], elapsedSec: number): { index: number; intoStep: number } {
+    let start = 0;
+    for (let i = 0; i < steps.length; i++) {
+        if (elapsedSec < start + steps[i].seconds)
+            return { index: i, intoStep: elapsedSec - start };
+        start += steps[i].seconds;
+    }
+    return { index: steps.length, intoStep: 0 };
+}
+
+export function stepStart(steps: Step[], index: number): number {
+    return totalSeconds(steps.slice(0, index));
+}

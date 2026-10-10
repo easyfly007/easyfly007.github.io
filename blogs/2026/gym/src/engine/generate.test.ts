@@ -4,7 +4,7 @@ import type { Conditions, Equipment, Goal, Intensity } from '../types';
 import { isFeasible, maxSweat } from './filter';
 import { BASE } from './fixtures';
 import { generateWorkout } from './generate';
-import { buildTimeline, totalSeconds } from './timeline';
+import { buildTimeline, locate, stepStart, totalSeconds } from './timeline';
 
 const DURATIONS = [15, 20, 30, 45, 60];
 const GOALS: Goal[] = ['general', 'fat_loss', 'strength', 'flexibility'];
@@ -99,5 +99,12 @@ describe('buildTimeline', () => {
         ]);
         expect(steps.filter((s) => s.kind === 'work').map((s) => s.side)).toEqual(['left', 'right']);
         expect(steps.find((s) => s.kind === 'work')!.seconds).toBe(30);
+    });
+
+    it('locates the current step by elapsed seconds', () => {
+        const steps = buildTimeline(generateWorkout(BASE, 5).blocks);
+        expect(locate(steps, 0)).toEqual({ index: 0, intoStep: 0 });
+        expect(locate(steps, stepStart(steps, 3) + 1)).toEqual({ index: 3, intoStep: 1 });
+        expect(locate(steps, totalSeconds(steps)).index).toBe(steps.length);
     });
 });

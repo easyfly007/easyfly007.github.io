@@ -127,6 +127,17 @@ a.src {
   white-space: nowrap;
 }
 a.src::before { content: "["; opacity: 0.6; }
+/* 专有名词后面的英文对照 */
+.en {
+  font-family: var(--font-body);
+  font-size: 0.8em;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0;
+  color: var(--muted);
+  margin-left: 0.25em;
+  margin-right: 0.15em;
+}
 a.src::after { content: "↗]"; opacity: 0.6; }
 a.src:hover { border-bottom-color: var(--ember); }
 
@@ -1343,6 +1354,187 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     return BANDS.length - 1;
   }
 
+  // ---------- 专有名词的英文对照 ----------
+  // 每个词在同一张卡片、同一条事件或同一个段落里，只在第一次出现时加英文
+  var GLOSS = [
+    // 国家、地区
+    ["东南亚", "Southeast Asia"],
+    ["印尼", "Indonesia"],
+    ["马来西亚", "Malaysia"],
+    ["新加坡", "Singapore"],
+    ["菲律宾", "Philippines"],
+    ["文莱", "Brunei"],
+    ["泰国", "Thailand"],
+    ["越南", "Vietnam"],
+    ["日本", "Japan"],
+    ["苏门答腊", "Sumatra"],
+    ["南苏门答腊", "South Sumatra"],
+    ["廖内", "Riau"],
+    ["占碑", "Jambi"],
+    ["加里曼丹", "Kalimantan"],
+    ["西加里曼丹", "West Kalimantan"],
+    ["中加里曼丹", "Central Kalimantan"],
+    ["南加里曼丹", "South Kalimantan"],
+    ["西加", "West Kalimantan"],
+    ["中加", "Central Kalimantan"],
+    ["南加", "South Kalimantan"],
+    ["婆罗洲", "Borneo"],
+    ["爪哇", "Java"],
+    ["南海", "South China Sea"],
+    ["马来半岛", "Peninsular Malaysia"],
+    ["砂拉越", "Sarawak"],
+    ["沙巴", "Sabah"],
+    ["古晋", "Kuching"],
+    ["古晋省", "Kuching Division"],
+    ["西连", "Serian"],
+    ["西连县", "Serian District"],
+    ["坤甸", "Pontianak"],
+    ["吉隆坡", "Kuala Lumpur"],
+    ["布城", "Putrajaya"],
+    ["雪兰莪", "Selangor"],
+    ["森美兰", "Negeri Sembilan"],
+    ["马六甲", "Malacca"],
+    ["柔佛", "Johor"],
+    ["峇株巴辖", "Batu Pahat"],
+    ["马尼拉", "Manila"],
+    ["大马尼拉", "Metro Manila"],
+    ["奎松市", "Quezon City"],
+    ["宿务", "Cebu"],
+    ["胡志明市", "Ho Chi Minh City"],
+    ["雅加达", "Jakarta"],
+    ["吉隆坡", "Kuala Lumpur"],
+    ["滨海湾", "Marina Bay"],
+    // 机构
+    ["东盟", "ASEAN"],
+    ["新加坡国家环境局", "National Environment Agency"],
+    ["国家环境局", "National Environment Agency"],
+    ["新加坡气象局", "Meteorological Service Singapore"],
+    ["印尼气象局", "BMKG"],
+    ["印尼国家抗灾署", "BNPB"],
+    ["印尼外交部", "Ministry of Foreign Affairs"],
+    ["东盟气象中心", "ASEAN Specialised Meteorological Centre"],
+    ["东盟跨境烟霾污染控制协调中心", "ASEAN Coordinating Centre for Transboundary Haze Pollution Control"],
+    ["东盟烟霾协调中心", "ACC THPC"],
+    ["协调中心", "ACC THPC"],
+    ["泥炭地恢复署", "Peatland Restoration Agency"],
+    ["泥炭地与红树林恢复署", "Peatland and Mangrove Restoration Agency"],
+    ["美国气候预测中心", "Climate Prediction Center"],
+    ["能源与清洁空气研究中心", "Centre for Research on Energy and Clean Air"],
+    ["世界银行", "World Bank"],
+    ["联合国", "United Nations"],
+    ["烟霾工作组", "Haze Task Force"],
+    ["社区中心", "Community Centres"],
+    ["海峡时报", "The Straits Times"],
+    ["美联社", "Associated Press"],
+    ["法新社", "AFP"],
+    ["路透社", "Reuters"],
+    ["NASA 地球观测站", "NASA Earth Observatory"],
+    // 协定、法律、活动
+    ["《区域烟霾行动计划》", "Regional Haze Action Plan"],
+    ["《东盟跨境烟霾污染协定》", "ASEAN Agreement on Transboundary Haze Pollution"],
+    ["《跨境烟霾污染法》", "Transboundary Haze Pollution Act"],
+    ["F1 新加坡大奖赛", "Formula One Singapore Grand Prix"],
+    ["F1 新加坡站", "Formula One Singapore Grand Prix"],
+    // 人名
+    ["佐科总统", "President Joko Widodo"],
+    ["佐科", "Joko Widodo"],
+    // 术语
+    ["泥炭沼泽森林", "peat swamp forest"],
+    ["泥炭地", "peatland"],
+    ["泥炭", "peat"],
+    ["超强厄尔尼诺", "super El Niño"],
+    ["厄尔尼诺", "El Niño"],
+    ["正印度洋偶极子", "positive Indian Ocean Dipole"],
+    ["印度洋偶极子", "Indian Ocean Dipole"],
+    ["西南季风", "Southwest Monsoon"],
+    ["人工增雨", "cloud seeding"],
+    ["堵渠坝", "canal blocks"],
+    ["特许经营区", "concession"],
+    ["金合欢", "acacia"],
+    ["油棕", "oil palm"],
+    ["印尼盾", "rupiah"],
+    ["新元", "Singapore dollars"]
+  ];
+  var GLOSS_MAP = {};
+  GLOSS.forEach(function (g) {
+    GLOSS_MAP[g[0]] = g[1];
+  });
+  // 长词优先，避免"西加里曼丹"被拆成"加里曼丹"
+  var GLOSS_RE = new RegExp(Object.keys(GLOSS_MAP).sort(function (a, b) {
+    return b.length - a.length;
+  }).map(function (k) {
+    return k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }).join("|"), "g");
+  var GLOSS_SKIP = "h1, h2, a.src, script, style, svg, button, label, input, time, title, .en, .nav, .srclist, .presets, .legend, .ctry, .label, .meta, .go, .eyebrow, .tabs, .stamp, .big, .lv-pill, .band-pill, .status, .no";
+  var GLOSS_SCOPE = "li, article, figure, .photo, .explain > div, .yearcard, .panel, .livebox, .readout, .caption, p, h3, header, section, footer";
+  // 太常见的词（国家名等）每个板块只标一次
+  var GLOSS_WIDE = { "东南亚": 1, "印尼": 1, "马来西亚": 1, "新加坡": 1, "菲律宾": 1, "文莱": 1, "泰国": 1, "越南": 1, "日本": 1, "东盟": 1, "泥炭地": 1, "泥炭": 1 };
+  var GLOSS_WIDE_SCOPE = "header, section, footer, .panel, .yearcard, .livebox";
+  var glossDone = typeof WeakSet === "function" ? new WeakSet() : null;
+
+  function glossify(root) {
+    if (!glossDone || !root)
+      return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [];
+    var n = walker.nextNode();
+    while (n) {
+      if (!glossDone.has(n) && n.parentElement && !n.parentElement.closest(GLOSS_SKIP))
+        nodes.push(n);
+      n = walker.nextNode();
+    }
+    var seen = new Map();
+    function seenFor(scope) {
+      if (!seen.has(scope)) {
+        var set = {};
+        scope.querySelectorAll(".en[data-k]").forEach(function (e) {
+          set[e.getAttribute("data-k")] = true;
+        });
+        seen.set(scope, set);
+      }
+      return seen.get(scope);
+    }
+    nodes.forEach(function (node) {
+      var text = node.nodeValue;
+      var scope = node.parentElement.closest(GLOSS_SCOPE) || root;
+      var wide = node.parentElement.closest(GLOSS_WIDE_SCOPE) || root;
+      var frag = document.createDocumentFragment();
+      var last = 0;
+      var changed = false;
+      var m;
+      GLOSS_RE.lastIndex = 0;
+      while ((m = GLOSS_RE.exec(text)) !== null) {
+        var term = m[0];
+        var set = seenFor(GLOSS_WIDE[term] ? wide : scope);
+        var end = m.index + term.length;
+        // 已经写了英文缩写的（如"印尼气象局（BMKG）"）就不再加
+        var after = text.slice(end, end + 2);
+        if (set[term] || /^（[A-Za-z]/.test(after))
+          continue;
+        set[term] = true;
+        var t = document.createTextNode(text.slice(last, end));
+        glossDone.add(t);
+        frag.appendChild(t);
+        var en = document.createElement("span");
+        en.className = "en";
+        en.lang = "en";
+        en.setAttribute("data-k", term);
+        en.textContent = GLOSS_MAP[term];
+        frag.appendChild(en);
+        last = end;
+        changed = true;
+      }
+      if (!changed) {
+        glossDone.add(node);
+        return;
+      }
+      var rest = document.createTextNode(text.slice(last));
+      glossDone.add(rest);
+      frag.appendChild(rest);
+      node.parentNode.replaceChild(frag, node);
+    });
+  }
+
   function srcLinks(list) {
     if (!list)
       return "";
@@ -1402,6 +1594,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       caption.innerHTML = PRESETS[match].text + srcLinks(PRESETS[match].src);
     else
       caption.textContent = "当前数值是你拖出来的示意值。点上面的按钮看真实读数。";
+    glossify(caption);
   }
 
   slider.addEventListener("input", function () {
@@ -1586,6 +1779,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
 
   function liveFail() {
     liveEl.innerHTML = '<span class="lv-time">暂时读不到新加坡的实时 PSI，可以直接去官方网站查看' + srcLinks([["haze.gov.sg", "https://www.haze.gov.sg/"]]) + "</span>";
+    glossify(liveEl);
   }
 
   function liveShow(item) {
@@ -1610,9 +1804,11 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       (others ? '<span class="lv-regions">' + others + "</span>" : "") +
       '<span class="lv-time">' + (when ? "更新于 " + when : "") + srcLinks(LIVE_SRC) + "</span>" +
       '<button type="button" class="back" id="liveGo">放进窗口里看</button>';
+    glossify(liveEl);
     document.getElementById("liveGo").addEventListener("click", function () {
       setPsi(v);
       caption.innerHTML = "新加坡中区此刻的 24 小时 PSI" + (when ? "，" + when : "") + "。" + srcLinks(LIVE_SRC);
+      glossify(caption);
     });
   }
 
@@ -1654,7 +1850,8 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     nea: ["NEA", "https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-(04-september-2026)"],
     tempo: ["Tempo", "https://en.tempo.co/read/2121261/singapore-haze-hits-2026-high-as-psi-reaches-192"],
     malaymail: ["Malay Mail", "https://www.malaymail.com/news/singapore/2026/10/09/singapore-haze-worsens-as-central-regions-air-quality-nears-2026-high-smoke-from-indonesia-continues-to-drift-in/238308"],
-    outlook: ["Outlook India", "https://www.outlookindia.com/international/indonesias-wildfire-haze-shuts-malaysian-schools-pushes-singapore-pollution-to-2026-high"]
+    outlook: ["Outlook India", "https://www.outlookindia.com/international/indonesias-wildfire-haze-shuts-malaysian-schools-pushes-singapore-pollution-to-2026-high"],
+    jp: ["Jakarta Post", "https://www.thejakartapost.com/world/2026/09/06/haze-emergency-grips-sarawak-town"]
   };
   function refs(keys) {
     return srcLinks(keys.map(function (k) {
@@ -1687,11 +1884,11 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     ["8/11", "fires", "卫星累计监测到的火点超过 15.4 万个。", ["mongabay"]],
     ["8/11", "pontianak", "坤甸数十所学校关闭。", ["wiki"]],
     ["8/11", "sarawak", "古晋成为污染最严重的大城市。", ["wiki"]],
-    ["8/12", "sarawak", "实兆远 API 超过 200，108 所学校关闭（另一处引文写 107 所）。", ["wiki"]],
+    ["8/12", "sarawak", "西连 API 超过 200，108 所学校关闭（另一处引文写 107 所）。", ["wiki"]],
     ["8/20", "sarawak", "砂拉越 10 个教育区的 591 所学校全部关闭，涉及约 19.7 万名学生。", ["wiki"]],
-    ["8/21", "sarawak", "实兆远 API 242。", ["wiki"]],
+    ["8/21", "sarawak", "西连 API 242。", ["wiki"]],
     ["8/26", "asean", "东盟启动区域警戒 Level 3，成员国须每天提交态势报告和烟羽轨迹图。", ["antara"]],
-    ["8/29", "sarawak", "实兆远 API 302。", ["wiki"]],
+    ["8/29", "sarawak", "西连 API 302。", ["wiki"]],
     ["8/31", "sarawak", "砂拉越一个监测站的 API 达到 475。", ["wiki"]],
     ["9/1", "brunei", "文莱 PSI 164–215，9 月 2 日至 3 日学校改为居家学习。", ["wiki"]],
     ["9/1", "manila", "奎松市（大马尼拉）停止面授课。", ["wiki"]],
@@ -1699,7 +1896,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     ["9/3", "cebu", "宿务停课。", ["wiki"]],
     ["9/3", "sarawak", "砂拉越批准三天人工增雨，由 C-130 运输机播撒盐溶液。", ["wiki"]],
     ["9/3", "pontianak", "西加里曼丹 Supadio 机场能见度只有约 100 米，林业部长的飞机无法降落。", ["antara"]],
-    ["9/4", "sarawak", "实兆远宣布进入紧急状态。", ["wiki"]],
+    ["9/4", "sarawak", "空气污染指数超过 500，砂拉越西连县宣布进入紧急状态。", ["wiki", "jp"]],
     ["9/4", "sg", "新加坡中区 24 小时 PSI 达到 101，是 2023 年 10 月以来首次因烟霾进入「不健康」。", ["nea"]],
     ["9/4", "pontianak", "西加里曼丹 166 个火点中，61 个经过实地核实。", ["antara"]],
     ["9/5", "sabah", "印尼外交部表示，烟霾已飘到沙巴、砂拉越、新加坡、文莱和菲律宾（包括马尼拉）。", ["antara"]],
@@ -1959,6 +2156,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       }).join("") + "</ul>";
     }
     panel.innerHTML = h;
+    glossify(panel);
     var back = document.getElementById("back");
     if (back)
       back.addEventListener("click", function () {
@@ -2186,6 +2384,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     wtStatus.classList.toggle("bad", bad);
     peatReadout.style.setProperty("--band", bad ? "var(--ember)" : "var(--ink)");
     wtCaption.textContent = wtText(cm);
+    glossify(wtCaption);
     // 火星数量、烟的浓淡随干层厚度增加（示意）
     var n = Math.round(embers.length * cm / 100);
     emberEls.forEach(function (el, i) {
@@ -2348,6 +2547,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     if (d.more)
       body += d.more;
     yearCard.innerHTML = '<div class="yr">' + d.y + "</div><div><h3>" + d.title + "</h3><p>" + body + "</p></div>";
+    glossify(yearCard);
   }
 
   METRICS.forEach(function (m) {
@@ -2433,6 +2633,8 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       selectTab(tabs[j], true);
     });
   });
+
+  glossify(document.body);
 })();
 </script>
 </body>

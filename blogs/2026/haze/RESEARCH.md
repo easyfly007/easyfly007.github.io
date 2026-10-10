@@ -96,6 +96,18 @@
 - NEA 9/5：近期活动看 1 小时 PM2.5，计划看 24 小时 PSI 预报；渠道 haze.gov.sg、NEA、MSS 网站、myENV 应用
 - Mongabay：林业部长 8/6 称预算不够就应增加
 
+## 现场图片（追加，2026-10-10 核对原网页图注）
+
+- NASA 地球观测站 https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/ ：Aqua MODIS 2026-09-01；图：Lauren Dauphin，数据 NASA EOSDIS LANCE、GIBS/Worldview；文：Adam Voiland。下载 indonesiafires_amo_20260901.jpg（1280×853）
+- NASA Earthdata https://www.earthdata.nasa.gov/news/worldview-image-archive/wildland-fires-indonesia-august-2026 ：NOAA-20 VIIRS 2026-08-28，中、西加里曼丹，页面 8/31 发布。下载 Kalimantan_Borneo_Fires_28Aug2026_VIIRS_NOAA20_witow_th.jpeg（722×544，页面上能找到的最大尺寸）
+- NASA 使用指南 https://www.nasa.gov/nasa-brand-center/images-and-media/ ：在美国一般不受版权保护；可用于教育、资讯用途；须注明 NASA 为来源；不得暗示背书；标志除外
+- 新加坡：The Star 2026-10-07，图注 "Hazy conditions seen on Esplanade Drive, Turn 13 of the Marina Bay Street Circuit, as road closures for the Formula One Singapore Grand Prix begins on Oct 7."，署名 ST
+- 印尼：The Star 2026-09-14，"Thick haze from forest fires blankets the city of Pontianak in West Kalimantan, Indonesia, on Monday, Sept. 14, 2026."，AP Photo/Tatan Syuflana
+- 马来西亚：Jakarta Post 2026-09-06，"An aerial view shows thick haze over Serian, a town in the Kuching Division of Sarawak, on the island of Borneo"，AFP/Mohd Rasfan，拍摄 2026-09-05
+- 菲律宾：Philstar Interaksyon 2026-09-02，"A thick haze shrouds Metro Manila due to smoke from ongoing fires in Kalimantan, Indonesia, in this drone picture taken in Quezon City, Philippines, September 1, 2026."，Reuters/Adrian Portugal
+- 菲律宾：Daily Tribune 2026-09-01，"Hazy skies blankets Quezon City on Tuesday, 1 September 2026."，Analy Labor
+- 没找到合用的：维基共享资源上 2026 年的自由授权照片
+
 ## PSI 分级与健康建议（首屏已用）
 
 - 分级：0–50 良好，51–100 中等，101–200 不健康，201–300 非常不健康，>300 危险

@@ -7,8 +7,9 @@
 - 页面要好看、能交互，所有数字都注明来源
 
 ## 发布方式
-1. 先发成 Claude Artifact，方便预览和逐步检查
-2. 定稿后导出一份完整的 `index.html`，放到 GitHub Pages（或 Netlify），得到公开短链接
+- 源文件：`easyfly007.github.io` 仓库的 `blogs/2026/haze/index.html`
+- 公开地址：https://easyfly007.github.io/blogs/2026/haze/ （每步提交并推送后自动更新）
+- 同时发布一份 Claude Artifact 方便预览：https://claude.ai/artifact/V1U157WnQH3r3RNZAfD1go
    - 公众号文章里放不了 HTML，只能放链接（"阅读原文"或文中链接），再配一张长图或封面图
    - Twitter：链接卡片 + 截图
 

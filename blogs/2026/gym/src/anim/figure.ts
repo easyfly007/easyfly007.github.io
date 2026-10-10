@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { Gender } from '../types';
-import { fullPose } from './pose';
-import type { AnimDef, BodyProp, Pose, SceneProp, V3 } from './types';
+import { fullPose, poseAt } from './pose';
+import type { AnimDef, BodyProp, Contact, ContactPart, Pose, SceneProp, V3 } from './types';
 
 // 简洁的低多边形人偶（胶囊体 + 球体），每段肢体是一个 Group，按姿态里的方向摆放。
 // 摆好后自动贴地（最低点落在地面），并让 anchor 指定的部位在水平面上保持不动
@@ -185,6 +185,8 @@ export function createFigure(gender: Gender, def: AnimDef): Figure {
                 return world(legs.R.foot);
             case 'hands':
                 return world(arms.L.end).add(world(arms.R.end)).multiplyScalar(0.5);
+            case 'knees':
+                return world(legs.L.lower).add(world(legs.R.lower)).multiplyScalar(0.5);
             default:
                 return null;
         }
@@ -198,7 +200,7 @@ export function createFigure(gender: Gender, def: AnimDef): Figure {
         return box.min.y;
     }
 
-    function setPose(input: Pose, phase = 0) {
+    function setPose(input: Pose, phase = 0, withContacts = true) {
         const p = fullPose(input);
         root.position.set(0, 0, 0);
         body.position.set(0, 0, 0);
@@ -243,6 +245,8 @@ export function createFigure(gender: Gender, def: AnimDef): Figure {
         root.position.x += p.dx ?? 0;
         root.position.z += p.dz ?? 0;
         root.updateMatrixWorld(true);
+        if (withContacts)
+            applyContacts(p, phase);
 
         if (!sceneProps)
             sceneProps = buildSceneProps(def.scene ?? [], props, joints());
@@ -272,9 +276,111 @@ export function createFigure(gender: Gender, def: AnimDef): Figure {
         };
     }
 
+    // ---------- 接触点：撑地的手脚水平不动 ----------
+    const contacts = resolveContacts(def);
+    const limbOf: Record<ContactPart, { limb: Limb; leg: boolean; side: 'L' | 'R' }> = {
+        footL: { limb: legs.L, leg: true, side: 'L' },
+        footR: { limb: legs.R, leg: true, side: 'R' },
+        handL: { limb: arms.L, leg: false, side: 'L' },
+        handR: { limb: arms.R, leg: false, side: 'R' },
+    };
+    // 每个接触点固定在参考时刻（整个循环 = 开头；一段时间 = 这段的中间）按原姿态算出的水平位置
+    const pins = contacts.map((c) => {
+        setPose(poseAt(def, c.ref), c.ref, false);
+        const at = world(limbOf[c.part].limb.end);
+        return { ...c, x: at.x, z: at.z };
+    });
+
+    // 两段式肢体的反向关节：根关节不动，末端到达 target，弯曲方向沿用原姿态的膝/肘方向
+    function reach(limb: Limb, target: THREE.Vector3, leg: boolean) {
+        const r = world(limb.upper);
+        const k0 = world(limb.lower);
+        const e0 = world(limb.end);
+        const l1 = k0.distanceTo(r);
+        const l2 = e0.distanceTo(k0);
+        const toT = target.clone().sub(r);
+        const dist = Math.min(Math.max(toT.length(), Math.abs(l1 - l2) + 1e-4), l1 + l2 - 1e-4);
+        const dir = toT.normalize();
+        const pole = k0.clone().sub(r);
+        pole.sub(dir.clone().multiplyScalar(pole.dot(dir)));
+        if (pole.lengthSq() < 1e-8) {
+            // 原姿态是直的：膝盖朝身体前方弯，手肘朝身体后方弯
+            pole.set(0, 0, leg ? 1 : -1).applyQuaternion(body.getWorldQuaternion(qa));
+            pole.sub(dir.clone().multiplyScalar(pole.dot(dir)));
+        }
+        pole.normalize();
+        const a = (l1 * l1 - l2 * l2 + dist * dist) / (2 * dist);
+        const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+        const knee = r.clone().add(dir.clone().multiplyScalar(a)).add(pole.multiplyScalar(h));
+        const end = r.clone().add(dir.clone().multiplyScalar(dist));
+        const d1 = knee.clone().sub(r).normalize();
+        const d2 = end.clone().sub(knee).normalize();
+        point(limb.upper, [d1.x, d1.y, d1.z], null);
+        point(limb.lower, [d2.x, d2.y, d2.z], null);
+    }
+
+    function applyContacts(p: Pose, phase: number) {
+        for (const c of pins) {
+            const w = contactWeight(c, phase);
+            if (w <= 0)
+                continue;
+            const { limb, leg, side } = limbOf[c.part];
+            const e = world(limb.end);
+            const target = new THREE.Vector3(e.x + (c.x - e.x) * w, e.y, e.z + (c.z - e.z) * w);
+            reach(limb, target, leg);
+            if (leg)
+                placeFoot(legs[side].foot, p[`toe${side}`]);
+        }
+        root.updateMatrixWorld(true);
+    }
+
     setPose(def.keys[0][1]);
     const height = (ANKLE + SHIN + THIGH + TORSO + 0.28) * b.scale;
     return { root, props, height, setPose, joints };
+}
+
+// ---------- 接触点 ----------
+
+interface ResolvedContact {
+    part: ContactPart;
+    from: number;
+    to: number;
+    whole: boolean;
+    ref: number;                // 取固定位置的时刻
+}
+
+const EDGE = 0.06;              // 接触开始/结束时用这么长的进度渐入渐出，避免跳动
+
+function resolveContacts(def: AnimDef): ResolvedContact[] {
+    let list: Contact[] | undefined = def.contacts;
+    if (!list) {
+        const jumps = def.keys.some(([, p]) => (p.lift ?? 0) > 0 || p.dx !== undefined || p.dz !== undefined);
+        if (def.anchor === 'feet' && !jumps)
+            list = [{ part: 'footL' }, { part: 'footR' }];
+        else if (def.anchor === 'hands')
+            list = [{ part: 'handL' }, { part: 'handR' }];
+        else
+            list = [];
+    }
+    return list.map((c) => {
+        const whole = c.from === undefined && c.to === undefined;
+        const from = c.from ?? 0;
+        const to = c.to ?? 1;
+        const len = from <= to ? to - from : 1 - from + to;
+        return { part: c.part, from, to, whole, ref: whole ? 0 : (from + len / 2) % 1 };
+    });
+}
+
+function contactWeight(c: ResolvedContact, phase: number): number {
+    if (c.whole)
+        return 1;
+    const p = ((phase % 1) + 1) % 1;
+    const len = c.from <= c.to ? c.to - c.from : 1 - c.from + c.to;
+    const into = (p - c.from + 1) % 1;
+    if (into > len)
+        return 0;
+    const edge = Math.min(into, len - into);
+    return Math.min(1, edge / EDGE);
 }
 
 // ---------- 器械 ----------

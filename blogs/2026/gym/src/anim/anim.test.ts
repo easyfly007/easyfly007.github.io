@@ -46,6 +46,30 @@ describe('animation library', () => {
     });
 });
 
+describe('planted hands and feet', () => {
+    it('do not slide when they stay on the ground for the whole cycle', () => {
+        const parts: [string, number][] = [['ankleL', 0.1], ['ankleR', 0.1], ['handL', 0.07], ['handR', 0.07]];
+        for (const [id, base] of Object.entries(ANIMATIONS)) {
+            const defs = EXERCISE_BY_ID[id].perSide ? [base, mirrorDef(base)] : [base];
+            for (const def of defs) {
+                const fig = createFigure('male', def);
+                const frames = PHASES.map((ph) => {
+                    fig.setPose(poseAt(def, ph), ph);
+                    return fig.joints();
+                });
+                for (const [joint, h] of parts) {
+                    if (!frames.every((j) => j[joint].y < h))
+                        continue;
+                    const xs = frames.map((j) => j[joint].x);
+                    const zs = frames.map((j) => j[joint].z);
+                    const range = Math.hypot(Math.max(...xs) - Math.min(...xs), Math.max(...zs) - Math.min(...zs));
+                    expect(range, `${id} ${joint}`).toBeLessThan(0.03);
+                }
+            }
+        }
+    });
+});
+
 describe('animation schedule', () => {
     it('changes view after every squat rep', () => {
         expect(animCycleSec('squat')).toBe(3);

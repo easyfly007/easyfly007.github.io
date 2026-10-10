@@ -150,6 +150,10 @@ export function mirrorDef(def: AnimDef): AnimDef {
         anchor,
         keys: def.keys.map(([t, p]) => [t, mirrorPose(fullPose(p))]),
         props: def.props?.map((x) => ({ dumbbellL: 'dumbbellR', dumbbellR: 'dumbbellL', kettlebellL: 'kettlebellR', kettlebellR: 'kettlebellL' } as const)[x as 'dumbbellL'] ?? x),
+        contacts: def.contacts?.map((c) => ({
+            ...c,
+            part: ({ footL: 'footR', footR: 'footL', handL: 'handR', handR: 'handL' } as const)[c.part],
+        })),
         scene: def.scene?.map((s) => ({
             ...s,
             at: s.at === 'footL' ? 'footR' : s.at === 'footR' ? 'footL' : s.at,

@@ -159,9 +159,14 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     // ---------- 弓步类 ----------
     lunge: {
         anchor: 'footR',
+        contacts: [{ part: 'footR' }, { part: 'footL', from: 0.36, to: 0.64 }, { part: 'footL', from: 0.96, to: 0.03 }],
         keys: [
             [0, STANDING],
+            [0.08, { ...legL(25, 45, 4), ...legR(0, 4, 4) }],
+            [0.2, { ...legL(55, 75, 4), ...legR(5, 10, 4) }],
             [0.5, { ...legL(80, 85, 4), ...legR(-15, 85, 4), spine: up(4) }],
+            [0.8, { ...legL(55, 75, 4), ...legR(5, 10, 4) }],
+            [0.92, { ...legL(25, 45, 4), ...legR(0, 4, 4) }],
         ],
     },
 
@@ -197,6 +202,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
 
     // ---------- 俯卧撑 / 平板 ----------
     pushup: {
+        contacts: [{ part: 'footL' }, { part: 'footR' }, { part: 'handL' }, { part: 'handR' }],
         anchor: 'feet',
         keys: [
             [0, { pitch: 64, ...straightArmsDown(0.18, 0.05) }],
@@ -205,7 +211,8 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     knee_pushup: {
-        anchor: 'feet',
+        contacts: [{ part: 'handL' }, { part: 'handR' }],
+        anchor: 'knees',
         keys: [
             [0, { pitch: 46, ...legs(0, 100), ...straightArmsDown(0.18, 0.05) }],
             [0.5, { pitch: 73, ...legs(0, 100), armsWorld: true, armL: v(0.55, -0.25, -0.8), foreL: v(0.05, -1, 0.08), armR: v(-0.55, -0.25, -0.8), foreR: v(-0.05, -1, 0.08) }],
@@ -213,6 +220,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     plank: {
+        contacts: [{ part: 'handL' }, { part: 'handR' }],
         cycleSec: 4,
         keys: [
             [0, { pitch: 76, armsWorld: true, armL: v(0.05, -1, 0), foreL: v(0.08, -0.05, 1), armR: v(-0.05, -1, 0), foreR: v(-0.08, -0.05, 1) }],
@@ -344,12 +352,15 @@ export const ANIMATIONS: Record<string, AnimDef> = {
         anchor: 'footR',
         keys: [
             [0, { ...legL(-30, 10, 3), ...legR(0, 0, 3), ...arms(0, 45) }],
+            [0.25, { ...legL(18, 35, 3), ...legR(0, 0, 3), ...arms(0, 45) }],
             [0.5, { ...legL(65, 5, 3), ...legR(0, 0, 3), ...arms(0, 45) }],
+            [0.75, { ...legL(18, 35, 3), ...legR(0, 0, 3), ...arms(0, 45) }],
         ],
     },
 
     march_in_place: {
         cycleSec: 1.2,
+        contacts: [{ part: 'footR', from: 0.6, to: 0.4 }, { part: 'footL', from: 0.1, to: 0.9 }],
         keys: [
             [0, { ...legL(70, 80, 4), ...legR(0, 0, 4), ...armR(45, 8, 80), ...armL(-25, 8, 80) }],
             [0.25, { ...legs(5, 8, 4), ...arms(10, 8, 80) }],
@@ -359,16 +370,47 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     inchworm: {
+        anchor: 'feet',
+        // 手一步一步往前爬到平板再爬回来：每一步按几何算出身体角度，手落地时固定，两步之间手前伸离地；脚整个过程不动
+        contacts: [
+            { part: 'footL' },
+            { part: 'footR' },
+            ...(['handL', 'handR'] as const).flatMap((part) => [
+                { part, from: 0.1, to: 0.14 },
+                { part, from: 0.2, to: 0.24 },
+                { part, from: 0.3, to: 0.34 },
+                { part, from: 0.4, to: 0.44 },
+                { part, from: 0.5, to: 0.54 },
+                { part, from: 0.6, to: 0.64 },
+                { part, from: 0.7, to: 0.74 },
+                { part, from: 0.8, to: 0.84 },
+                { part, from: 0.9, to: 0.94 },
+            ]),
+        ],
         keys: [
-            [0, STANDING],
-            [0.2, { pitch: 115, head: up(-20), legsWorld: true, thighL: [0.03, -1, 0.05], shinL: [0, -1, -0.02], thighR: [-0.03, -1, 0.05], shinR: [0, -1, -0.02], ...straightArmsDown(0.12, 0.15) }],
-            [0.45, { ...HIGH_PLANK }],
-            [0.6, { ...HIGH_PLANK }],
-            [0.8, { pitch: 115, head: up(-20), legsWorld: true, thighL: [0.03, -1, 0.05], shinL: [0, -1, -0.02], thighR: [-0.03, -1, 0.05], shinR: [0, -1, -0.02], ...straightArmsDown(0.12, 0.15) }],
+            [0, { legsWorld: true, thighL: [0.03, -1, 0], shinL: [0.03, -1, 0], thighR: [-0.03, -1, 0], shinR: [-0.03, -1, 0] }],
+            [0.12, { pitch: 132.5, head: up(-15), legsWorld: true, thighL: [0.03, -1.00, -0.00], shinL: [0.03, -1.00, -0.00], thighR: [-0.03, -1.00, -0.00], shinR: [-0.03, -1.00, -0.00], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.17, { pitch: 132.3, head: up(-15), legsWorld: true, thighL: [0.03, -0.99, -0.14], shinL: [0.03, -0.99, -0.14], thighR: [-0.03, -0.99, -0.14], shinR: [-0.03, -0.99, -0.14], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.22, { pitch: 129.2, head: up(-15), legsWorld: true, thighL: [0.03, -0.96, -0.28], shinL: [0.03, -0.96, -0.28], thighR: [-0.03, -0.96, -0.28], shinR: [-0.03, -0.96, -0.28], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.27, { pitch: 123.7, head: up(-15), legsWorld: true, thighL: [0.03, -0.91, -0.41], shinL: [0.03, -0.91, -0.41], thighR: [-0.03, -0.91, -0.41], shinR: [-0.03, -0.91, -0.41], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.32, { pitch: 121.1, head: up(-15), legsWorld: true, thighL: [0.03, -0.85, -0.53], shinL: [0.03, -0.85, -0.53], thighR: [-0.03, -0.85, -0.53], shinR: [-0.03, -0.85, -0.53], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.37, { pitch: 116.4, head: up(-15), legsWorld: true, thighL: [0.03, -0.77, -0.64], shinL: [0.03, -0.77, -0.64], thighR: [-0.03, -0.77, -0.64], shinR: [-0.03, -0.77, -0.64], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.42, { pitch: 106.3, head: up(-15), legsWorld: true, thighL: [0.03, -0.67, -0.74], shinL: [0.03, -0.67, -0.74], thighR: [-0.03, -0.67, -0.74], shinR: [-0.03, -0.67, -0.74], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.47, { pitch: 94.9, head: up(-15), legsWorld: true, thighL: [0.03, -0.56, -0.83], shinL: [0.03, -0.56, -0.83], thighR: [-0.03, -0.56, -0.83], shinR: [-0.03, -0.56, -0.83], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.52, { pitch: 82.2, head: up(-15), legsWorld: true, thighL: [0.03, -0.44, -0.90], shinL: [0.03, -0.44, -0.90], thighR: [-0.03, -0.44, -0.90], shinR: [-0.03, -0.44, -0.90], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.57, { pitch: 94.9, head: up(-15), legsWorld: true, thighL: [0.03, -0.56, -0.83], shinL: [0.03, -0.56, -0.83], thighR: [-0.03, -0.56, -0.83], shinR: [-0.03, -0.56, -0.83], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.62, { pitch: 106.3, head: up(-15), legsWorld: true, thighL: [0.03, -0.67, -0.74], shinL: [0.03, -0.67, -0.74], thighR: [-0.03, -0.67, -0.74], shinR: [-0.03, -0.67, -0.74], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.67, { pitch: 116.4, head: up(-15), legsWorld: true, thighL: [0.03, -0.77, -0.64], shinL: [0.03, -0.77, -0.64], thighR: [-0.03, -0.77, -0.64], shinR: [-0.03, -0.77, -0.64], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.72, { pitch: 121.1, head: up(-15), legsWorld: true, thighL: [0.03, -0.85, -0.53], shinL: [0.03, -0.85, -0.53], thighR: [-0.03, -0.85, -0.53], shinR: [-0.03, -0.85, -0.53], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.77, { pitch: 123.7, head: up(-15), legsWorld: true, thighL: [0.03, -0.91, -0.41], shinL: [0.03, -0.91, -0.41], thighR: [-0.03, -0.91, -0.41], shinR: [-0.03, -0.91, -0.41], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.82, { pitch: 129.2, head: up(-15), legsWorld: true, thighL: [0.03, -0.96, -0.28], shinL: [0.03, -0.96, -0.28], thighR: [-0.03, -0.96, -0.28], shinR: [-0.03, -0.96, -0.28], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
+            [0.87, { pitch: 132.3, head: up(-15), legsWorld: true, thighL: [0.03, -0.99, -0.14], shinL: [0.03, -0.99, -0.14], thighR: [-0.03, -0.99, -0.14], shinR: [-0.03, -0.99, -0.14], armsWorld: true, armL: v(0.1, -0.78, 0.62), foreL: v(0.1, -0.78, 0.62), armR: v(-0.1, -0.78, 0.62), foreR: v(-0.1, -0.78, 0.62) }],
+            [0.92, { pitch: 132.5, head: up(-15), legsWorld: true, thighL: [0.03, -1.00, -0.00], shinL: [0.03, -1.00, -0.00], thighR: [-0.03, -1.00, -0.00], shinR: [-0.03, -1.00, -0.00], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.12, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.12, -1, 0) }],
         ],
     },
 
     cat_cow: {
+        contacts: [{ part: 'handL' }, { part: 'handR' }],
         keys: [
             [0, { ...QUADRUPED, spine: up(-18), head: up(45) }],
             [0.5, { ...QUADRUPED, pitch: 80, spine: up(15), head: up(-35) }],
@@ -453,6 +495,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     squat_jump: {
+        contacts: [{ part: 'footL', from: 0.7, to: 0.42 }, { part: 'footR', from: 0.7, to: 0.42 }],
         anchor: 'feet',
         keys: [
             [0, { ...STANDING, armsWorld: true, ...arms(0, 10) }],
@@ -465,9 +508,14 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     db_lunge: {
         anchor: 'footR',
         props: ['dumbbells'],
+        contacts: [{ part: 'footR' }, { part: 'footL', from: 0.36, to: 0.64 }, { part: 'footL', from: 0.96, to: 0.03 }],
         keys: [
             [0, { ...STANDING, ...arms(0, 10) }],
+            [0.08, { ...legL(25, 45, 4), ...legR(0, 4, 4), ...arms(0, 10) }],
+            [0.2, { ...legL(55, 75, 4), ...legR(5, 10, 4), ...arms(0, 10) }],
             [0.5, { ...legL(80, 85, 4), ...legR(-15, 85, 4), spine: up(4), ...arms(0, 10) }],
+            [0.8, { ...legL(55, 75, 4), ...legR(5, 10, 4), ...arms(0, 10) }],
+            [0.92, { ...legL(25, 45, 4), ...legR(0, 4, 4), ...arms(0, 10) }],
         ],
     },
 
@@ -486,9 +534,12 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     band_lateral_walk: {
         anchor: 'footR',
         props: ['bandKnees'],
+        contacts: [{ part: 'footR' }, { part: 'footL', from: 0.38, to: 0.62 }, { part: 'footL', from: 0.88, to: 0.12 }],
         keys: [
             [0, { ...legs(35, 45, 6), spine: up(20), ...HANDS_ON_HIPS }],
+            [0.25, { ...legL(45, 70, 13), ...legR(35, 45, 6), spine: up(20), ...HANDS_ON_HIPS }],
             [0.5, { ...legL(35, 45, 20), ...legR(35, 45, 6), spine: up(20), ...HANDS_ON_HIPS }],
+            [0.75, { ...legL(45, 70, 13), ...legR(35, 45, 6), spine: up(20), ...HANDS_ON_HIPS }],
         ],
     },
 
@@ -512,6 +563,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     pike_pushup: {
+        contacts: [{ part: 'footL' }, { part: 'footR' }, { part: 'handL' }, { part: 'handR' }],
         anchor: 'feet',
         keys: [
             [0, { pitch: 135, head: up(-10), legsWorld: true, thighL: [0.04, -0.75, -0.66], shinL: [0.04, -0.75, -0.66], thighR: [-0.04, -0.75, -0.66], shinR: [-0.04, -0.75, -0.66], ...straightArmsDown(0.18, 0.1) }],
@@ -520,6 +572,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     chair_dip: {
+        contacts: [{ part: 'footL' }, { part: 'footR' }, { part: 'handL' }, { part: 'handR' }],
         anchor: 'hands',
         scene: [{ kind: 'chair', at: 'hands', offset: [0, 0, -0.1] }],
         keys: [
@@ -635,8 +688,10 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     bird_dog: {
+        contacts: [{ part: 'handR' }, { part: 'footL' }, { part: 'handL', from: 0.94, to: 0.04 }],
         keys: [
             [0, QUADRUPED],
+            [0.12, { ...QUADRUPED, armL: [0.05, -0.85, 0.2], foreL: [0.05, -0.7, 0.4] }],
             [0.5, { ...QUADRUPED, armL: [0.05, 0.1, 1], foreL: [0.05, 0.1, 1], thighR: [-0.04, 0.12, -1], shinR: [-0.04, 0.12, -1], toeR: [0, -1, -0.2] }],
         ],
     },
@@ -651,6 +706,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
 
     standing_crunch: {
         repsPerCycle: 2,
+        contacts: [{ part: 'footL', from: 0.38, to: 0.12 }, { part: 'footR', from: 0.88, to: 0.62 }],
         keys: [
             [0, { ...STANDING, ...HANDS_BEHIND_HEAD }],
             [0.25, { ...legL(95, 90, 4), ...legR(0, 0, 4), spine: up(20, 10), twist: 30, ...HANDS_BEHIND_HEAD }],
@@ -662,13 +718,25 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     // ======================= 主训练：有氧 / 爆发 =======================
     burpee: {
         cycleSec: 3,
+        contacts: [
+            { part: 'handL', from: 0.15, to: 0.72 },
+            { part: 'handR', from: 0.15, to: 0.72 },
+            { part: 'footL', from: 0.93, to: 0.2 },
+            { part: 'footR', from: 0.93, to: 0.2 },
+            { part: 'footL', from: 0.34, to: 0.54 },
+            { part: 'footR', from: 0.34, to: 0.54 },
+            { part: 'footL', from: 0.68, to: 0.78 },
+            { part: 'footR', from: 0.68, to: 0.78 },
+        ],
         keys: [
             [0, STANDING],
-            [0.18, { ...legs(100, 135, 12), spine: up(55), ...straightArmsDown(0.18, 0.2) }],
+            [0.15, { ...legs(100, 135, 12), spine: up(55), ...straightArmsDown(0.18, 0.2) }],
+            [0.27, { pitch: 55, ...legs(30, 60, 6), ...straightArmsDown(0.16, 0.05), lift: 0.12 }],
             [0.38, { ...HIGH_PLANK }],
-            [0.52, { ...HIGH_PLANK }],
-            [0.68, { ...legs(100, 135, 12), spine: up(55), ...straightArmsDown(0.18, 0.2) }],
-            [0.84, { ...legs(0, 0, 6), ...arms(170, 15), lift: 0.25, toeL: [0, -0.7, 0.7], toeR: [0, -0.7, 0.7] }],
+            [0.5, { ...HIGH_PLANK }],
+            [0.61, { pitch: 55, ...legs(30, 60, 6), ...straightArmsDown(0.16, 0.05), lift: 0.12 }],
+            [0.72, { ...legs(100, 135, 12), spine: up(55), ...straightArmsDown(0.18, 0.2) }],
+            [0.86, { ...legs(0, 0, 6), ...arms(170, 15), lift: 0.25, toeL: [0, -0.7, 0.7], toeR: [0, -0.7, 0.7] }],
         ],
     },
 
@@ -798,6 +866,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     downward_dog: {
+        contacts: [{ part: 'footL' }, { part: 'footR' }, { part: 'handL' }, { part: 'handR' }],
         cycleSec: 5,
         anchor: 'feet',
         keys: [
@@ -807,6 +876,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     cobra: {
+        contacts: [{ part: 'handL' }, { part: 'handR' }],
         cycleSec: 5,
         keys: [
             [0, { pitch: 90, spine: up(-50), head: up(-20), toeL: [0, -0.3, -1], toeR: [0, -0.3, -1], armsWorld: true, armL: v(0.2, -1, 0.15), foreL: v(0.1, -1, 0.25), armR: v(-0.2, -1, 0.15), foreR: v(-0.1, -1, 0.25) }],
@@ -815,6 +885,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     pigeon_pose: {
+        contacts: [{ part: 'handL' }, { part: 'handR' }],
         cycleSec: 5,
         keys: [
             [0, { pitch: 35, legsWorld: true, thighL: [0.45, -0.3, 0.85], shinL: [-0.95, -0.05, 0.25], thighR: [-0.05, -0.2, -1], shinR: [-0.05, -0.05, -1], toeL: [-0.3, 0, 1], toeR: [0, -0.3, -1], armsWorld: true, armL: v(0.25, -1, 0.3), foreL: v(0.2, -1, 0.3), armR: v(-0.25, -1, 0.3), foreR: v(-0.2, -1, 0.3) }],
@@ -839,6 +910,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     kneeling_hip_flexor_stretch: {
+        contacts: [{ part: 'footL' }],
         cycleSec: 5,
         keys: [
             [0, { legsWorld: true, thighL: [0.06, -0.1, 1], shinL: [0, -1, 0.05], thighR: [-0.06, -0.95, -0.3], shinR: [0, 0.03, -1], toeR: [0, -0.2, -1], ...HANDS_ON_HIPS }],
@@ -991,9 +1063,14 @@ export const ANIMATIONS: Record<string, AnimDef> = {
 
     reverse_lunge: {
         anchor: 'footL',
+        contacts: [{ part: 'footL' }, { part: 'footR', from: 0.36, to: 0.64 }, { part: 'footR', from: 0.96, to: 0.03 }],
         keys: [
             [0, STANDING],
+            [0.08, { ...legL(3, 6, 4), ...legR(15, 50, 4) }],
+            [0.2, { ...legL(15, 20, 4), ...legR(-5, 95, 4) }],
             [0.5, { ...legL(80, 85, 4), ...legR(-15, 85, 4), spine: up(4) }],
+            [0.8, { ...legL(15, 20, 4), ...legR(-5, 95, 4) }],
+            [0.92, { ...legL(3, 6, 4), ...legR(15, 50, 4) }],
         ],
     },
 
@@ -1009,6 +1086,7 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     },
 
     diamond_pushup: {
+        contacts: [{ part: 'footL' }, { part: 'footR' }, { part: 'handL' }, { part: 'handR' }],
         anchor: 'feet',
         keys: [
             [0, { pitch: 64, armsWorld: true, armL: v(-0.12, -1, 0.05), foreL: v(-0.1, -1, 0.05), armR: v(0.12, -1, 0.05), foreR: v(0.1, -1, 0.05) }],
@@ -1018,25 +1096,40 @@ export const ANIMATIONS: Record<string, AnimDef> = {
 
     single_leg_rdl: {
         anchor: 'footL',
+        contacts: [{ part: 'footL' }, { part: 'footR', from: 0.95, to: 0.04 }],
         keys: [
             [0, { legsWorld: true, thighL: [0.03, -1, 0.02], shinL: [0, -1, -0.02], thighR: [-0.03, -1, 0.02], shinR: [0, -1, -0.02], ...straightArmsDown(0.12, 0.03) }],
+            [0.05, { legsWorld: true, thighL: [0.03, -1, 0.02], shinL: [0, -1, -0.02], thighR: [-0.03, -0.99, -0.1], shinR: [-0.03, -0.88, -0.45], ...straightArmsDown(0.12, 0.03) }],
+            [0.12, { pitch: 15, legsWorld: true, thighL: [0.03, -1, 0.04], shinL: [0, -1, -0.03], thighR: [-0.03, -0.95, -0.3], shinR: [-0.03, -0.85, -0.52], ...straightArmsDown(0.12, 0.03) }],
             [0.5, { pitch: 80, head: up(-15), legsWorld: true, thighL: [0.03, -1, 0.1], shinL: [0, -1, -0.05], thighR: [-0.03, 0.17, -0.98], shinR: [-0.03, 0.17, -0.98], toeR: [0, -1, -0.1], ...straightArmsDown(0.1, 0) }],
+            [0.88, { pitch: 15, legsWorld: true, thighL: [0.03, -1, 0.04], shinL: [0, -1, -0.03], thighR: [-0.03, -0.95, -0.3], shinR: [-0.03, -0.85, -0.52], ...straightArmsDown(0.12, 0.03) }],
+            [0.95, { legsWorld: true, thighL: [0.03, -1, 0.02], shinL: [0, -1, -0.02], thighR: [-0.03, -0.99, -0.1], shinR: [-0.03, -0.88, -0.45], ...straightArmsDown(0.12, 0.03) }],
         ],
     },
 
     side_lunge: {
         anchor: 'footR',
+        contacts: [{ part: 'footR' }, { part: 'footL', from: 0.36, to: 0.64 }, { part: 'footL', from: 0.96, to: 0.03 }],
         keys: [
-            [0, { ...legs(0, 0, 6) }],
+            [0, { legsWorld: true, thighL: [0.06, -1, 0], shinL: [0.06, -1, 0], thighR: [-0.06, -1, 0], shinR: [-0.06, -1, 0] }],
+            [0.08, { legsWorld: true, thighL: [0.1, -0.9, 0.42], shinL: [0.06, -0.9, -0.42], thighR: [-0.06, -1, 0], shinR: [-0.06, -1, 0] }],
+            [0.2, { legsWorld: true, thighL: [0.5, -0.7, 0.35], shinL: [0.25, -0.75, -0.6], thighR: [-0.06, -1, 0], shinR: [-0.06, -1, 0], ...arms(30, 10, 40) }],
             [0.5, { pitch: 25, legsWorld: true, thighL: [0.35, -0.55, 0.75], shinL: [0.08, -1, -0.15], thighR: [-0.6, -0.8, 0], shinR: [-0.6, -0.8, 0], toeL: [0.3, 0, 1], toeR: [-0.3, 0, 1], ...arms(70, 10, 60) }],
+            [0.8, { legsWorld: true, thighL: [0.5, -0.7, 0.35], shinL: [0.25, -0.75, -0.6], thighR: [-0.06, -1, 0], shinR: [-0.06, -1, 0], ...arms(30, 10, 40) }],
+            [0.92, { legsWorld: true, thighL: [0.1, -0.9, 0.42], shinL: [0.06, -0.9, -0.42], thighR: [-0.06, -1, 0], shinR: [-0.06, -1, 0] }],
         ],
     },
 
     curtsy_lunge: {
         anchor: 'footL',
+        contacts: [{ part: 'footL' }, { part: 'footR', from: 0.36, to: 0.64 }, { part: 'footR', from: 0.96, to: 0.03 }],
         keys: [
             [0, STANDING],
+            [0.08, { ...legL(3, 6, 3), ...legR(15, 50, 3), ...arms(10, 12, 20) }],
+            [0.2, { ...legL(15, 20, 3), thighR: limb(0, -10, -1), shinR: limb(-95, -10, -1), ...arms(20, 15, 40) }],
             [0.5, { ...legL(75, 80, 3), thighR: limb(-20, -25, -1), shinR: limb(-105, -25, -1), spine: up(5), ...arms(40, 15, 60) }],
+            [0.8, { ...legL(15, 20, 3), thighR: limb(0, -10, -1), shinR: limb(-95, -10, -1), ...arms(20, 15, 40) }],
+            [0.92, { ...legL(3, 6, 3), ...legR(15, 50, 3), ...arms(10, 12, 20) }],
         ],
     },
 
@@ -1071,9 +1164,14 @@ export const ANIMATIONS: Record<string, AnimDef> = {
     kb_goblet_reverse_lunge: {
         anchor: 'footL',
         props: ['kettlebellGoblet'],
+        contacts: [{ part: 'footL' }, { part: 'footR', from: 0.36, to: 0.64 }, { part: 'footR', from: 0.96, to: 0.03 }],
         keys: [
             [0, { ...STANDING, ...GOBLET_ARMS }],
+            [0.08, { ...legL(3, 6, 4), ...legR(15, 50, 4), ...GOBLET_ARMS }],
+            [0.2, { ...legL(15, 20, 4), ...legR(-5, 95, 4), ...GOBLET_ARMS }],
             [0.5, { ...legL(80, 85, 4), ...legR(-15, 85, 4), spine: up(4), ...GOBLET_ARMS }],
+            [0.8, { ...legL(15, 20, 4), ...legR(-5, 95, 4), ...GOBLET_ARMS }],
+            [0.92, { ...legL(3, 6, 4), ...legR(15, 50, 4), ...GOBLET_ARMS }],
         ],
     },
 
@@ -1123,9 +1221,9 @@ export const ANIMATIONS: Record<string, AnimDef> = {
         props: ['rope'],
         keys: [
             [0, { dx: -0.12, ...legs(0, 18, 3), ...arms(10, 25, 55) }],
-            [0.25, { ...legs(0, 4, 3), ...arms(10, 25, 55), lift: 0.06 }],
+            [0.25, { ...legs(0, 4, 3), ...arms(10, 25, 55), lift: 0.1 }],
             [0.5, { dx: 0.12, ...legs(0, 18, 3), ...arms(10, 25, 55) }],
-            [0.75, { ...legs(0, 4, 3), ...arms(10, 25, 55), lift: 0.06 }],
+            [0.75, { ...legs(0, 4, 3), ...arms(10, 25, 55), lift: 0.1 }],
         ],
     },
 

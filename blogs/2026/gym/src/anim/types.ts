@@ -56,7 +56,17 @@ export interface SceneProp {
     turn?: boolean;             // 墙面转 90 度（立在人物侧面）
 }
 
-export type Anchor = 'feet' | 'footL' | 'footR' | 'hands' | 'none';
+export type Anchor = 'feet' | 'footL' | 'footR' | 'hands' | 'knees' | 'none';
+
+export type ContactPart = 'footL' | 'footR' | 'handL' | 'handR';
+
+// 接触点：这段时间里该部位撑在地上（或凳上）不动，水平位置固定，由膝/肘弯曲来适应。
+// from > to 表示跨过循环首尾（如 0.85 → 0.15）；不写 from/to 表示整个循环
+export interface Contact {
+    part: ContactPart;
+    from?: number;
+    to?: number;
+}
 
 export interface AnimDef {
     cycleSec?: number;          // 计时动作一个循环的秒数；计次动作用动作库的 secPerRep
@@ -65,6 +75,8 @@ export interface AnimDef {
     hang?: boolean;             // 悬垂：手固定在单杠高度，不贴地
     plant?: { part: 'footL' | 'footR'; y: number };  // 这只脚踩在高处（凳面高度 y），身体其余部分不低于地面
     repsPerCycle?: number;      // 一个循环包含几次（左右交替的动作 = 2），默认 1
+    // 撑地不动的部位。不写时：anchor 为 feet 且不跳跃 → 双脚整个循环不动；anchor 为 hands → 双手不动
+    contacts?: Contact[];
     ropeTurns?: number;         // 跳绳：一个循环里绳子转几圈，默认 1
     props?: BodyProp[];
     scene?: SceneProp[];

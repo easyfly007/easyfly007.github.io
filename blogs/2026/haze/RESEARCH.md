@@ -25,6 +25,9 @@
 | NEA 8 月措施 | https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026 |
 | haze.gov.sg | https://www.haze.gov.sg/ |
 | NLB Infopedia（2013 年 401） | https://eresources.nlb.gov.sg/infopedia/articles/SIP_2013-08-30_185150.html |
+| Bernama（8/20，季风） | https://bernama.com/en/news.php?id=2596769 |
+| The Vibes（9/20，十年后烟霾重来） | https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015 |
+| Christiawan 2017（PP 57/2016 第 23 条） | https://journal.untar.ac.id/index.php/hukum/article/view/1073 |
 
 ## 2026 霾季：事实与出处
 
@@ -73,6 +76,20 @@
 | 10/8 | F1 新加坡站称烟霾加重时户外娱乐活动可能受限 | 新加坡 | Wikipedia 2026 |
 | 10/9 | 新加坡中区 24 小时 PSI 达本季最高（各报道 181/186/192）；马来西亚吉隆坡、布城、雪兰莪、森美兰、马六甲、柔佛停课 | 新加坡、马来半岛 | Tempo、Malay Mail、Outlook India |
 
+## 成因（第 3 步已用，2026-10-10 核实）
+
+- 西南季风 5 月 14 日开始，预计 9 月结束，带来西南风；ASMC 报告西加里曼丹的中到浓烟霾向北飘进砂拉越西部 → Bernama 8/20（马来西亚 NREB 引述）
+- 超强厄尔尼诺 6 月正式到来 → Mongabay
+- 泥炭排干后会变干、在地下燃烧；Pantau Gambut 7 月研究：观察到的 70% 堵渠坝已损坏，52% 的干预点地下水位仍低于安全阈值 → The Vibes 9/20
+- 南加里曼丹不用火清地比烧要贵得多；世界银行研究也发现烧的每公顷成本低于人工、半机械、机械清地 → The Vibes 9/20
+- 泥炭地恢复署（BRG）后改为泥炭地与红树林恢复署（BRGM），临时授权 2024 年到期 → The Vibes 9/20
+- 吊销企业经营许可这一最重处罚历来很少用 → The Vibes 9/20
+- 特许经营区内有火点不等于企业放火或负法律责任 → The Vibes 9/20
+- 廖内 2026 年防火预算只有 36.7 亿印尼盾（约 20.55 万美元）（FITRA Riau）；BNPB 预算为 15 年来最低 → Mongabay
+- PP 57/2016 第 23 条：泥炭地地下水位低于泥炭表面 0.4 米即视为受损；金合欢和油棕种植需要 0.6–0.8 米的水位 → Christiawan 2017（期刊摘要）。法规原文 PDF 在 ppkl.menlhk.go.id，本次下载超时
+- ⚠ "一半火点位于特许经营区内"：没找到出处，不用
+- ⚠ 西加里曼丹烧痕最大的特许区由本地财团和新加坡、日本关联企业控制（Jakarta Post 经 ANN 转载，asianews.network/?p=300323），页面打不开，未核实
+
 ## PSI 分级与健康建议（首屏已用）
 
 - 分级：0–50 良好，51–100 中等，101–200 不健康，201–300 非常不健康，>300 危险
@@ -92,4 +109,4 @@
 
 1995 东盟跨境污染合作计划 → 1997 区域烟霾行动计划 → 2002 东盟跨境烟霾污染协定（AATHP）签署，2003 年生效 → 2014 印尼批准（最后一个批准的成员国）；新加坡《跨境烟霾污染法》→ 2016 印尼泥炭地恢复署（BRG）；东盟无烟霾路线图（目标 2020 年，未实现）→ 2019 原始林和泥炭地新许可永久禁令 → 2023 ACC THPC 设立协定 → 2026 Level 3
 
-泥炭地剖面交互要用的法规：PP 71/2014（经 PP 57/2016 修订）规定泥炭地地下水位低于地表 0.4 米即视为受损 ⚠ 需找到原文链接
+泥炭地剖面交互要用的法规：PP 71/2014（经 PP 57/2016 修订）规定泥炭地地下水位低于地表 0.4 米即视为受损 → 已用 Christiawan 2017 作为出处（见"成因"）

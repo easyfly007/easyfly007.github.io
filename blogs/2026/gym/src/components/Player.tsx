@@ -4,6 +4,7 @@ import { buildTimeline, locate, stepStart, totalSeconds } from '../engine/timeli
 import { formatDuration } from '../labels';
 import { beep, speak, stopSpeaking } from '../speech';
 import type { Gender, Step, Workout } from '../types';
+import { ExerciseBodyMap } from './BodyMap';
 import { ExerciseVideo } from './ExerciseVideo';
 
 interface Props {
@@ -176,6 +177,7 @@ export function Player({ workout, coach, onExit }: Props) {
                         <li key={c}>{c}</li>
                     ))}
                 </ul>
+                <ExerciseBodyMap exerciseId={ex.id} stretch={ex.category === 'stretch'} />
                 {isWork && nextWork && (
                     <div className="muted">之后：{EXERCISE_BY_ID[nextWork.exerciseId].name}</div>
                 )}

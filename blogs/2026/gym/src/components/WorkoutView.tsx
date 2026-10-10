@@ -1,6 +1,7 @@
 import { EXERCISE_BY_ID } from '../data/exercises';
-import { MUSCLE_LABEL } from '../labels';
+import { EXERCISE_MUSCLES, MUSCLE_DETAIL_LABEL } from '../data/muscles';
 import type { Block, Workout, WorkoutItem } from '../types';
+import { ExerciseBodyMap } from './BodyMap';
 
 interface Props {
     workout: Workout;
@@ -64,9 +65,17 @@ export function WorkoutView({ workout, title, savedName, onStart, onRegenerate, 
                                         <span className="item-name">{ex.name}</span>
                                         <span className="item-dose">{dose(it, !!ex.perSide)}</span>
                                     </div>
-                                    <div className="muted small">
-                                        {ex.muscles.map((m) => MUSCLE_LABEL[m]).join(' · ')} — {ex.cues[0]}
-                                    </div>
+                                    <details className="item-detail">
+                                        <summary className="muted small">
+                                            {EXERCISE_MUSCLES[ex.id].primary.map((m) => MUSCLE_DETAIL_LABEL[m]).join(' · ')} — {ex.cues[0]}
+                                        </summary>
+                                        <ExerciseBodyMap exerciseId={ex.id} stretch={ex.category === 'stretch'} />
+                                        <ul className="cues-list small">
+                                            {ex.cues.map((c) => (
+                                                <li key={c}>{c}</li>
+                                            ))}
+                                        </ul>
+                                    </details>
                                 </li>
                             );
                         })}

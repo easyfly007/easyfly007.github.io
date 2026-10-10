@@ -29,6 +29,7 @@ describe('App flow', () => {
         expect(screen.getByText('热身')).toBeTruthy();
         expect(screen.getByText(/^主训练/)).toBeTruthy();
         expect(screen.getByText('放松')).toBeTruthy();
+        expect(document.querySelectorAll('.item-detail .body-map').length).toBeGreaterThan(0);
 
         click('保存为模板');
         expect(JSON.parse(window.localStorage.getItem('gym.saved.v1')!)).toHaveLength(1);

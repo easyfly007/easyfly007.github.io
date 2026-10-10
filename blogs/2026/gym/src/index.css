@@ -498,3 +498,101 @@ button.big {
     padding: 10px 12px;
     margin: 0 0 16px;
 }
+
+/* ---------- 人体肌肉图 ---------- */
+:root {
+    --bm-base: #dfe2e6;
+    --bm-none: #c6cbd2;
+    --bm-primary: #e0531f;
+    --bm-secondary: #f5b08c;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bm-base: #2f343c;
+        --bm-none: #444a54;
+        --bm-primary: #e8602c;
+        --bm-secondary: #8c4a2c;
+    }
+}
+
+.body-map {
+    margin: 8px 0;
+    max-width: 320px;
+    width: 100%;
+}
+
+.body-map.compact {
+    max-width: 160px;
+}
+
+.body-map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.body-map figcaption {
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: left;
+}
+
+.bm-base {
+    fill: var(--bm-base);
+}
+
+.bm-none,
+.bm-primary,
+.bm-secondary {
+    stroke: var(--card);
+    stroke-width: 0.6;
+}
+
+.bm-none {
+    fill: var(--bm-none);
+}
+
+.bm-primary {
+    fill: var(--bm-primary);
+}
+
+.bm-secondary {
+    fill: var(--bm-secondary);
+}
+
+.bm-label {
+    font-size: 9px;
+    fill: var(--muted);
+}
+
+.bm-key {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: -1px;
+}
+
+.bm-key-primary {
+    background: var(--bm-primary);
+}
+
+.bm-key-secondary {
+    background: var(--bm-secondary);
+}
+
+.item-detail summary {
+    cursor: pointer;
+}
+
+.cues-list {
+    margin: 4px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+}
+
+.player .body-map {
+    max-width: 260px;
+}

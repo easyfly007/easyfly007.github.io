@@ -125,9 +125,6 @@
         color: #fff;
     }
 </style>
-<script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
-</script>
 </head>
 <body>
 <main>
@@ -157,7 +154,8 @@
 </main>
 
 <script type="module">
-import * as THREE from 'three';
+// 用完整地址导入：Vite 开发服务器会把裸模块名 'three' 改写成本地依赖，忽略 importmap
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
 const TOTAL_SEC = 30;
 const REP_SEC = 3;           // 与动作库 squat 的 secPerRep 一致

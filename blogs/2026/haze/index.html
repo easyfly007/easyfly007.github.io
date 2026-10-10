@@ -758,6 +758,17 @@ section.block { padding-block: 56px; border-top: 1px solid var(--line); }
 .acts h3 { font-size: var(--step-0); margin: 0 0 4px; }
 .acts p { margin: 0; font-size: 0.92rem; line-height: 1.7; }
 
+/* 保存图片 */
+.savebar { margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.savebar .play { width: auto; padding: 7px 18px; }
+.savemsg { margin: 0; font-size: var(--step--1); color: var(--ember); min-height: 1.4em; }
+.savegrid { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.savecard { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.savecard img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; object-position: top; }
+.savecard figcaption { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 8px 10px; font-size: var(--step--1); font-weight: 700; }
+.savecard.full { border-color: var(--ember); }
+.savecard button[disabled] { opacity: 0.6; cursor: progress; }
+
 /* 来源汇总 */
 .srclist { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 8px 32px; }
 .srclist h3 { grid-column: 1 / -1; font-size: var(--step--1); font-family: var(--font-num); letter-spacing: 0.12em; color: var(--ember); margin: 18px 0 0; }
@@ -828,6 +839,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       <li><a href="#history">历史</a></li>
       <li><a href="#policy">政策</a></li>
       <li><a href="#action">应对</a></li>
+      <li><a href="#save">保存图片</a></li>
       <li><a href="#sources">来源</a></li>
     </ul>
   </div>
@@ -1248,6 +1260,19 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       </div>
     </div>
   </section>
+  <section class="block" id="save">
+    <div class="wrap">
+      <h2><small>保存</small>保存图片</h2>
+      <p class="intro">本文按九个部分制成九张适合手机阅读的图片，另附一张完整长图，可保存到手机相册后分享。图片截取于 2026 年 10 月 10 日，页首实时读数为截图当时的数值。</p>
+      <div class="savebar">
+        <button type="button" class="play" id="saveAll">全部保存（9 张）</button>
+        <p class="savemsg" id="saveMsg" aria-live="polite"></p>
+      </div>
+      <div class="savegrid" id="saveGrid"></div>
+      <p class="note">iPhone：点击「保存」后，在弹出的菜单中选择「存储图像」。Android：图片将保存到相册或「下载」文件夹。在微信中打开时，请点击缩略图打开大图，再长按选择「保存图片」。</p>
+    </div>
+  </section>
+
   <section class="block" id="sources">
     <div class="wrap">
       <h2><small>来源</small>资料出处</h2>
@@ -2863,6 +2888,109 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       selectTab(tabs[j], true);
     });
   });
+
+  // ---------- 保存图片到手机 ----------
+  var SHARE_IMGS = [
+    ["1-hero", "1 首屏"],
+    ["2-now", "2 现状"],
+    ["3-scenes", "3 现场"],
+    ["4-reach", "4 影响范围"],
+    ["5-causes", "5 成因"],
+    ["6-history", "6 历史"],
+    ["7-policy", "7 政策"],
+    ["8-action", "8 应对"],
+    ["9-sources", "9 来源"],
+    ["full", "完整长图"]
+  ];
+  var saveGrid = document.getElementById("saveGrid");
+  var saveMsg = document.getElementById("saveMsg");
+  var inWeChat = /MicroMessenger/i.test(navigator.userAgent);
+
+  function shareUrl(key) {
+    return "img/share/haze-2026-" + key + ".jpg";
+  }
+  function shareName(item) {
+    return "烟霾季2026-" + item[1].replace(" ", "-") + ".jpg";
+  }
+
+  function fetchFile(item) {
+    return fetch(shareUrl(item[0])).then(function (r) {
+      if (!r.ok)
+        throw new Error("HTTP " + r.status);
+      return r.blob();
+    }).then(function (b) {
+      return new File([b], shareName(item), { type: "image/jpeg" });
+    });
+  }
+
+  function downloadFile(file) {
+    var url = URL.createObjectURL(file);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 4000);
+  }
+
+  // 优先用系统分享（iPhone 上可选"存储图像"直接存进相册），不支持时改为下载
+  function saveFiles(files) {
+    if (navigator.canShare && navigator.share && navigator.canShare({ files: files }))
+      return navigator.share({ files: files, title: "烟霾季 2026" }).catch(function (e) {
+        if (e && e.name === "AbortError")
+          return;
+        throw e;
+      });
+    files.forEach(function (f, i) {
+      setTimeout(function () {
+        downloadFile(f);
+      }, i * 600);
+    });
+    return Promise.resolve();
+  }
+
+  function setMsg(text) {
+    saveMsg.textContent = text;
+  }
+
+  function onSave(items, btn) {
+    if (inWeChat) {
+      setMsg("微信内无法直接保存，请点击缩略图打开大图后长按，选择「保存图片」；或点右上角「…」在浏览器中打开本页。");
+      return;
+    }
+    var label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "准备中…";
+    Promise.all(items.map(fetchFile)).then(saveFiles).then(function () {
+      setMsg("");
+    }).catch(function () {
+      setMsg("保存未完成，请点击缩略图打开大图后长按保存。");
+    }).then(function () {
+      btn.disabled = false;
+      btn.textContent = label;
+    });
+  }
+
+  SHARE_IMGS.forEach(function (item) {
+    var fig = document.createElement("figure");
+    fig.className = "savecard" + (item[0] === "full" ? " full" : "");
+    fig.innerHTML =
+      '<a href="' + shareUrl(item[0]) + '" target="_blank" rel="noopener" aria-label="打开大图：' + item[1] + '">' +
+      '<img src="img/share/thumb-' + item[0] + '.jpg" width="300" height="400" loading="lazy" alt="' + item[1] + '的截图"></a>' +
+      "<figcaption><span>" + item[1] + '</span><button type="button" class="back">保存</button></figcaption>';
+    fig.querySelector("button").addEventListener("click", function (ev) {
+      onSave([item], ev.currentTarget);
+    });
+    saveGrid.appendChild(fig);
+  });
+  document.getElementById("saveAll").addEventListener("click", function (ev) {
+    onSave(SHARE_IMGS.slice(0, 9), ev.currentTarget);
+  });
+  if (inWeChat)
+    setMsg("微信内请点击缩略图打开大图，长按选择「保存图片」。");
 
   glossify(document.body);
 })();

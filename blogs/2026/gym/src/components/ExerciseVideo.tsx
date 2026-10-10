@@ -13,6 +13,17 @@ interface Props {
 // 播放位置与计时的偏差超过这么多秒（按片段自身时间算）就重新对齐
 const MAX_DRIFT_SEC = 0.3;
 
+// 浏览器录制的片段常常没有写时长（duration 为 Infinity），跳到末尾一次浏览器才会算出来
+function fixUnknownDuration(e: React.SyntheticEvent<HTMLVideoElement>) {
+    const v = e.currentTarget;
+    if (v.duration !== Infinity)
+        return;
+    v.addEventListener('durationchange', () => {
+        v.currentTime = 0;
+    }, { once: true });
+    v.currentTime = 1e9;
+}
+
 // 按跟练计时拼接动作片段：每个视角一个 <video> 叠在一起，只显示当前视角那个，切换时不黑屏。
 // 片段按播放速度缩放到"一次动作"的时长，所以画面始终和计时、计次对齐
 export function ExerciseVideo({ step, intoStep, paused }: Props) {
@@ -59,6 +70,7 @@ export function ExerciseVideo({ step, intoStep, paused }: Props) {
                     muted
                     playsInline
                     preload="auto"
+                    onLoadedMetadata={fixUnknownDuration}
                     className={c.view === pos.view ? 'on' : undefined}
                 />
             ))}

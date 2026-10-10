@@ -644,6 +644,39 @@ section.block, section.todo { padding-block: 56px; border-top: 1px solid var(--l
 .yearcard h3 { font-size: var(--step-0); margin: 0 0 4px; }
 .yearcard p { margin: 0; font-size: 0.92rem; line-height: 1.7; }
 
+/* 应对：标签页 */
+.tabs { margin-top: 28px; display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.tabs button {
+  font: inherit;
+  font-weight: 700;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { color: var(--ink); background: var(--surface); border-color: var(--line); box-shadow: inset 0 3px 0 var(--ember); }
+.tabpanel { background: var(--surface); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 6px 6px; padding: clamp(16px, 3vw, 28px); }
+.tabpanel[hidden] { display: none; }
+.tabpanel .lead { margin: 0 0 14px; color: var(--muted); font-size: 0.92rem; }
+.acts { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px 28px; }
+.acts li { border-top: 1px dashed var(--line); padding-top: 10px; }
+.acts h3 { font-size: var(--step-0); margin: 0 0 4px; }
+.acts p { margin: 0; font-size: 0.92rem; line-height: 1.7; }
+
+/* 来源汇总 */
+.srclist { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 8px 32px; }
+.srclist h3 { grid-column: 1 / -1; font-size: var(--step--1); font-family: var(--font-num); letter-spacing: 0.12em; color: var(--ember); margin: 18px 0 0; }
+.srclist h3:first-child { margin-top: 0; }
+.srclist a { display: block; font-size: 0.9rem; line-height: 1.55; text-decoration: none; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.srclist a:hover b { color: var(--ember); }
+.srclist b { font-weight: 700; }
+.srclist span { display: block; color: var(--muted); font-size: var(--step--1); overflow-wrap: anywhere; }
+
 /* 政策：纵向时间轴 */
 .tl { list-style: none; margin: 28px 0 0; padding: 0; position: relative; max-width: 46em; }
 .tl::before { content: ""; position: absolute; left: 7.4rem; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
@@ -987,8 +1020,96 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       </ol>
     </div>
   </section>
-  <section class="todo" id="action"><div class="wrap"><h2><small>应对</small>能做什么</h2><p>第 5 步制作中：应急、长期与个人防护。</p></div></section>
-  <section class="todo" id="sources"><div class="wrap"><h2><small>来源</small>资料出处</h2><p>第 5 步制作中：来源汇总。</p></div></section>
+  <section class="block" id="action">
+    <div class="wrap">
+      <h2><small>应对</small>能做什么</h2>
+      <p class="intro">灭火和停课只能应付眼前，烟霾会不会每年回来，取决于泥炭地、执法和钱。下面分三层：各国政府正在做的、需要长期做的，以及你自己可以做的。</p>
+
+      <div class="tabs" role="tablist" aria-label="应对措施">
+        <button type="button" role="tab" id="tab-now" aria-controls="panel-now" aria-selected="true">应急</button>
+        <button type="button" role="tab" id="tab-long" aria-controls="panel-long" aria-selected="false" tabindex="-1">长期</button>
+        <button type="button" role="tab" id="tab-me" aria-controls="panel-me" aria-selected="false" tabindex="-1">个人</button>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-now" aria-labelledby="tab-now">
+        <p class="lead">霾季期间各国正在做的事。</p>
+        <ul class="acts">
+          <li><h3>灭火</h3><p>印尼投入约 48,000 人和 35 架飞机，用于监测、洒水和人工增雨<a class="src" href="https://news.mongabay.com/2026/08/indonesias-wildfire-season-surges-as-haze-spreads-into-malaysia/" target="_blank" rel="noopener">Mongabay</a>。日本派出 JS Kunisaki 舰和 3 架 CH-47 直升机支援<a class="src" href="https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze" target="_blank" rel="noopener">Wikipedia</a>。</p></li>
+          <li><h3>人工增雨</h3><p>砂拉越批准了三天的人工增雨，由 C-130 运输机播撒盐溶液<a class="src" href="https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze" target="_blank" rel="noopener">Wikipedia</a>。</p></li>
+          <li><h3>停课</h3><p>8 月 20 日砂拉越 591 所学校全部关闭<a class="src" href="https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze" target="_blank" rel="noopener">Wikipedia</a>；10 月 9 日吉隆坡、布城、雪兰莪、森美兰、马六甲和柔佛停课<a class="src" href="https://www.outlookindia.com/international/indonesias-wildfire-haze-shuts-malaysian-schools-pushes-singapore-pollution-to-2026-high" target="_blank" rel="noopener">Outlook India</a>。</p></li>
+          <li><h3>新加坡的准备</h3><p>烟霾工作组由 28 个机构组成，1994 年 9 月成立。所有中小学教室都配了空气净化器；PSI 进入「非常不健康」（超过 200）时，各社区中心的空调房会开放<a class="src" href="https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026" target="_blank" rel="noopener">NEA</a>。</p></li>
+          <li><h3>每日通报</h3><p>新加坡 NEA 从 9 月 4 日起每天发布烟霾通报<a class="src" href="https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-(04-september-2026)" target="_blank" rel="noopener">NEA</a><a class="src" href="https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze" target="_blank" rel="noopener">Wikipedia</a>。</p></li>
+          <li><h3>追责</h3><p>截至 9 月 17 日，印尼有 162 名纵火嫌疑人、219 起刑事调查、95 家公司受到调查<a class="src" href="https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze" target="_blank" rel="noopener">Wikipedia</a>。</p></li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-long" aria-labelledby="tab-long" hidden>
+        <p class="lead">不解决这些，明年的旱季还会再来一次。</p>
+        <ul class="acts">
+          <li><h3>让泥炭地重新湿起来</h3><p>按印尼法规，泥炭地地下水位要保持在地表以下 40 cm 以内<a class="src" href="https://journal.untar.ac.id/index.php/hukum/article/view/1073" target="_blank" rel="noopener">Christiawan 2017</a>。但 Pantau Gambut 7 月的调查发现，被观察的堵渠坝有 70% 已经损坏，52% 的干预点水位仍低于安全阈值<a class="src" href="https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015" target="_blank" rel="noopener">The Vibes</a>：建了坝还要有人维护。</p></li>
+          <li><h3>让不烧比烧划算</h3><p>在南加里曼丹，不用火清地比烧要贵得多<a class="src" href="https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015" target="_blank" rel="noopener">The Vibes</a>。只要这笔账不变，禁令就很难真正落实。</p></li>
+          <li><h3>问责企业</h3><p>吊销经营许可这种最重的处罚历来很少使用；同时，特许经营区里有火点，本身并不能证明是企业放的火或要负法律责任<a class="src" href="https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015" target="_blank" rel="noopener">The Vibes</a>。新加坡 2014 年的法律允许对造成跨境烟霾的企业最高罚款 200 万新元<a class="src" href="https://www.eco-business.com/news/parliament-passes-transboundary-haze-pollution-bill/" target="_blank" rel="noopener">Eco-Business</a>。</p></li>
+          <li><h3>把钱补回来</h3><p>印尼国家抗灾署今年的预算是 15 年来最低<a class="src" href="https://news.mongabay.com/2026/08/indonesias-wildfire-season-surges-as-haze-spreads-into-malaysia/" target="_blank" rel="noopener">Mongabay</a>。林业部长 8 月 6 日表示，预算不够就应该增加<a class="src" href="https://news.mongabay.com/2026/08/indonesias-wildfire-season-surges-as-haze-spreads-into-malaysia/" target="_blank" rel="noopener">Mongabay</a>。</p></li>
+          <li><h3>恢复机构</h3><p>负责泥炭地恢复的 BRGM 临时授权在 2024 年到期<a class="src" href="https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015" target="_blank" rel="noopener">The Vibes</a>。</p></li>
+          <li><h3>区域机制</h3><p>东盟烟霾协调中心 2026 年 4 月才在雅加达启用办公室，要等各方都批准后才能全面运作<a class="src" href="https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc" target="_blank" rel="noopener">ANTARA</a>。</p></li>
+        </ul>
+      </div>
+
+      <div class="tabpanel" role="tabpanel" id="panel-me" aria-labelledby="tab-me" hidden>
+        <p class="lead">以下以新加坡国家环境局（NEA）的建议为准；其他国家请看当地的官方指引。</p>
+        <ul class="acts">
+          <li><h3>先看读数</h3><p>安排眼前的活动看 1 小时 PM2.5，提前计划看 24 小时 PSI 预报<a class="src" href="https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-05-september-2026" target="_blank" rel="noopener">NEA</a>。官方渠道有 haze.gov.sg、NEA 和新加坡气象局网站、myENV 应用<a class="src" href="https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-05-september-2026" target="_blank" rel="noopener">NEA</a>。本页首屏的实时读数来自 data.gov.sg<a class="src" href="https://data.gov.sg/datasets/d_fe37906a0182569d891506e815e819b7/view" target="_blank" rel="noopener">data.gov.sg</a>。</p></li>
+          <li><h3>按等级减少户外运动</h3><p>PSI「不健康」时：健康人士减少长时间或剧烈的户外运动；老人、孕妇和儿童尽量减少；慢性心肺病患者避免<a class="src" href="https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-05-september-2026" target="_blank" rel="noopener">NEA</a>。各等级的完整建议见首屏面板。</p></li>
+          <li><h3>N95 口罩</h3><p>短时间外出或待在室内不需要戴。预报 PSI 进入「危险」（超过 300）时，必须在户外待好几个小时的健康人可以戴 N95<a class="src" href="https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026" target="_blank" rel="noopener">NEA</a>。</p></li>
+          <li><h3>照顾体弱的人</h3><p>PSI 超过 200 时，体弱人群应避免或尽量减少户外活动<a class="src" href="https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026" target="_blank" rel="noopener">NEA</a>。社区中心的空调房在这个时候开放<a class="src" href="https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026" target="_blank" rel="noopener">NEA</a>。</p></li>
+          <li><h3>如果你是雇主</h3><p>PSI 达到「不健康」时，减少繁重工作和体弱员工的户外工作，并提供防护用品<a class="src" href="https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026" target="_blank" rel="noopener">NEA</a>。</p></li>
+          <li><h3>随时查看</h3><p>烟霾变化很快，请以官方最新数据为准<a class="src" href="https://www.haze.gov.sg/" target="_blank" rel="noopener">haze.gov.sg</a>。</p></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="block" id="sources">
+    <div class="wrap">
+      <h2><small>来源</small>资料出处</h2>
+      <p class="intro">正文里每个数字后面都有对应的来源链接，这里只做汇总。资料截至 2026 年 10 月 9 日；首屏的实时读数除外。</p>
+      <div class="srclist">
+        <h3>2026 霾季</h3>
+        <a href="https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze" target="_blank" rel="noopener"><b>Wikipedia</b>：2026 Southeast Asian haze：霾季时间线、受影响国家、停课、追责与死亡估算<span>https://en.wikipedia.org/wiki/2026_Southeast_Asian_haze</span></a>
+        <a href="https://news.mongabay.com/2026/08/indonesias-wildfire-season-surges-as-haze-spreads-into-malaysia/" target="_blank" rel="noopener"><b>Mongabay</b>：2026-08：印尼火季激增、烟霾进入马来西亚；火点、过火面积、预算<span>https://news.mongabay.com/2026/08/indonesias-wildfire-season-surges-as-haze-spreads-into-malaysia/</span></a>
+        <a href="https://en.antaranews.com/news/430264/indonesias-2026-fire-season-strains-asean-haze-response" target="_blank" rel="noopener"><b>ANTARA</b>：2026-09-07：印尼火季考验东盟烟霾应对；Level 3 警戒<span>https://en.antaranews.com/news/430264/indonesias-2026-fire-season-strains-asean-haze-response</span></a>
+        <a href="https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc" target="_blank" rel="noopener"><b>ANTARA</b>：2026-04-22：印尼成为东盟烟霾控制中心所在地<span>https://en.antaranews.com/news/413276/indonesia-serves-as-asean-haze-control-hub-through-accthpc</span></a>
+        <a href="https://www.abc.net.au/news/2026-09-07/indonesia-wildfires-haze-poor-air-quality-smog-drought-el-nino/107122922" target="_blank" rel="noopener"><b>ABC</b>：2026-09-07：印尼林火与超强厄尔尼诺；中加里曼丹 ISPU、全国过火面积<span>https://www.abc.net.au/news/2026-09-07/indonesia-wildfires-haze-poor-air-quality-smog-drought-el-nino/107122922</span></a>
+        <a href="https://www.abc.net.au/news/2026-09-04/causes-of-indonesian-wildfires-and-how-the-government-tackling/107113456" target="_blank" rel="noopener"><b>ABC</b>：2026-09-04：印尼林火的成因与政府应对<span>https://www.abc.net.au/news/2026-09-04/causes-of-indonesian-wildfires-and-how-the-government-tackling/107113456</span></a>
+        <a href="https://en.tempo.co/read/2121261/singapore-haze-hits-2026-high-as-psi-reaches-192" target="_blank" rel="noopener"><b>Tempo</b>：2026-10：新加坡 PSI 升至年度最高 192<span>https://en.tempo.co/read/2121261/singapore-haze-hits-2026-high-as-psi-reaches-192</span></a>
+        <a href="https://www.malaymail.com/news/singapore/2026/10/09/singapore-haze-worsens-as-central-regions-air-quality-nears-2026-high-smoke-from-indonesia-continues-to-drift-in/238308" target="_blank" rel="noopener"><b>Malay Mail</b>：2026-10-09：新加坡烟霾加重<span>https://www.malaymail.com/news/singapore/2026/10/09/singapore-haze-worsens-as-central-regions-air-quality-nears-2026-high-smoke-from-indonesia-continues-to-drift-in/238308</span></a>
+        <a href="https://www.outlookindia.com/international/indonesias-wildfire-haze-shuts-malaysian-schools-pushes-singapore-pollution-to-2026-high" target="_blank" rel="noopener"><b>Outlook India</b>：2026-10：马来西亚学校停课<span>https://www.outlookindia.com/international/indonesias-wildfire-haze-shuts-malaysian-schools-pushes-singapore-pollution-to-2026-high</span></a>
+        <a href="https://bernama.com/en/news.php?id=2596769" target="_blank" rel="noopener"><b>Bernama</b>：2026-08-20：西南季风与砂拉越烟霾<span>https://bernama.com/en/news.php?id=2596769</span></a>
+        <a href="https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015" target="_blank" rel="noopener"><b>The Vibes</b>：2026-09-20：2015 年十年后烟霾重来；泥炭排水、烧地成本、执法<span>https://www.thevibes.com/articles/lifestyles/127492/indonesias-haze-returns-as-fire-prevention-gaps-persist-a-decade-after-2015</span></a>
+        <a href="https://www.thesoutheastasiadesk.com/p/southeast-asia-transboundary-haze-emergency" target="_blank" rel="noopener"><b>The Southeast Asia Desk</b>：东南亚跨境烟霾紧急状态<span>https://www.thesoutheastasiadesk.com/p/southeast-asia-transboundary-haze-emergency</span></a>
+        <h3>官方与数据</h3>
+        <a href="https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-(04-september-2026)" target="_blank" rel="noopener"><b>NEA</b>：2026-09-04 烟霾通报：新加坡 PSI 首次进入不健康<span>https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-(04-september-2026)</span></a>
+        <a href="https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-05-september-2026" target="_blank" rel="noopener"><b>NEA</b>：2026-09-05 烟霾通报：健康建议<span>https://www.nea.gov.sg/media/news/advisories/index/haze-situation-update-05-september-2026</span></a>
+        <a href="https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026" target="_blank" rel="noopener"><b>NEA</b>：新加坡政府机构的烟霾应对措施<span>https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026</span></a>
+        <a href="https://www.haze.gov.sg/" target="_blank" rel="noopener"><b>haze.gov.sg</b>：新加坡官方烟霾网站<span>https://www.haze.gov.sg/</span></a>
+        <a href="https://data.gov.sg/datasets/d_fe37906a0182569d891506e815e819b7/view" target="_blank" rel="noopener"><b>data.gov.sg</b>：PSI 实时数据集（首屏实时读数）<span>https://data.gov.sg/datasets/d_fe37906a0182569d891506e815e819b7/view</span></a>
+        <a href="https://data.goodstats.id/statistic/simak-luas-karhutla-indonesia-2015-2024-ggvhd" target="_blank" rel="noopener"><b>GoodStats</b>：2025-03-28：印尼 2015–2024 年过火面积（SiPongi 数据）<span>https://data.goodstats.id/statistic/simak-luas-karhutla-indonesia-2015-2024-ggvhd</span></a>
+        <h3>历史与政策</h3>
+        <a href="https://eresources.nlb.gov.sg/infopedia/articles/SIP_2013-08-30_185150.html" target="_blank" rel="noopener"><b>NLB Infopedia</b>：2013 年新加坡 PSI 401<span>https://eresources.nlb.gov.sg/infopedia/articles/SIP_2013-08-30_185150.html</span></a>
+        <a href="https://en.wikipedia.org/wiki/2013_Southeast_Asian_haze" target="_blank" rel="noopener"><b>Wikipedia</b>：2013 Southeast Asian haze<span>https://en.wikipedia.org/wiki/2013_Southeast_Asian_haze</span></a>
+        <a href="https://news.un.org/en/story/2002/06/37182-agreement-asian-countries-forest-fire-haze-welcomed-un-environment-agency" target="_blank" rel="noopener"><b>UN News</b>：2002-06-10：东盟跨境烟霾协定签署；1997–98 年大火的面积与损失<span>https://news.un.org/en/story/2002/06/37182-agreement-asian-countries-forest-fire-haze-welcomed-un-environment-agency</span></a>
+        <a href="https://news.mongabay.com/2006/11/southeast-asian-nations-propose-haze-fund-but-fail-to-address-root-cause/" target="_blank" rel="noopener"><b>Mongabay</b>：2006-11：东盟提出设立烟霾基金<span>https://news.mongabay.com/2006/11/southeast-asian-nations-propose-haze-fund-but-fail-to-address-root-cause/</span></a>
+        <a href="https://blogs.worldbank.org/en/eastasiapacific/controlling-burn-indonesia-s-efforts-prevent-forest-and-land-fire-crisis" target="_blank" rel="noopener"><b>World Bank</b>：2016-10-26：印尼防止林火危机的努力；2015 年损失、泥炭地恢复署<span>https://blogs.worldbank.org/en/eastasiapacific/controlling-burn-indonesia-s-efforts-prevent-forest-and-land-fire-crisis</span></a>
+        <a href="https://phys.org/news/2019-12-indonesia-billion-forest-fire-losses-world.html" target="_blank" rel="noopener"><b>phys.org</b>：2019-12-11：世界银行估算 2019 年林火损失 52 亿美元<span>https://phys.org/news/2019-12-indonesia-billion-forest-fire-losses-world.html</span></a>
+        <a href="https://cil.nus.edu.sg/databasecil/1997-regional-haze-action-plan-3" target="_blank" rel="noopener"><b>NUS CIL</b>：1997 年《区域烟霾行动计划》<span>https://cil.nus.edu.sg/databasecil/1997-regional-haze-action-plan-3</span></a>
+        <a href="https://asean.org/asean-haze-agreement-to-enter-into-force" target="_blank" rel="noopener"><b>ASEAN</b>：东盟跨境烟霾协定生效<span>https://asean.org/asean-haze-agreement-to-enter-into-force</span></a>
+        <a href="https://www.eco-business.com/news/parliament-passes-transboundary-haze-pollution-bill/" target="_blank" rel="noopener"><b>Eco-Business</b>：2014-08-06：新加坡国会通过《跨境烟霾污染法》<span>https://www.eco-business.com/news/parliament-passes-transboundary-haze-pollution-bill/</span></a>
+        <a href="https://www.thejakartapost.com/news/2014/09/17/ri-ratifies-haze-treaty.html" target="_blank" rel="noopener"><b>Jakarta Post</b>：2014-09-17：印尼批准烟霾协定<span>https://www.thejakartapost.com/news/2014/09/17/ri-ratifies-haze-treaty.html</span></a>
+        <a href="https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent" target="_blank" rel="noopener"><b>WEF</b>：2019-08：印尼森林砍伐禁令永久化<span>https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent</span></a>
+        <h3>研究与法规</h3>
+        <a href="https://journal.untar.ac.id/index.php/hukum/article/view/1073" target="_blank" rel="noopener"><b>Christiawan 2017</b>：Era Hukum 期刊：PP 57/2016 泥炭地地下水位 0.4 米的规定<span>https://journal.untar.ac.id/index.php/hukum/article/view/1073</span></a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
@@ -2132,6 +2253,39 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
   lastHistH = histHeight();
   drawHist();
   drawCard();
+
+  // ---------- 应对：标签页 ----------
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs [role="tab"]'));
+  function selectTab(t, focus) {
+    tabs.forEach(function (x) {
+      var on = x === t;
+      x.setAttribute("aria-selected", on ? "true" : "false");
+      x.tabIndex = on ? 0 : -1;
+      document.getElementById(x.getAttribute("aria-controls")).hidden = !on;
+    });
+    if (focus)
+      t.focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () {
+      selectTab(t, false);
+    });
+    t.addEventListener("keydown", function (ev) {
+      var j = -1;
+      if (ev.key === "ArrowRight")
+        j = (i + 1) % tabs.length;
+      else if (ev.key === "ArrowLeft")
+        j = (i - 1 + tabs.length) % tabs.length;
+      else if (ev.key === "Home")
+        j = 0;
+      else if (ev.key === "End")
+        j = tabs.length - 1;
+      if (j < 0)
+        return;
+      ev.preventDefault();
+      selectTab(tabs[j], true);
+    });
+  });
 })();
 </script>
 </body>

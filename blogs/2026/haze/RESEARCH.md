@@ -90,6 +90,12 @@
 - ⚠ "一半火点位于特许经营区内"：没找到出处，不用
 - ⚠ 西加里曼丹烧痕最大的特许区由本地财团和新加坡、日本关联企业控制（Jakarta Post 经 ANN 转载，asianews.network/?p=300323），页面打不开，未核实
 
+## 应对措施（第 5 步已用）
+
+- NEA 措施页（内容日期 2026-09-04）https://www.nea.gov.sg/media/news/news/index/singapore-government-agencies-implement-measures-to-mitigate-impact-of-haze-Aug2026 ：烟霾工作组 28 个机构，1994 年 9 月成立；PSI 超过 200 时各社区中心空调房开放；所有中小学教室配空气净化器；短时间或室内不需要 N95，预报 PSI 超过 300 时需在户外待几小时的健康人可戴 N95；PSI 超过 200 时体弱人群避免或尽量减少户外活动；雇主在不健康时减少繁重和体弱员工户外工作并提供防护用品。页面没有提到派发 N95
+- NEA 9/5：近期活动看 1 小时 PM2.5，计划看 24 小时 PSI 预报；渠道 haze.gov.sg、NEA、MSS 网站、myENV 应用
+- Mongabay：林业部长 8/6 称预算不够就应增加
+
 ## PSI 分级与健康建议（首屏已用）
 
 - 分级：0–50 良好，51–100 中等，101–200 不健康，201–300 非常不健康，>300 危险

@@ -93,7 +93,11 @@ export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage
         target.y = Math.max(0.45, size.y * 0.5);
         const half = Math.max(size.y * 0.5 + 0.25, (Math.max(size.x, size.z) * 0.5 + 0.3) / (16 / 9));
         const distance = half / Math.tan((FOV / 2) * Math.PI / 180);
-        return { target, distance, views: upright ? ['front', 'side', 'full'] : ['side', 'full', 'front'] };
+        // 站姿先看正面；躺/撑时从能看到身体全长的方向先看（身体沿 z 方向躺就从侧面看，沿 x 方向侧躺就从正面看）
+        let views: AnimView[] = ['front', 'side', 'full'];
+        if (!upright)
+            views = size.x > size.z ? ['front', 'full', 'side'] : ['side', 'full', 'front'];
+        return { target, distance, views };
     }
 
     function setExercise(exerciseId: string, side: 'left' | 'right' | undefined, coach: Gender) {

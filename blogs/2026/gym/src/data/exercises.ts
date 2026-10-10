@@ -469,6 +469,220 @@ export const EXERCISES: Exercise[] = [
         muscles: ['legs', 'glutes'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 30, stresses: ['knee'],
         cues: ['尽量蹲到底，脚跟着地', '双手合十，手肘撑开膝盖'],
     }),
+    // ---------- 扩充：瑜伽垫 / 徒手 ----------
+    ex({
+        id: 'side_lying_leg_raise', name: '侧卧抬腿', equipment: ['mat'], phases: ['main'], category: 'strength',
+        muscles: ['glutes'], sweat: 1, intensity: 1, defaultReps: 15, secPerRep: 2, perSide: true,
+        cues: ['侧卧，下方手臂枕在头下', '上方腿伸直向上抬，脚尖朝前，慢慢放下'],
+    }),
+    ex({
+        id: 'clamshell', name: '蚌式开合', equipment: ['mat'], phases: ['warmup', 'main'], category: 'strength',
+        muscles: ['glutes'], sweat: 1, intensity: 1, defaultReps: 15, secPerRep: 2, perSide: true,
+        cues: ['侧卧屈膝，两脚并拢', '脚跟贴住，上方膝盖向上打开，骨盆不向后倒'],
+    }),
+    ex({
+        id: 'single_leg_glute_bridge', name: '单腿臀桥', equipment: ['mat'], phases: ['main'], category: 'strength',
+        muscles: ['glutes', 'legs'], sweat: 2, intensity: 3, defaultReps: 10, perSide: true,
+        cues: ['一腿伸直抬起，另一脚踩地发力', '臀部抬起至身体成直线，骨盆保持水平'],
+    }),
+    ex({
+        id: 'russian_twist', name: '俄罗斯转体', equipment: ['mat'], phases: ['main'], category: 'core',
+        muscles: ['core'], sweat: 2, intensity: 3, defaultReps: 20, secPerRep: 1.5, stresses: ['back'],
+        cues: ['坐姿上身后倾，双脚可离地或着地', '双手合握，左右转动肩膀，眼睛跟着手走'],
+    }),
+    ex({
+        id: 'v_up', name: 'V 字卷腹', equipment: ['mat'], phases: ['main'], category: 'core',
+        muscles: ['core'], sweat: 2, intensity: 4, defaultReps: 10, stresses: ['back'],
+        cues: ['仰卧，手脚伸直', '同时抬起上身和双腿，手碰脚尖后慢慢放下'],
+    }),
+    ex({
+        id: 'reverse_crunch', name: '反向卷腹', equipment: ['mat'], phases: ['main'], category: 'core',
+        muscles: ['core'], sweat: 1, intensity: 2, defaultReps: 15, secPerRep: 2,
+        cues: ['仰卧屈膝抬腿', '收腹把骨盆卷离地面，膝盖靠近胸口'],
+    }),
+    ex({
+        id: 'leg_raise', name: '仰卧抬腿', equipment: ['mat'], phases: ['main'], category: 'core',
+        muscles: ['core'], sweat: 1, intensity: 3, defaultReps: 12, stresses: ['back'],
+        cues: ['仰卧双腿伸直，手放身体两侧', '腿抬到垂直再慢慢放下，腰背贴地'],
+    }),
+    ex({
+        id: 'flutter_kicks', name: '仰卧交替踢腿', equipment: ['mat'], phases: ['main'], category: 'core',
+        muscles: ['core'], sweat: 2, intensity: 3, mode: 'time', defaultSeconds: 30, stresses: ['back'],
+        cues: ['仰卧，双腿离地约 15 厘米', '上下小幅交替踢腿，腰背贴地'],
+    }),
+    ex({
+        id: 'hollow_hold', name: '空心支撑', equipment: ['mat'], phases: ['main'], category: 'core',
+        muscles: ['core'], sweat: 1, intensity: 3, mode: 'time', defaultSeconds: 20, stresses: ['back'],
+        cues: ['仰卧，手臂过头，肩和腿离地', '腰背压紧地面，身体成浅弧形'],
+    }),
+    ex({
+        id: 'bear_plank', name: '熊式支撑', phases: ['main'], category: 'core',
+        muscles: ['core', 'shoulders'], sweat: 2, intensity: 3, mode: 'time', defaultSeconds: 30, stresses: ['wrist'],
+        cues: ['四点跪姿，膝盖离地约 5 厘米', '背部平直，保持均匀呼吸'],
+    }),
+    ex({
+        id: 'plank_jacks', name: '平板开合跳', phases: ['main'], category: 'cardio',
+        muscles: ['core', 'full_body'], sweat: 3, intensity: 3, mode: 'time', defaultSeconds: 30,
+        noisy: true, stresses: ['wrist'],
+        cues: ['高位平板，双脚跳开再并拢', '臀部保持稳定，不要上下起伏'],
+    }),
+    ex({
+        id: 'plank_shoulder_tap', name: '平板触肩', phases: ['main'], category: 'core',
+        muscles: ['core', 'shoulders'], sweat: 2, intensity: 3, mode: 'time', defaultSeconds: 30, stresses: ['wrist'],
+        cues: ['高位平板，双脚略分开', '交替用手碰对侧肩膀，髋部不晃动'],
+    }),
+    ex({
+        id: 'donkey_kick', name: '跪姿后踢腿', equipment: ['mat'], phases: ['main'], category: 'strength',
+        muscles: ['glutes'], sweat: 1, intensity: 2, defaultReps: 15, secPerRep: 2, perSide: true, stresses: ['wrist'],
+        cues: ['四点跪姿，膝盖保持 90 度', '脚掌向天花板蹬，臀部发力，腰不要塌'],
+    }),
+    ex({
+        id: 'fire_hydrant', name: '消防栓式', equipment: ['mat'], phases: ['warmup', 'main'], category: 'strength',
+        muscles: ['glutes'], sweat: 1, intensity: 1, defaultReps: 12, secPerRep: 2, perSide: true, stresses: ['wrist'],
+        cues: ['四点跪姿', '屈膝向侧面抬腿到与髋同高，骨盆不要转'],
+    }),
+    ex({
+        id: 'reverse_lunge', name: '后撤步箭步蹲', phases: ['main'], category: 'strength',
+        muscles: ['legs', 'glutes'], sweat: 2, intensity: 2, defaultReps: 10, perSide: true, stresses: ['knee'],
+        cues: ['一脚向后撤一大步下蹲', '前脚发力站回，上身保持直立'],
+    }),
+    ex({
+        id: 'sumo_squat', name: '相扑深蹲', phases: ['main'], category: 'strength',
+        muscles: ['legs', 'glutes'], sweat: 2, intensity: 2, defaultReps: 15, stresses: ['knee'],
+        cues: ['两脚比肩宽，脚尖外转', '下蹲时膝盖向外打开，上身直立'],
+    }),
+    ex({
+        id: 'wall_pushup', name: '扶墙俯卧撑', locations: ['indoor'], phases: ['warmup', 'main'], category: 'strength',
+        muscles: ['chest', 'arms'], sweat: 1, intensity: 1, defaultReps: 15, secPerRep: 2,
+        cues: ['双手扶墙，与肩同宽', '身体成直线，胸部靠近墙面后推回'],
+    }),
+    ex({
+        id: 'diamond_pushup', name: '钻石俯卧撑', phases: ['main'], category: 'strength',
+        muscles: ['arms', 'chest'], sweat: 2, intensity: 4, defaultReps: 8, stresses: ['wrist', 'shoulder'],
+        cues: ['双手拇指和食指相对成菱形', '手肘贴着身体下放，用三头肌推起'],
+    }),
+    ex({
+        id: 'single_leg_rdl', name: '单腿硬拉', phases: ['main'], category: 'strength',
+        muscles: ['glutes', 'legs'], sweat: 1, intensity: 2, defaultReps: 10, secPerRep: 4, perSide: true, stresses: ['back'],
+        cues: ['单腿站立，膝盖微屈', '上身前倾、后腿向后抬，身体成 T 字，再站回'],
+    }),
+    ex({
+        id: 'side_lunge', name: '侧弓步', phases: ['warmup', 'main'], category: 'strength',
+        muscles: ['legs', 'glutes'], sweat: 2, intensity: 2, defaultReps: 10, perSide: true, stresses: ['knee'],
+        cues: ['向侧面跨一大步，屈膝下蹲', '另一腿伸直，臀部向后坐，再推回站立'],
+    }),
+    ex({
+        id: 'curtsy_lunge', name: '屈膝礼弓步', phases: ['main'], category: 'strength',
+        muscles: ['legs', 'glutes'], sweat: 2, intensity: 3, defaultReps: 10, perSide: true, stresses: ['knee'],
+        cues: ['一脚向斜后方交叉撤步', '下蹲至前腿约 90 度，再推回站立'],
+    }),
+
+    // ---------- 扩充：壶铃 / 单杠 / 跳绳 / 弹力带 / 哑铃 ----------
+    ex({
+        id: 'kb_deadlift', name: '壶铃硬拉', equipment: ['kettlebell'], phases: ['main'], category: 'strength',
+        muscles: ['glutes', 'legs', 'back'], sweat: 2, intensity: 3, defaultReps: 12, stresses: ['back'],
+        cues: ['壶铃放在两脚之间', '臀部后推，背部平直，蹬地站起'],
+    }),
+    ex({
+        id: 'kb_press', name: '壶铃单臂推举', equipment: ['kettlebell'], phases: ['main'], category: 'strength',
+        muscles: ['shoulders', 'arms'], sweat: 1, intensity: 3, defaultReps: 8, perSide: true, stresses: ['shoulder'],
+        cues: ['壶铃架在肩前，手腕伸直', '向上推至手臂伸直，核心收紧'],
+    }),
+    ex({
+        id: 'kb_row', name: '壶铃单臂划船', equipment: ['kettlebell'], phases: ['main'], category: 'strength',
+        muscles: ['back', 'arms'], sweat: 1, intensity: 3, defaultReps: 10, perSide: true, stresses: ['back'],
+        cues: ['弓步俯身，一手撑在膝上', '手肘贴着身体向后上方拉'],
+    }),
+    ex({
+        id: 'kb_goblet_reverse_lunge', name: '壶铃后撤弓步', equipment: ['kettlebell'], phases: ['main'], category: 'strength',
+        muscles: ['legs', 'glutes'], sweat: 2, intensity: 3, defaultReps: 8, perSide: true, stresses: ['knee'],
+        cues: ['双手托壶铃于胸前', '向后撤步下蹲，前脚发力站回'],
+    }),
+    ex({
+        id: 'chin_up', name: '反手引体向上', equipment: ['pullup_bar'], phases: ['main'], category: 'strength',
+        muscles: ['back', 'arms'], sweat: 2, intensity: 5, defaultReps: 6, secPerRep: 4, stresses: ['shoulder'],
+        cues: ['反手握杠，与肩同宽', '下巴过杠，再慢慢放下'],
+    }),
+    ex({
+        id: 'dead_hang', name: '悬垂', equipment: ['pullup_bar'], phases: ['main', 'cooldown'], category: 'strength',
+        muscles: ['back', 'arms'], sweat: 1, intensity: 2, mode: 'time', defaultSeconds: 30, stresses: ['shoulder'],
+        cues: ['双手握杠，身体自然下垂', '肩膀放松或轻微下沉，均匀呼吸'],
+    }),
+    ex({
+        id: 'negative_pullup', name: '离心引体（慢放）', equipment: ['pullup_bar'], phases: ['main'], category: 'strength',
+        muscles: ['back', 'arms'], sweat: 2, intensity: 4, defaultReps: 5, secPerRep: 5, stresses: ['shoulder'],
+        cues: ['跳到下巴过杠的位置', '用 3 到 5 秒慢慢放下到手臂伸直'],
+    }),
+    ex({
+        id: 'jump_rope_alt', name: '交替脚跳绳', equipment: ['jump_rope'], phases: ['main'], category: 'cardio',
+        muscles: ['legs', 'full_body'], sweat: 4, intensity: 4, mode: 'time', defaultSeconds: 60,
+        needsShoes: true, noisy: true, needsSpace: true, stresses: ['knee'],
+        cues: ['像原地小跑一样左右脚交替', '保持轻快节奏，用手腕转绳'],
+    }),
+    ex({
+        id: 'jump_rope_side', name: '左右跳绳', equipment: ['jump_rope'], phases: ['main'], category: 'cardio',
+        muscles: ['legs', 'full_body'], sweat: 4, intensity: 4, mode: 'time', defaultSeconds: 45,
+        needsShoes: true, noisy: true, needsSpace: true, stresses: ['knee'],
+        cues: ['双脚并拢左右小跳', '落地要轻，节奏稳定'],
+    }),
+    ex({
+        id: 'jump_rope_high_knee', name: '高抬腿跳绳', equipment: ['jump_rope'], phases: ['main'], category: 'cardio',
+        muscles: ['legs', 'core'], sweat: 5, intensity: 5, mode: 'time', defaultSeconds: 30,
+        needsShoes: true, noisy: true, needsSpace: true, stresses: ['knee'],
+        cues: ['交替抬膝到髋部高度', '量力而行，保持节奏'],
+    }),
+    ex({
+        id: 'band_curl', name: '弹力带弯举', equipment: ['band'], phases: ['main'], category: 'strength',
+        muscles: ['arms'], sweat: 1, intensity: 2, defaultReps: 15, secPerRep: 2,
+        cues: ['双脚踩住弹力带', '上臂贴住身体，向上弯举'],
+    }),
+    ex({
+        id: 'band_overhead_press', name: '弹力带推举', equipment: ['band'], phases: ['main'], category: 'strength',
+        muscles: ['shoulders', 'arms'], sweat: 1, intensity: 2, defaultReps: 15, stresses: ['shoulder'],
+        cues: ['踩住弹力带，两手在肩部', '向上推至手臂伸直'],
+    }),
+    ex({
+        id: 'db_reverse_fly', name: '哑铃俯身飞鸟', equipment: ['dumbbell'], phases: ['main'], category: 'strength',
+        muscles: ['back', 'shoulders'], sweat: 1, intensity: 2, defaultReps: 12, stresses: ['back'],
+        cues: ['俯身约 45 度，背部平直', '手臂微屈向两侧抬起，夹紧肩胛'],
+    }),
+    ex({
+        id: 'db_triceps_extension', name: '哑铃颈后臂屈伸', equipment: ['dumbbell'], phases: ['main'], category: 'strength',
+        muscles: ['arms'], sweat: 1, intensity: 2, defaultReps: 12, stresses: ['shoulder'],
+        cues: ['双手握一只哑铃举过头顶', '上臂不动，前臂向后下放再伸直'],
+    }),
+    ex({
+        id: 'db_front_raise', name: '哑铃前平举', equipment: ['dumbbell'], phases: ['main'], category: 'strength',
+        muscles: ['shoulders'], sweat: 1, intensity: 2, defaultReps: 12,
+        cues: ['手臂微屈，向前抬到与肩同高', '慢速下放，不要借力'],
+    }),
+
+    // ---------- 扩充：安静的拉伸 / 放松 ----------
+    ex({
+        id: 'neck_stretch', name: '颈部侧屈拉伸', phases: ['warmup', 'cooldown'], category: 'stretch',
+        muscles: ['shoulders'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 30, perSide: true,
+        cues: ['头向一侧肩膀倾斜', '同侧手轻扶头部，另一侧肩膀下沉'],
+    }),
+    ex({
+        id: 'shoulder_rolls', name: '耸肩绕环', phases: ['warmup'], category: 'mobility',
+        muscles: ['shoulders'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 30,
+        cues: ['手臂放松，肩膀向上、向后、向下画圈', '动作缓慢，配合呼吸'],
+    }),
+    ex({
+        id: 'thread_the_needle', name: '穿针式', equipment: ['mat'], phases: ['warmup', 'cooldown'], category: 'stretch',
+        muscles: ['back', 'shoulders'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 30, perSide: true,
+        cues: ['四点跪姿，一手从另一臂下方穿过', '肩膀和侧脸贴地，感受上背拉伸'],
+    }),
+    ex({
+        id: 'butterfly_stretch', name: '蝴蝶式', equipment: ['mat'], phases: ['cooldown'], category: 'stretch',
+        muscles: ['legs'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 45,
+        cues: ['坐姿脚心相对，脚跟靠近身体', '背部挺直，膝盖自然下沉'],
+    }),
+    ex({
+        id: 'knee_to_chest', name: '仰卧抱膝', equipment: ['mat'], phases: ['cooldown'], category: 'stretch',
+        muscles: ['back', 'glutes'], sweat: 1, intensity: 1, mode: 'time', defaultSeconds: 30,
+        cues: ['仰卧，双手抱膝拉向胸口', '下背放松贴地，深呼吸'],
+    }),
 ];
 
 export const EXERCISE_BY_ID: Record<string, Exercise> = Object.fromEntries(EXERCISES.map((e) => [e.id, e]));

@@ -862,4 +862,371 @@ export const ANIMATIONS: Record<string, AnimDef> = {
             [0.5, { ...legs(117, 152, 22), spine: up(22), ...arms(35, 25, 100) }],
         ],
     },
+
+    // ======================= 扩充：瑜伽垫 / 徒手 =======================
+    side_lying_leg_raise: {
+        keys: [
+            [0, { roll: -90, ...legs(0, 0, 2), armR: limb(180, 10, -1), foreR: [0.5, 0.6, 0], ...armL(35, 0) }],
+            [0.5, { roll: -90, ...legL(0, 0, 45), ...legR(0, 0, 2), armR: limb(180, 10, -1), foreR: [0.5, 0.6, 0], ...armL(35, 0) }],
+        ],
+    },
+
+    clamshell: {
+        keys: [
+            [0, { roll: -90, pitch: 10, ...legs(50, 90, 2), armR: limb(180, 10, -1), foreR: [0.5, 0.6, 0], ...armL(35, 0) }],
+            [0.5, { roll: -90, pitch: 10, thighL: limb(50, 40, 1), shinL: [-0.3, -0.35, -0.85], ...legR(50, 90, 2), armR: limb(180, 10, -1), foreR: [0.5, 0.6, 0], ...armL(35, 0) }],
+        ],
+    },
+
+    single_leg_glute_bridge: {
+        anchor: 'footR',
+        keys: [
+            [0, { ...SUPINE_KNEES_BENT, thighL: [0.03, 0.73, 0.68], shinL: [0.03, 0.73, 0.68], toeL: [0, 0.6, 0.8], head: up(30), armsWorld: true, armL: v(0.15, -0.05, 1), foreL: v(0.15, -0.05, 1), armR: v(-0.15, -0.05, 1), foreR: v(-0.15, -0.05, 1) }],
+            [0.5, {
+                ...SUPINE_KNEES_BENT,
+                pitch: -122,
+                thighL: [0.03, 0.18, 0.98],
+                shinL: [0.03, 0.18, 0.98],
+                toeL: [0, 0.98, -0.2],
+                thighR: [-0.03, 0.18, 0.98],
+                shinR: [0, -0.97, -0.24],
+                head: up(55),
+                armsWorld: true,
+                armL: v(0.15, -0.05, 1),
+                foreL: v(0.15, -0.05, 1),
+                armR: v(-0.15, -0.05, 1),
+                foreR: v(-0.15, -0.05, 1),
+            }],
+        ],
+    },
+
+    russian_twist: {
+        repsPerCycle: 2,
+        keys: [
+            [0, { pitch: -40, twist: 45, legsWorld: true, thighL: [0.08, 0.5, 0.86], shinL: [0.04, -0.45, 0.89], thighR: [-0.08, 0.5, 0.86], shinR: [-0.04, -0.45, 0.89], ...arms(70, 5, 40) }],
+            [0.5, { pitch: -40, twist: -45, legsWorld: true, thighL: [0.08, 0.5, 0.86], shinL: [0.04, -0.45, 0.89], thighR: [-0.08, 0.5, 0.86], shinR: [-0.04, -0.45, 0.89], ...arms(70, 5, 40) }],
+        ],
+    },
+
+    v_up: {
+        keys: [
+            [0, { pitch: -90, legsWorld: true, thighL: [0.04, 0, 1], shinL: [0.04, 0, 1], thighR: [-0.04, 0, 1], shinR: [-0.04, 0, 1], toeL: [0, 1, 0.3], toeR: [0, 1, 0.3], armsWorld: true, armL: v(0.12, 0, -1), foreL: v(0.12, 0, -1), armR: v(-0.12, 0, -1), foreR: v(-0.12, 0, -1) }],
+            [0.5, { pitch: -45, legsWorld: true, thighL: [0.04, 0.7, 0.7], shinL: [0.04, 0.7, 0.7], thighR: [-0.04, 0.7, 0.7], shinR: [-0.04, 0.7, 0.7], toeL: [0, 0.7, -0.7], toeR: [0, 0.7, -0.7], armsWorld: true, armL: v(0.08, 0.55, 0.83), foreL: v(0.06, 0.55, 0.83), armR: v(-0.08, 0.55, 0.83), foreR: v(-0.06, 0.55, 0.83) }],
+        ],
+    },
+
+    reverse_crunch: {
+        keys: [
+            [0, { ...SUPINE, ...legs(90, 90) }],
+            [0.5, { ...SUPINE, pitch: -72, spine: up(-18), ...legs(135, 115) }],
+        ],
+    },
+
+    leg_raise: {
+        keys: [
+            [0, { ...SUPINE, ...legs(8, 0) }],
+            [0.5, { ...SUPINE, ...legs(88, 0) }],
+        ],
+    },
+
+    flutter_kicks: {
+        cycleSec: 0.7,
+        keys: [
+            [0, { ...SUPINE, head: up(25), ...legL(22, 0), ...legR(8, 0) }],
+            [0.5, { ...SUPINE, head: up(25), ...legL(8, 0), ...legR(22, 0) }],
+        ],
+    },
+
+    hollow_hold: {
+        cycleSec: 4,
+        keys: [
+            [0, { ...SUPINE, spine: up(22), head: up(10), ...arms(165, 8), ...legs(15, 0) }],
+            [0.5, { ...SUPINE, spine: up(20), head: up(10), ...arms(167, 8), ...legs(16, 0) }],
+        ],
+    },
+
+    bear_plank: {
+        cycleSec: 4,
+        keys: [
+            [0, { ...QUADRUPED, toeL: [0, -0.9, 0.4], toeR: [0, -0.9, 0.4], thighL: [0.04, -1, 0.05], thighR: [-0.04, -1, 0.05] }],
+            [0.5, { ...QUADRUPED, pitch: 78, toeL: [0, -0.9, 0.4], toeR: [0, -0.9, 0.4], thighL: [0.04, -1, 0.05], thighR: [-0.04, -1, 0.05] }],
+        ],
+    },
+
+    plank_jacks: {
+        cycleSec: 1,
+        anchor: 'hands',
+        keys: [
+            [0, { ...HIGH_PLANK, ...legs(0, 0, 3) }],
+            [0.25, { ...HIGH_PLANK, ...legs(0, 0, 9), lift: 0.04 }],
+            [0.5, { ...HIGH_PLANK, ...legs(0, 0, 15) }],
+            [0.75, { ...HIGH_PLANK, ...legs(0, 0, 9), lift: 0.04 }],
+        ],
+    },
+
+    plank_shoulder_tap: {
+        cycleSec: 2,
+        anchor: 'feet',
+        keys: [
+            [0, { ...HIGH_PLANK, ...legs(0, 0, 8) }],
+            [0.25, { ...HIGH_PLANK, ...legs(0, 0, 8), armL: v(-0.25, -0.35, -0.2), foreL: v(-0.7, 0.6, 0.1) }],
+            [0.5, { ...HIGH_PLANK, ...legs(0, 0, 8) }],
+            [0.75, { ...HIGH_PLANK, ...legs(0, 0, 8), armR: v(0.25, -0.35, -0.2), foreR: v(0.7, 0.6, 0.1) }],
+        ],
+    },
+
+    donkey_kick: {
+        keys: [
+            [0, QUADRUPED],
+            [0.5, { ...QUADRUPED, thighL: [0.04, 0.15, -1], shinL: [0.04, 1, 0], toeL: [0, 0, -1] }],
+        ],
+    },
+
+    fire_hydrant: {
+        keys: [
+            [0, QUADRUPED],
+            [0.5, { ...QUADRUPED, thighL: [1, -0.1, 0], shinL: [0.1, 0, -1], toeL: [0, -0.2, -1] }],
+        ],
+    },
+
+    reverse_lunge: {
+        anchor: 'footL',
+        keys: [
+            [0, STANDING],
+            [0.5, { ...legL(80, 85, 4), ...legR(-15, 85, 4), spine: up(4) }],
+        ],
+    },
+
+    sumo_squat: squatDef({ ...legs(95, 125, 28), spine: up(15), toeL: [0.4, 0, 0.9], toeR: [-0.4, 0, 0.9] }, { ...legs(0, 0, 22), toeL: [0.4, 0, 0.9], toeR: [-0.4, 0, 0.9], ...arms(30, 10, 90) }),
+
+    wall_pushup: {
+        anchor: 'feet',
+        scene: [{ kind: 'wall', at: 'hands', offset: [0, 0, 0.05] }],
+        keys: [
+            [0, { pitch: 20, armsWorld: true, armL: v(0.15, 0.05, 1), foreL: v(0.15, 0.05, 1), armR: v(-0.15, 0.05, 1), foreR: v(-0.15, 0.05, 1) }],
+            [0.5, { pitch: 30, armsWorld: true, armL: v(0.6, -0.15, -0.2), foreL: v(0.05, 0.25, 1), armR: v(-0.6, -0.15, -0.2), foreR: v(-0.05, 0.25, 1) }],
+        ],
+    },
+
+    diamond_pushup: {
+        anchor: 'feet',
+        keys: [
+            [0, { pitch: 64, armsWorld: true, armL: v(-0.12, -1, 0.05), foreL: v(-0.1, -1, 0.05), armR: v(0.12, -1, 0.05), foreR: v(0.1, -1, 0.05) }],
+            [0.5, { pitch: 80, armsWorld: true, armL: v(0.2, -0.25, -0.95), foreL: v(-0.15, -1, 0.25), armR: v(-0.2, -0.25, -0.95), foreR: v(0.15, -1, 0.25) }],
+        ],
+    },
+
+    single_leg_rdl: {
+        anchor: 'footL',
+        keys: [
+            [0, { legsWorld: true, thighL: [0.03, -1, 0.02], shinL: [0, -1, -0.02], thighR: [-0.03, -1, 0.02], shinR: [0, -1, -0.02], ...straightArmsDown(0.12, 0.03) }],
+            [0.5, { pitch: 80, head: up(-15), legsWorld: true, thighL: [0.03, -1, 0.1], shinL: [0, -1, -0.05], thighR: [-0.03, 0.17, -0.98], shinR: [-0.03, 0.17, -0.98], toeR: [0, -1, -0.1], ...straightArmsDown(0.1, 0) }],
+        ],
+    },
+
+    side_lunge: {
+        anchor: 'footR',
+        keys: [
+            [0, { ...legs(0, 0, 6) }],
+            [0.5, { pitch: 25, legsWorld: true, thighL: [0.35, -0.55, 0.75], shinL: [0.08, -1, -0.15], thighR: [-0.6, -0.8, 0], shinR: [-0.6, -0.8, 0], toeL: [0.3, 0, 1], toeR: [-0.3, 0, 1], ...arms(70, 10, 60) }],
+        ],
+    },
+
+    curtsy_lunge: {
+        anchor: 'footL',
+        keys: [
+            [0, STANDING],
+            [0.5, { ...legL(75, 80, 3), thighR: limb(-20, -25, -1), shinR: limb(-105, -25, -1), spine: up(5), ...arms(40, 15, 60) }],
+        ],
+    },
+
+    // ======================= 扩充：壶铃 / 单杠 / 跳绳 / 弹力带 / 哑铃 =======================
+    kb_deadlift: {
+        anchor: 'feet',
+        props: ['kettlebell'],
+        keys: [
+            [0, { legsWorld: true, thighL: [0.06, -1, 0.04], shinL: [0, -1, -0.03], thighR: [-0.06, -1, 0.04], shinR: [0, -1, -0.03], ...straightArmsDown(0.04, 0.05) }],
+            [0.5, { pitch: 55, head: up(-25), legsWorld: true, thighL: [0.08, -0.75, 0.66], shinL: [0, -0.97, -0.24], thighR: [-0.08, -0.75, 0.66], shinR: [0, -0.97, -0.24], ...straightArmsDown(0.04, 0) }],
+        ],
+    },
+
+    kb_press: {
+        anchor: 'feet',
+        props: ['kettlebellL'],
+        keys: [
+            [0, { ...STANDING, armL: limb(20, 30, 1), foreL: [-0.1, 1, 0.1], ...armR(0, 30) }],
+            [0.5, { ...STANDING, armL: limb(172, 8, 1), foreL: [0.05, 1, 0], ...armR(0, 30) }],
+        ],
+    },
+
+    kb_row: {
+        anchor: 'feet',
+        props: ['kettlebellL'],
+        keys: [
+            [0, { pitch: 50, head: up(-20), legsWorld: true, thighL: [0.06, -0.95, -0.25], shinL: [0.04, -1, -0.1], thighR: [-0.08, -0.8, 0.6], shinR: [-0.02, -1, -0.12], armsWorld: true, armL: v(0.1, -1, 0.05), foreL: v(0.1, -1, 0.05), armR: v(-0.15, -0.75, 0.6), foreR: v(-0.05, -1, 0.1) }],
+            [0.5, { pitch: 50, head: up(-20), legsWorld: true, thighL: [0.06, -0.95, -0.25], shinL: [0.04, -1, -0.1], thighR: [-0.08, -0.8, 0.6], shinR: [-0.02, -1, -0.12], armsWorld: true, armL: v(0.12, -0.15, -1), foreL: v(0.05, -1, 0.05), armR: v(-0.15, -0.75, 0.6), foreR: v(-0.05, -1, 0.1) }],
+        ],
+    },
+
+    kb_goblet_reverse_lunge: {
+        anchor: 'footL',
+        props: ['kettlebellGoblet'],
+        keys: [
+            [0, { ...STANDING, ...GOBLET_ARMS }],
+            [0.5, { ...legL(80, 85, 4), ...legR(-15, 85, 4), spine: up(4), ...GOBLET_ARMS }],
+        ],
+    },
+
+    chin_up: {
+        hang: true,
+        scene: [{ kind: 'bar', at: 'hands' }],
+        keys: [
+            [0, { ...legs(10, 25), armsWorld: true, armL: v(0.12, 1, 0), foreL: v(0.05, 1, 0), armR: v(-0.12, 1, 0), foreR: v(-0.05, 1, 0) }],
+            [0.5, { ...legs(15, 35), head: up(-15), armsWorld: true, armL: v(0.35, -0.6, 0.7), foreL: v(-0.05, 1, -0.1), armR: v(-0.35, -0.6, 0.7), foreR: v(0.05, 1, -0.1) }],
+        ],
+    },
+
+    dead_hang: {
+        hang: true,
+        cycleSec: 4,
+        scene: [{ kind: 'bar', at: 'hands' }],
+        keys: [
+            [0, { ...legs(3, 8), armsWorld: true, armL: v(0.3, 1, 0), foreL: v(0.15, 1, 0), armR: v(-0.3, 1, 0), foreR: v(-0.15, 1, 0) }],
+            [0.5, { ...legs(5, 10), armsWorld: true, armL: v(0.3, 1, 0), foreL: v(0.15, 1, 0), armR: v(-0.3, 1, 0), foreR: v(-0.15, 1, 0) }],
+        ],
+    },
+
+    negative_pullup: {
+        hang: true,
+        scene: [{ kind: 'bar', at: 'hands' }],
+        keys: [
+            [0, { ...legs(15, 35), head: up(-15), armsWorld: true, armL: v(0.85, -0.45, 0.1), foreL: v(-0.05, 1, 0), armR: v(-0.85, -0.45, 0.1), foreR: v(0.05, 1, 0) }],
+            [0.15, { ...legs(15, 35), head: up(-15), armsWorld: true, armL: v(0.85, -0.45, 0.1), foreL: v(-0.05, 1, 0), armR: v(-0.85, -0.45, 0.1), foreR: v(0.05, 1, 0) }],
+            [0.85, { ...legs(10, 25), armsWorld: true, armL: v(0.3, 1, 0), foreL: v(0.15, 1, 0), armR: v(-0.3, 1, 0), foreR: v(-0.15, 1, 0) }],
+        ],
+    },
+
+    jump_rope_alt: {
+        cycleSec: 0.7,
+        ropeTurns: 2,
+        anchor: 'feet',
+        props: ['rope'],
+        keys: [
+            [0, { ...legL(35, 55, 3), ...legR(0, 8, 3), ...arms(10, 25, 55), lift: 0.03 }],
+            [0.5, { ...legR(35, 55, 3), ...legL(0, 8, 3), ...arms(10, 25, 55), lift: 0.03 }],
+        ],
+    },
+
+    jump_rope_side: {
+        cycleSec: 1,
+        ropeTurns: 2,
+        props: ['rope'],
+        keys: [
+            [0, { dx: -0.12, ...legs(0, 18, 3), ...arms(10, 25, 55) }],
+            [0.25, { ...legs(0, 4, 3), ...arms(10, 25, 55), lift: 0.06 }],
+            [0.5, { dx: 0.12, ...legs(0, 18, 3), ...arms(10, 25, 55) }],
+            [0.75, { ...legs(0, 4, 3), ...arms(10, 25, 55), lift: 0.06 }],
+        ],
+    },
+
+    jump_rope_high_knee: {
+        cycleSec: 0.8,
+        ropeTurns: 2,
+        props: ['rope'],
+        keys: [
+            [0, { ...legL(85, 95, 4), ...legR(0, 5, 4), ...arms(10, 25, 55), lift: 0.04 }],
+            [0.5, { ...legR(85, 95, 4), ...legL(0, 5, 4), ...arms(10, 25, 55), lift: 0.04 }],
+        ],
+    },
+
+    band_curl: {
+        anchor: 'feet',
+        props: ['bandFeet'],
+        keys: [
+            [0, { ...STANDING, ...arms(0, 8, 10) }],
+            [0.5, { ...STANDING, ...arms(5, 8, 140) }],
+        ],
+    },
+
+    band_overhead_press: {
+        anchor: 'feet',
+        props: ['bandFeet'],
+        keys: [
+            [0, { ...STANDING, ...RACK_ARMS }],
+            [0.5, { ...STANDING, ...OVERHEAD_ARMS }],
+        ],
+    },
+
+    db_reverse_fly: {
+        anchor: 'feet',
+        props: ['dumbbells'],
+        keys: [
+            [0, { pitch: 50, head: up(-20), legsWorld: true, thighL: [0.05, -0.92, 0.38], shinL: [0, -1, -0.1], thighR: [-0.05, -0.92, 0.38], shinR: [0, -1, -0.1], armsWorld: true, armL: v(0.12, -1, 0), foreL: v(0.15, -1, 0), armR: v(-0.12, -1, 0), foreR: v(-0.15, -1, 0) }],
+            [0.5, { pitch: 50, head: up(-20), legsWorld: true, thighL: [0.05, -0.92, 0.38], shinL: [0, -1, -0.1], thighR: [-0.05, -0.92, 0.38], shinR: [0, -1, -0.1], armsWorld: true, armL: v(1, -0.25, 0), foreL: v(1, -0.4, 0), armR: v(-1, -0.25, 0), foreR: v(-1, -0.4, 0) }],
+        ],
+    },
+
+    db_triceps_extension: {
+        anchor: 'feet',
+        props: ['dumbbellGoblet'],
+        keys: [
+            [0, { ...STANDING, armL: limb(170, 8, 1), foreL: [-0.15, 1, 0], armR: limb(170, 8, -1), foreR: [0.15, 1, 0] }],
+            [0.5, { ...STANDING, armL: limb(170, 8, 1), foreL: [-0.2, -0.8, -0.55], armR: limb(170, 8, -1), foreR: [0.2, -0.8, -0.55] }],
+        ],
+    },
+
+    db_front_raise: {
+        anchor: 'feet',
+        props: ['dumbbells'],
+        keys: [
+            [0, { ...STANDING, ...arms(0, 8, 5) }],
+            [0.5, { ...STANDING, ...arms(90, 8, 5) }],
+        ],
+    },
+
+    // ======================= 扩充：拉伸 / 放松 =======================
+    neck_stretch: {
+        cycleSec: 5,
+        anchor: 'feet',
+        keys: [
+            [0, { ...STANDING, head: up(0, 30), armL: limb(150, 75, 1), foreL: [-0.55, 0.6, 0.2], ...armR(0, 12) }],
+            [0.5, { ...STANDING, head: up(0, 36), armL: limb(150, 75, 1), foreL: [-0.6, 0.55, 0.2], ...armR(0, 14) }],
+        ],
+    },
+
+    shoulder_rolls: {
+        cycleSec: 2.5,
+        linear: true,
+        anchor: 'feet',
+        keys: [
+            [0, { ...STANDING, ...arms(0, 10) }],
+            [0.25, { ...STANDING, ...arms(6, 14), head: up(-4) }],
+            [0.5, { ...STANDING, ...arms(-8, 12), spine: up(-3) }],
+            [0.75, { ...STANDING, ...arms(-4, 6) }],
+        ],
+    },
+
+    thread_the_needle: {
+        cycleSec: 5,
+        keys: [
+            [0, { ...QUADRUPED, pitch: 85, twist: -40, armL: [-1, -0.25, 0.1], foreL: [-1, -0.1, 0.1] }],
+            [0.5, { ...QUADRUPED, pitch: 87, twist: -45, armL: [-1, -0.25, 0.1], foreL: [-1, -0.1, 0.1] }],
+        ],
+    },
+
+    butterfly_stretch: {
+        cycleSec: 5,
+        keys: [
+            [0, { pitch: 5, legsWorld: true, thighL: [0.75, -0.25, 0.6], shinL: [-0.95, -0.05, 0.25], thighR: [-0.75, -0.25, 0.6], shinR: [0.95, -0.05, 0.25], toeL: [-0.3, 0, 1], toeR: [0.3, 0, 1], armsWorld: true, armL: v(0.1, -0.6, 0.8), foreL: v(0.05, -0.7, 0.7), armR: v(-0.1, -0.6, 0.8), foreR: v(-0.05, -0.7, 0.7) }],
+            [0.5, { pitch: 15, legsWorld: true, thighL: [0.78, -0.3, 0.55], shinL: [-0.95, -0.05, 0.25], thighR: [-0.78, -0.3, 0.55], shinR: [0.95, -0.05, 0.25], toeL: [-0.3, 0, 1], toeR: [0.3, 0, 1], armsWorld: true, armL: v(0.1, -0.6, 0.8), foreL: v(0.05, -0.7, 0.7), armR: v(-0.1, -0.6, 0.8), foreR: v(-0.05, -0.7, 0.7) }],
+        ],
+    },
+
+    knee_to_chest: {
+        cycleSec: 5,
+        keys: [
+            [0, { ...SUPINE, ...legs(125, 135), ...arms(55, 12, 55) }],
+            [0.5, { ...SUPINE, ...legs(132, 138), ...arms(60, 12, 60) }],
+        ],
+    },
 };

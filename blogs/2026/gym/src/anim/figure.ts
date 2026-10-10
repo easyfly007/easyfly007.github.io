@@ -125,7 +125,7 @@ export function createFigure(gender: Gender, def: AnimDef): Figure {
     const legs = { L: legsL, R: legsR };
 
     const props = new THREE.Group();
-    const propParts = buildBodyProps(def.props ?? [], props);
+    const propParts = buildBodyProps(def.props ?? [], props, def.ropeTurns ?? 1);
     let sceneProps: THREE.Object3D[] | null = null;
 
     const q = new THREE.Quaternion();
@@ -346,7 +346,7 @@ function strap(parent: THREE.Group, color?: THREE.Material): (a: THREE.Vector3, 
 
 type Updater = (j: Record<string, THREE.Vector3>, chest: THREE.Object3D, phase: number) => void;
 
-function buildBodyProps(list: BodyProp[], parent: THREE.Group): Updater[] {
+function buildBodyProps(list: BodyProp[], parent: THREE.Group, ropeTurns: number): Updater[] {
     const out: Updater[] = [];
     const sideAxis = (chest: THREE.Object3D) => new THREE.Vector3(1, 0, 0).applyQuaternion(chest.getWorldQuaternion(new THREE.Quaternion()));
     for (const kind of list) {
@@ -376,6 +376,14 @@ function buildBodyProps(list: BodyProp[], parent: THREE.Group): Updater[] {
                 k.position.copy(j.handL).add(j.handR).multiplyScalar(0.5);
                 k.position.y += 0.04;
                 k.quaternion.identity();
+            });
+        } else if (kind === 'kettlebellL' || kind === 'kettlebellR') {
+            const k = kettlebell();
+            parent.add(k);
+            const s = kind === 'kettlebellL' ? 'L' : 'R';
+            out.push((j) => {
+                k.position.copy(j[`hand${s}`]);
+                k.quaternion.setFromUnitVectors(DOWN, j[`hand${s}`].clone().sub(j[`elbow${s}`]).normalize());
             });
         } else if (kind === 'kettlebell') {
             const k = kettlebell();
@@ -434,7 +442,7 @@ function buildBodyProps(list: BodyProp[], parent: THREE.Group): Updater[] {
             const pieces = Array.from({ length: 8 }, () => strap(rope, new THREE.MeshStandardMaterial({ color: 0x3b6fd8 })));
             out.push((j, _chest, phase) => {
                 // 绳子每个循环绕身体转一圈：循环开始时在头顶，转到一半时在脚下（此时人腾空）
-                const angle = phase * Math.PI * 2;
+                const angle = phase * Math.PI * 2 * ropeTurns;
                 const mid = j.handL.clone().add(j.handR).multiplyScalar(0.5);
                 const radius = Math.max(0.9, j.head.y - j.ankleL.y + 0.15) / 2;
                 const center = mid.clone().setY((j.head.y + j.ankleL.y) / 2);

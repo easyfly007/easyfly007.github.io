@@ -149,7 +149,7 @@ export function mirrorDef(def: AnimDef): AnimDef {
         ...def,
         anchor,
         keys: def.keys.map(([t, p]) => [t, mirrorPose(fullPose(p))]),
-        props: def.props?.map((x) => (x === 'dumbbellL' ? 'dumbbellR' : x === 'dumbbellR' ? 'dumbbellL' : x)),
+        props: def.props?.map((x) => ({ dumbbellL: 'dumbbellR', dumbbellR: 'dumbbellL', kettlebellL: 'kettlebellR', kettlebellR: 'kettlebellL' } as const)[x as 'dumbbellL'] ?? x),
         scene: def.scene?.map((s) => ({
             ...s,
             at: s.at === 'footL' ? 'footR' : s.at === 'footR' ? 'footL' : s.at,

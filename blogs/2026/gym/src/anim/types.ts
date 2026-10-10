@@ -37,6 +37,8 @@ export type BodyProp =
     | 'dumbbellGoblet'          // 双手托一只在胸前（竖直）
     | 'kettlebell'              // 双手握一只，沿手臂方向挂在手下（摆荡）
     | 'kettlebellGoblet'        // 双手托一只在胸前，壶身朝下
+    | 'kettlebellL'             // 左手单手持壶铃（壶身沿前臂方向）
+    | 'kettlebellR'
     | 'barbell'                 // 双手握杠
     | 'barbellBack'             // 杠铃扛在斜方肌上
     | 'bandHands'               // 两手之间拉一根弹力带
@@ -63,6 +65,7 @@ export interface AnimDef {
     hang?: boolean;             // 悬垂：手固定在单杠高度，不贴地
     plant?: { part: 'footL' | 'footR'; y: number };  // 这只脚踩在高处（凳面高度 y），身体其余部分不低于地面
     repsPerCycle?: number;      // 一个循环包含几次（左右交替的动作 = 2），默认 1
+    ropeTurns?: number;         // 跳绳：一个循环里绳子转几圈，默认 1
     props?: BodyProp[];
     scene?: SceneProp[];
     linear?: boolean;           // 关键帧之间匀速（跑、跳）；默认缓入缓出

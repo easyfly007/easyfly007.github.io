@@ -1,5 +1,6 @@
 # 健身计划生成器：开发约定
 
+- 开始工作前先在仓库根目录 `git pull`，在最新代码上开发
 - 进度和下一步看 `PLAN.md`；需求看 `docs/requirements.md`，数据结构和算法看 `docs/design.md`
 - 技术栈：React + TypeScript + Vite，测试用 Vitest（界面测试用 jsdom + Testing Library）
 - Node 需要 18+。本机系统自带的是 v12，用 nvm 里的 Node 22：`export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"`

@@ -93,3 +93,15 @@ export interface SavedWorkout {
     createdAt: string;
     lastUsedAt?: string;
 }
+
+export interface Step {
+    kind: 'prepare' | 'work' | 'rest';
+    exerciseId: string;         // work 为当前动作；prepare/rest 为下一个动作（用于预告）
+    seconds: number;
+    label: string;              // 语音与屏幕上的主文字
+    blockIndex: number;
+    side?: 'left' | 'right';
+    reps?: number;
+    set?: { index: number; count: number };
+    round?: { index: number; count: number };
+}

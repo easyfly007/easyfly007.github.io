@@ -2,19 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { EXERCISES } from '../data/exercises';
 import type { Conditions } from '../types';
 import { candidates, isFeasible } from './filter';
-
-export const BASE: Conditions = {
-    equipment: [],
-    location: 'indoor',
-    space: 'small',
-    quiet: false,
-    hasShoes: true,
-    durationMin: 30,
-    intensity: 2,
-    canShower: true,
-    goal: 'general',
-    limitations: [],
-};
+import { BASE } from './fixtures';
 
 describe('exercise library', () => {
     it('has unique ids', () => {

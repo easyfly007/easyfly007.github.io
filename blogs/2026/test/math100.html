@@ -98,7 +98,6 @@
   .q.bad { background: var(--bad-bg); }
   .q.bad input { border-color: var(--bad); }
   .q.bad .mark { color: var(--bad); }
-  .q .ans { grid-column: 2 / 5; font-size: 14px; color: var(--bad); }
   .actions { display: flex; gap: 8px; margin-top: 10px; }
   button {
     font: inherit;
@@ -223,7 +222,6 @@ function render() {
     act.className = 'actions';
     act.innerHTML =
       '<button data-check="' + g + '">检查</button>' +
-      '<button class="ghost" data-show="' + g + '">看答案</button>' +
       '<span class="result"></span>';
     box.appendChild(act);
     groupsEl.appendChild(box);
@@ -236,12 +234,6 @@ function rowOf(i) {
   return groupsEl.querySelector('input[data-i="' + i + '"]').parentElement;
 }
 
-function clearAns(row) {
-  const old = row.querySelector('.ans');
-  if (old)
-    old.remove();
-}
-
 function checkGroup(g) {
   const box = groupsEl.children[g];
   let right = 0;
@@ -250,7 +242,6 @@ function checkGroup(g) {
     const i = g * 5 + k;
     const row = rowOf(i);
     const val = row.querySelector('input').value.trim();
-    clearAns(row);
     row.classList.remove('ok', 'bad');
     if (val === '') {
       blank++;
@@ -274,20 +265,6 @@ function checkGroup(g) {
     res.textContent = '对了 ' + right + ' 题，改一改再检查';
   box.classList.toggle('allok', right === 5);
   updateScore();
-}
-
-function showAnswers(g) {
-  for (let k = 0; k < 5; k++) {
-    const i = g * 5 + k;
-    const row = rowOf(i);
-    clearAns(row);
-    if (status[i] === true)
-      continue;
-    const tip = document.createElement('span');
-    tip.className = 'ans';
-    tip.textContent = '答案：' + questions[i].ans;
-    row.appendChild(tip);
-  }
 }
 
 function updateScore() {
@@ -314,8 +291,6 @@ groupsEl.addEventListener('click', function (e) {
   const t = e.target;
   if (t.dataset.check !== undefined)
     checkGroup(Number(t.dataset.check));
-  else if (t.dataset.show !== undefined)
-    showAnswers(Number(t.dataset.show));
 });
 
 // 只允许输入数字；回车跳到下一题，每组第 5 题回车直接检查

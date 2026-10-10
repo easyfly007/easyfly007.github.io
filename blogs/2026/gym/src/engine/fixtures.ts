@@ -12,4 +12,5 @@ export const BASE: Conditions = {
     canShower: true,
     goal: 'general',
     limitations: [],
+    rest: 'normal',
 };

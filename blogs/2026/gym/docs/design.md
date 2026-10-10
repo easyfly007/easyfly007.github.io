@@ -38,6 +38,7 @@ src/
   canShower: boolean
   goal: 'general' | 'fat_loss' | 'strength' | 'flexibility'
   limitations: Limitation[]   // 'knee' | 'back' | 'shoulder' | 'wrist'
+  rest?: 'short' | 'normal' | 'long'  // 休息档位，缺省为 normal
 }
 ```
 
@@ -123,6 +124,7 @@ WorkoutItem {
 5. **按时长填充**（时长都用跟练时间线精确计算，保证预估 = 实际）：
    - 循环：在 每轮 3–6 个动作 × 1–10 轮 中选最接近目标的组合
    - 常规组：在 动作数 × 组数（2–5）中选最接近目标的组合，偏向该强度的默认组数
+   - 休息档位：主训练的组间/动作间/轮间休息在默认值上 −15 / 0 / +15 秒，最少 10 秒；热身、放松、拉伸流的 5 秒衔接不变
    - 拉伸流/热身/放松：逐个追加动作直到不再更接近目标；动作不够时把停留时间最多拉长到 2 倍，再从头循环
 
 ## 跟练时间线

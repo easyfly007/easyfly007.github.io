@@ -21,6 +21,7 @@ const DEFAULT_CONDITIONS: Conditions = {
     canShower: true,
     goal: 'general',
     limitations: [],
+    rest: 'normal',
 };
 
 type View = 'home' | 'plan' | 'player';

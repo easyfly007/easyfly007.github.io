@@ -1,4 +1,4 @@
-import type { Conditions, Equipment, Goal, Limitation, Muscle } from './types';
+import type { Conditions, Equipment, Goal, Limitation, Muscle, RestLevel } from './types';
 
 export const EQUIPMENT_LABEL: Record<Equipment, string> = {
     mat: '瑜伽垫',
@@ -38,6 +38,12 @@ export const MUSCLE_LABEL: Record<Muscle, string> = {
 
 export const INTENSITY_LABEL = ['', '低', '中', '高'];
 
+export const REST_LABEL: Record<RestLevel, string> = {
+    short: '短一些',
+    normal: '默认',
+    long: '长一些',
+};
+
 export const DURATIONS = [15, 20, 30, 45, 60];
 
 // 用于默认的模板名，如"室内-哑铃+瑜伽垫-30分钟-中强度-不出汗"
@@ -50,6 +56,10 @@ export function describeConditions(c: Conditions): string {
         parts.push(GOAL_LABEL[c.goal]);
     if (!c.canShower)
         parts.push('不出汗');
+    if (c.rest === 'short')
+        parts.push('休息短');
+    if (c.rest === 'long')
+        parts.push('休息长');
     return parts.join('-');
 }
 

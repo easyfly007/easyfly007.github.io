@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EXERCISE_BY_ID } from '../data/exercises';
-import type { Conditions, Equipment, Goal, Intensity } from '../types';
+import type { Conditions, Equipment, Goal, Intensity, RestLevel } from '../types';
 import { isFeasible, maxSweat } from './filter';
 import { BASE } from './fixtures';
 import { generateWorkout } from './generate';
@@ -9,6 +9,7 @@ import { buildTimeline, locate, stepStart, totalSeconds } from './timeline';
 const DURATIONS = [15, 20, 30, 45, 60];
 const GOALS: Goal[] = ['general', 'fat_loss', 'strength', 'flexibility'];
 const INTENSITIES: Intensity[] = [1, 2, 3];
+const RESTS: RestLevel[] = ['short', 'normal', 'long'];
 const KITS: Equipment[][] = [[], ['mat'], ['dumbbell', 'mat'], ['band', 'chair'], ['barbell', 'kettlebell', 'mat']];
 
 function allConditions(): Conditions[] {
@@ -17,8 +18,10 @@ function allConditions(): Conditions[] {
         for (const goal of GOALS) {
             for (const intensity of INTENSITIES) {
                 for (const equipment of KITS) {
-                    for (const canShower of [true, false])
-                        out.push({ ...BASE, durationMin, goal, intensity, equipment, canShower });
+                    for (const canShower of [true, false]) {
+                        for (const rest of RESTS)
+                            out.push({ ...BASE, durationMin, goal, intensity, equipment, canShower, rest });
+                    }
                 }
             }
         }
@@ -70,6 +73,28 @@ describe('generateWorkout', () => {
     it('uses a circuit for fat loss', () => {
         const w = generateWorkout({ ...BASE, goal: 'fat_loss', intensity: 3 }, 3);
         expect(w.blocks[1].format).toBe('circuit');
+    });
+
+    it('shifts main-block rest by 15 seconds per level, never below 10', () => {
+        const restOf = (c: Conditions) => {
+            const main = generateWorkout(c, 3).blocks[1];
+            return [main.items[0].restSec, main.restBetweenRoundsSec];
+        };
+        const strength = { ...BASE, goal: 'strength' as const, intensity: 2 as const };
+        expect(restOf({ ...strength, rest: 'short' })[0]).toBe(60);
+        expect(restOf(strength)[0]).toBe(75);
+        expect(restOf({ ...strength, rest: 'long' })[0]).toBe(90);
+
+        const circuit = { ...BASE, goal: 'fat_loss' as const, intensity: 1 as const };
+        expect(restOf({ ...circuit, rest: 'short' })).toEqual([15, 45]);
+        expect(restOf({ ...circuit, rest: 'long' })).toEqual([45, 75]);
+        expect(restOf({ ...circuit, intensity: 3, rest: 'short' })[0]).toBe(10);
+    });
+
+    it('treats a missing rest level as normal (old saved data)', () => {
+        const old: Conditions = { ...BASE };
+        delete old.rest;
+        expect(generateWorkout(old, 4).blocks).toEqual(generateWorkout(BASE, 4).blocks);
     });
 
     it('does not repeat an exercise within the main block', () => {

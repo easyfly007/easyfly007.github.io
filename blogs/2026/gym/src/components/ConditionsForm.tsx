@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { DURATIONS, EQUIPMENT_LABEL, GOAL_LABEL, INTENSITY_LABEL, LIMITATION_LABEL } from '../labels';
-import type { Conditions, Equipment, Goal, Intensity, Limitation } from '../types';
+import { DURATIONS, EQUIPMENT_LABEL, GOAL_LABEL, INTENSITY_LABEL, LIMITATION_LABEL, REST_LABEL } from '../labels';
+import type { Conditions, Equipment, Goal, Intensity, Limitation, RestLevel } from '../types';
 
 interface Props {
     value: Conditions;
@@ -73,6 +73,14 @@ export function ConditionsForm({ value: c, onChange, onGenerate }: Props) {
                 {([1, 2, 3] as Intensity[]).map((i) => (
                     <Chip key={i} on={c.intensity === i} onClick={() => set({ intensity: i })}>
                         {INTENSITY_LABEL[i]}
+                    </Chip>
+                ))}
+            </Field>
+
+            <Field label="休息" hint="比默认少/多 15 秒">
+                {(Object.keys(REST_LABEL) as RestLevel[]).map((r) => (
+                    <Chip key={r} on={(c.rest ?? 'normal') === r} onClick={() => set({ rest: r })}>
+                        {REST_LABEL[r]}
                     </Chip>
                 ))}
             </Field>

@@ -62,6 +62,14 @@ describe('App flow', () => {
         expect(within(saved).getByText(/^室内-瑜伽垫\+哑铃-30分钟/)).toBeTruthy();
     });
 
+    it('applies the chosen rest level to the plan', () => {
+        render(<App />);
+        click('力量');
+        click('长一些');
+        click('生成训练');
+        expect(screen.getByText('组间休息 90 秒')).toBeTruthy();
+    });
+
     it('restores the last conditions on reload', () => {
         const first = render(<App />);
         click('杠铃');

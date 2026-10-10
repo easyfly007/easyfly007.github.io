@@ -11,6 +11,7 @@ export type Equipment =
 export type Location = 'indoor' | 'outdoor';
 export type Space = 'small' | 'large';
 export type Intensity = 1 | 2 | 3;
+export type RestLevel = 'short' | 'normal' | 'long';
 export type Goal = 'general' | 'fat_loss' | 'strength' | 'flexibility';
 export type Limitation = 'knee' | 'back' | 'shoulder' | 'wrist';
 export type Phase = 'warmup' | 'main' | 'cooldown';
@@ -36,6 +37,7 @@ export interface Conditions {
     canShower: boolean;
     goal: Goal;
     limitations: Limitation[];
+    rest?: RestLevel;           // 休息时长档位；缺省为默认档（兼容旧数据）
 }
 
 export interface Exercise {

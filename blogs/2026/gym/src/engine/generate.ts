@@ -1,5 +1,5 @@
 import { EXERCISES } from '../data/exercises';
-import type { Block, Conditions, Exercise, Muscle, Phase, Workout, WorkoutItem } from '../types';
+import type { Block, Conditions, Exercise, Muscle, Phase, RestLevel, Workout, WorkoutItem } from '../types';
 import { candidates } from './filter';
 import { createRng } from './random';
 import { BLOCK_TRANSITION_SEC, PREPARE_SEC, buildTimeline, totalSeconds } from './timeline';
@@ -17,6 +17,9 @@ const CIRCUIT_REST = [0, 30, 20, 15];
 const STRAIGHT_SETS = [0, 2, 3, 4];
 const STRAIGHT_REST = [0, 60, 75, 90];
 const MAX_SETS = 5;
+// 休息档位：在默认休息上 少/多 15 秒，最少 10 秒（留出预告下一个动作的时间）
+const REST_DELTA: Record<RestLevel, number> = { short: -15, normal: 0, long: 15 };
+const MIN_REST_SEC = 10;
 const MAX_STRAIGHT_ITEMS = 10;
 
 export function blockSeconds(block: Block): number {
@@ -24,6 +27,11 @@ export function blockSeconds(block: Block): number {
     if (steps.length === 0)
         return 0;
     return totalSeconds(steps) - PREPARE_SEC;
+}
+
+// 主训练的组间/动作间/轮间休息按档位调整；热身、放松、拉伸流的 5 秒衔接不调整
+function adjustRest(sec: number, c: Conditions): number {
+    return Math.max(MIN_REST_SEC, sec + REST_DELTA[c.rest ?? 'normal']);
 }
 
 function preferenceScore(e: Exercise, c: Conditions, phase: Phase): number {
@@ -99,7 +107,7 @@ function flowBlock(phase: Phase, title: string, ordered: Exercise[], targetSec: 
 
 function circuitBlock(ordered: Exercise[], c: Conditions, targetSec: number): Block {
     const work = CIRCUIT_WORK[c.intensity];
-    const rest = CIRCUIT_REST[c.intensity];
+    const rest = adjustRest(CIRCUIT_REST[c.intensity], c);
     const items = ordered.map((e) => ({ exerciseId: e.id, sets: 1, seconds: work, restSec: rest }));
     // 在 每轮 3–6 个动作 × 1–10 轮 中选最接近目标时长的组合
     let best: Block | undefined;
@@ -111,7 +119,7 @@ function circuitBlock(ordered: Exercise[], c: Conditions, targetSec: number): Bl
                 title: '主训练 · 循环',
                 format: 'circuit',
                 rounds,
-                restBetweenRoundsSec: ROUND_REST_SEC,
+                restBetweenRoundsSec: adjustRest(ROUND_REST_SEC, c),
                 items: items.slice(0, perRound),
             };
             const diff = Math.abs(blockSeconds(block) - targetSec);
@@ -125,7 +133,7 @@ function circuitBlock(ordered: Exercise[], c: Conditions, targetSec: number): Bl
 }
 
 function straightBlock(ordered: Exercise[], c: Conditions, targetSec: number): Block {
-    const restSec = c.canShower ? STRAIGHT_REST[c.intensity] : 60;
+    const restSec = adjustRest(c.canShower ? STRAIGHT_REST[c.intensity] : 60, c);
     const preferredSets = STRAIGHT_SETS[c.intensity];
     // 在 动作数 × 组数 中选最接近目标时长的组合；误差相近时偏向默认组数
     let best: Block | undefined;

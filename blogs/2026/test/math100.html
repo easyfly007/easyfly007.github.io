@@ -92,6 +92,8 @@
   }
   .q input:focus { outline: none; border-color: var(--accent); }
   .q .mark { font-size: 20px; text-align: center; }
+  .q input.empty { border-color: var(--accent); border-style: dashed; background: #fff5ec; }
+  .warn { color: var(--accent); font-weight: bold; }
   .q.ok { background: var(--ok-bg); }
   .q.ok input { border-color: var(--ok); }
   .q.ok .mark { color: var(--ok); }
@@ -115,7 +117,20 @@
     border: 1px solid var(--line);
   }
   button:active { transform: translateY(1px); }
-  .result { font-size: 15px; margin-left: auto; align-self: center; }
+  .result { font-size: 15px; margin-left: auto; align-self: center; text-align: right; }
+  .grade {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-weight: bold;
+    color: #fff;
+  }
+  .grade.fail { background: var(--bad); }
+  .grade.pass { background: #e0a100; }
+  .grade.good { background: #3b82c4; }
+  .grade.great { background: var(--ok); }
+  .grade.perfect { background: linear-gradient(90deg, #ff8a3d, #e5487a); }
+  .done .grade { font-size: 22px; padding: 4px 16px; }
   .done {
     display: none;
     text-align: center;
@@ -214,7 +229,9 @@ function render() {
       row.innerHTML =
         '<span class="no">' + (i + 1) + '.</span>' +
         '<span class="expr">' + questions[i].text + ' =</span>' +
-        '<input type="text" inputmode="numeric" autocomplete="off" maxlength="3" data-i="' + i + '">' +
+        '<input type="text" inputmode="numeric" pattern="[0-9]*" enterkeyhint="next" ' +
+        'autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" ' +
+        'maxlength="3" data-i="' + i + '">' +
         '<span class="mark"></span>';
       box.appendChild(row);
     }
@@ -234,37 +251,73 @@ function rowOf(i) {
   return groupsEl.querySelector('input[data-i="' + i + '"]').parentElement;
 }
 
+// 一组 5 题必须全部写完才判对错、打分；有空着的只提示，不评估
 function checkGroup(g) {
   const box = groupsEl.children[g];
+  const res = box.querySelector('.result');
+  const inputs = [];
+  let firstBlank = null;
+  for (let k = 0; k < 5; k++) {
+    const input = rowOf(g * 5 + k).querySelector('input');
+    inputs.push(input);
+    input.classList.remove('empty');
+    if (input.value.trim() === '') {
+      input.classList.add('empty');
+      if (firstBlank === null)
+        firstBlank = input;
+    }
+  }
+  if (firstBlank !== null) {
+    const blank = inputs.filter(function (el) {
+      return el.value.trim() === '';
+    }).length;
+    for (let k = 0; k < 5; k++) {
+      const i = g * 5 + k;
+      const row = rowOf(i);
+      status[i] = null;
+      row.classList.remove('ok', 'bad');
+      row.querySelector('.mark').textContent = '';
+    }
+    box.classList.remove('allok');
+    res.innerHTML = '<span class="warn">还有 ' + blank + ' 题没做完，做完才能打分哦</span>';
+    firstBlank.focus();
+    updateScore();
+    return false;
+  }
   let right = 0;
-  let blank = 0;
   for (let k = 0; k < 5; k++) {
     const i = g * 5 + k;
     const row = rowOf(i);
-    const val = row.querySelector('input').value.trim();
-    row.classList.remove('ok', 'bad');
-    if (val === '') {
-      blank++;
-      status[i] = null;
-      row.querySelector('.mark').textContent = '';
-      continue;
-    }
-    const ok = Number(val) === questions[i].ans;
+    const ok = Number(inputs[k].value) === questions[i].ans;
     status[i] = ok;
+    row.classList.remove('ok', 'bad');
     row.classList.add(ok ? 'ok' : 'bad');
     row.querySelector('.mark').textContent = ok ? '✓' : '✗';
     if (ok)
       right++;
   }
-  const res = box.querySelector('.result');
-  if (blank > 0)
-    res.textContent = '还有 ' + blank + ' 题没写哦';
-  else if (right === 5)
-    res.textContent = '全对，太棒了！🎉';
-  else
-    res.textContent = '对了 ' + right + ' 题，改一改再检查';
+  res.innerHTML = gradeHtml(right * 20);
   box.classList.toggle('allok', right === 5);
   updateScore();
+  return true;
+}
+
+// 按正确率评等级：满分 太棒了，≥90 优秀，≥80 良好，≥60 及格，<60 不及格
+function grade(score) {
+  if (score === 100)
+    return { text: '太棒了！🎉', cls: 'perfect' };
+  if (score >= 90)
+    return { text: '优秀', cls: 'great' };
+  if (score >= 80)
+    return { text: '良好', cls: 'good' };
+  if (score >= 60)
+    return { text: '及格', cls: 'pass' };
+  return { text: '不及格', cls: 'fail' };
+}
+
+function gradeHtml(score) {
+  const g = grade(score);
+  return score + ' 分 <span class="grade ' + g.cls + '">' + g.text + '</span>';
 }
 
 function updateScore() {
@@ -279,9 +332,9 @@ function updateScore() {
   document.getElementById('checked').textContent = checked;
   document.getElementById('right').textContent = right;
   const done = document.getElementById('done');
-  if (right === 100) {
+  if (checked === 100) {
     done.style.display = 'block';
-    done.textContent = '🏆 100 题全部答对！真厉害！';
+    done.innerHTML = '100 题总成绩：' + gradeHtml(right);
   } else {
     done.style.display = 'none';
   }
@@ -293,20 +346,49 @@ groupsEl.addEventListener('click', function (e) {
     checkGroup(Number(t.dataset.check));
 });
 
-// 只允许输入数字；回车跳到下一题，每组第 5 题回车直接检查
+// 只允许输入数字：全角数字转成半角，其余字符（字母、汉字、表情、空格等）一律去掉
+function digitsOnly(el) {
+  const v = el.value
+    .replace(/[０-９]/g, function (c) {
+      return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+    })
+    .replace(/[^0-9]/g, '')
+    .slice(0, 3);
+  if (v !== el.value)
+    el.value = v;
+}
+
+// 键入或粘贴非数字时直接拦下；输入法拼字过程中不拦，等拼完再清理
+groupsEl.addEventListener('beforeinput', function (e) {
+  if (e.target.tagName !== 'INPUT' || e.isComposing || e.data == null)
+    return;
+  if (/[^0-9０-９]/.test(e.data))
+    e.preventDefault();
+});
+
 groupsEl.addEventListener('input', function (e) {
+  if (e.target.tagName !== 'INPUT' || e.isComposing)
+    return;
+  digitsOnly(e.target);
+  if (e.target.value !== '')
+    e.target.classList.remove('empty');
+});
+
+groupsEl.addEventListener('compositionend', function (e) {
   if (e.target.tagName !== 'INPUT')
     return;
-  e.target.value = e.target.value.replace(/[^0-9]/g, '');
+  digitsOnly(e.target);
 });
+
+// 回车跳到下一题，每组第 5 题回车直接检查
 
 groupsEl.addEventListener('keydown', function (e) {
   if (e.target.tagName !== 'INPUT' || e.key !== 'Enter')
     return;
   e.preventDefault();
   const i = Number(e.target.dataset.i);
-  if (i % 5 === 4)
-    checkGroup(Math.floor(i / 5));
+  if (i % 5 === 4 && !checkGroup(Math.floor(i / 5)))
+    return;
   if (i < 99)
     groupsEl.querySelector('input[data-i="' + (i + 1) + '"]').focus();
 });

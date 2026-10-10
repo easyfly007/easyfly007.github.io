@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D 动作样例</title>
+<style>
+    :root {
+        --bg: #f6f7f9;
+        --card: #ffffff;
+        --text: #1d2330;
+        --muted: #6b7280;
+        --accent: #ff6b35;
+        --overlay: rgba(255, 255, 255, 0.82);
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg: #14161a;
+            --card: #1e2127;
+            --text: #e8eaed;
+            --muted: #9aa0a6;
+            --overlay: rgba(30, 33, 39, 0.82);
+        }
+    }
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 16px;
+    }
+    h1 {
+        font-size: 20px;
+        margin: 4px 0 4px;
+    }
+    .muted {
+        color: var(--muted);
+        font-size: 14px;
+    }
+    .stage {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        max-height: 75vh;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--card);
+        margin-top: 12px;
+    }
+    .stage canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .hud {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        background: var(--overlay);
+        line-height: 1.5;
+    }
+    .hud .name {
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .hud .count {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--accent);
+    }
+    .progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 6px;
+        background: rgba(128, 128, 128, 0.25);
+    }
+    .progress > div {
+        height: 100%;
+        width: 0;
+        background: var(--accent);
+    }
+    .done {
+        position: absolute;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        background: var(--overlay);
+        font-size: 28px;
+        font-weight: 700;
+    }
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    button {
+        font: inherit;
+        font-size: 15px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(128, 128, 128, 0.35);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+    }
+    button.on,
+    button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+<main>
+    <h1>3D 动作指导样例 · 深蹲</h1>
+    <div class="muted">30 秒 = 深蹲 10 次，每次 3 秒；每 10 秒切换视角：正面 → 斜上方 → 侧面。动作在同一时间轴上连续进行。</div>
+
+    <div class="stage" id="stage">
+        <div class="hud">
+            <div class="name">深蹲</div>
+            <div class="muted" id="view-name">正面</div>
+            <div class="count" id="rep">第 1 / 10 次</div>
+            <div class="muted" id="remain">剩余 30 秒</div>
+        </div>
+        <div class="progress"><div id="bar"></div></div>
+        <div class="done" id="done">
+            <div>完成</div>
+            <button type="button" class="primary" id="replay">重播</button>
+        </div>
+    </div>
+
+    <div class="row" id="views">
+        <button type="button" data-view="auto" class="on">自动切换</button>
+        <button type="button" data-view="0">正面</button>
+        <button type="button" data-view="1">斜上方</button>
+        <button type="button" data-view="2">侧面</button>
+    </div>
+</main>
+
+<script type="module">
+import * as THREE from 'three';
+
+const TOTAL_SEC = 30;
+const REP_SEC = 3;           // 与动作库 squat 的 secPerRep 一致
+const REPS = TOTAL_SEC / REP_SEC;
+const VIEW_SEC = 10;
+const DEG = Math.PI / 180;
+
+// 人偶尺寸（米）
+const THIGH = 0.44;
+const SHIN = 0.44;
+const ANKLE_Y = 0.07;
+const HIP_X = 0.11;
+const TORSO = 0.52;
+const UPPER_ARM = 0.3;
+const FOREARM = 0.28;
+
+const VIEWS = [
+    { name: '正面', pos: [0, 1.05, 3.3], target: [0, 0.8, 0] },
+    { name: '斜上方全身', pos: [2.3, 2.7, 2.5], target: [0, 0.7, 0] },
+    { name: '侧面', pos: [3.4, 0.95, 0.15], target: [0, 0.75, 0.1] },
+];
+
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+stage.prepend(renderer.domElement);
+
+const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(dark ? 0x1e2127 : 0xeef1f5);
+
+scene.add(new THREE.HemisphereLight(0xffffff, dark ? 0x30343c : 0xb9c0cc, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(2, 4, 3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+scene.add(sun);
+
+const floor = new THREE.Mesh(
+    new THREE.CircleGeometry(3, 48),
+    new THREE.MeshStandardMaterial({ color: dark ? 0x2a2e35 : 0xffffff, roughness: 1 }),
+);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+const grid = new THREE.GridHelper(6, 24, dark ? 0x4a505a : 0xc8cdd5, dark ? 0x353a42 : 0xdde1e7);
+grid.position.y = 0.001;
+scene.add(grid);
+
+// ---------- 人偶：分层级的关节 Group ----------
+const skin = new THREE.MeshStandardMaterial({ color: 0xf2c6a0, roughness: 0.8, flatShading: true });
+const shirt = new THREE.MeshStandardMaterial({ color: 0xff6b35, roughness: 0.7, flatShading: true });
+const pants = new THREE.MeshStandardMaterial({ color: 0x34495e, roughness: 0.8, flatShading: true });
+const shoe = new THREE.MeshStandardMaterial({ color: 0x222831, roughness: 0.6, flatShading: true });
+
+function mesh(geo, mat) {
+    const m = new THREE.Mesh(geo, mat);
+    m.castShadow = true;
+    return m;
+}
+
+// 沿 -y 方向的肢体段（关节在原点）
+function limb(length, radius, mat) {
+    const m = mesh(new THREE.CapsuleGeometry(radius, length - 2 * radius, 4, 8), mat);
+    m.position.y = -length / 2;
+    return m;
+}
+
+const pelvis = new THREE.Group();
+scene.add(pelvis);
+pelvis.add(mesh(new THREE.SphereGeometry(0.15, 10, 8).scale(1.1, 0.7, 0.8), pants));
+
+const torso = new THREE.Group();
+pelvis.add(torso);
+const chest = mesh(new THREE.CapsuleGeometry(0.14, TORSO - 0.2, 4, 10).scale(1.15, 1, 0.75), shirt);
+chest.position.y = TORSO / 2;
+torso.add(chest);
+const neck = mesh(new THREE.CylinderGeometry(0.045, 0.05, 0.08, 8), skin);
+neck.position.y = TORSO + 0.03;
+torso.add(neck);
+const head = mesh(new THREE.SphereGeometry(0.11, 12, 10).scale(0.9, 1.05, 0.95), skin);
+head.position.y = TORSO + 0.17;
+torso.add(head);
+
+function makeArm(side) {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(side * 0.2, TORSO - 0.06, 0);
+    torso.add(shoulder);
+    shoulder.add(mesh(new THREE.SphereGeometry(0.055, 8, 6), shirt));
+    shoulder.add(limb(UPPER_ARM, 0.045, shirt));
+    const elbow = new THREE.Group();
+    elbow.position.y = -UPPER_ARM;
+    shoulder.add(elbow);
+    elbow.add(limb(FOREARM, 0.04, skin));
+    const hand = mesh(new THREE.SphereGeometry(0.045, 8, 6), skin);
+    hand.position.y = -FOREARM - 0.02;
+    elbow.add(hand);
+    return { shoulder, elbow };
+}
+
+function makeLeg(side) {
+    const hip = new THREE.Group();
+    hip.position.set(side * HIP_X, 0, 0);
+    pelvis.add(hip);
+    hip.add(limb(THIGH, 0.07, pants));
+    const knee = new THREE.Group();
+    knee.position.y = -THIGH;
+    hip.add(knee);
+    knee.add(limb(SHIN, 0.055, pants));
+    const ankle = new THREE.Group();
+    ankle.position.y = -SHIN;
+    knee.add(ankle);
+    const foot = mesh(new THREE.BoxGeometry(0.1, 0.07, 0.24), shoe);
+    foot.position.set(0, -ANKLE_Y / 2, 0.06);
+    ankle.add(foot);
+    return { hip, knee, ankle };
+}
+
+const arms = [makeArm(-1), makeArm(1)];
+const legs = [makeLeg(-1), makeLeg(1)];
+
+// ---------- 深蹲姿态：脚固定，两段腿几何求髋位置 ----------
+// s ∈ [0, 1]：0 站直，1 蹲到底
+function pose(s) {
+    const shinAngle = 32 * DEG * s;     // 小腿前倾（膝盖向前，朝脚尖方向）
+    const thighAngle = 88 * DEG * s;    // 大腿后倒（髋向后坐）
+    const lean = 38 * DEG * s;          // 躯干前倾
+    // 侧视平面 (z 向前, y 向上)，踝关节固定在 (0, ANKLE_Y)
+    const kneeZ = SHIN * Math.sin(shinAngle);
+    const kneeY = ANKLE_Y + SHIN * Math.cos(shinAngle);
+    const hipZ = kneeZ - THIGH * Math.sin(thighAngle);
+    const hipY = kneeY + THIGH * Math.cos(thighAngle);
+    pelvis.position.set(0, hipY, hipZ);
+    torso.rotation.x = lean;
+    for (const leg of legs) {
+        // 大腿方向 (sin b, -cos b) 对应绕 x 旋转 -b；小腿世界角为 a，膝关节相对角 a + b；脚掌保持水平
+        leg.hip.rotation.x = -thighAngle;
+        leg.knee.rotation.x = thighAngle + shinAngle;
+        leg.ankle.rotation.x = -shinAngle;
+    }
+    // 手臂前平举配重：世界角从下垂 0 到前平举 90°，扣掉躯干前倾
+    const raise = 90 * DEG * s;
+    for (const arm of arms) {
+        arm.shoulder.rotation.x = -raise - lean;
+        arm.elbow.rotation.x = -10 * DEG * s;
+    }
+}
+
+// 每次 3 秒：余弦曲线，下蹲约 1.5 秒、起身约 1.5 秒，首尾都是站直，循环无缝
+function depthAt(t) {
+    const phase = (t % REP_SEC) / REP_SEC;
+    return (1 - Math.cos(2 * Math.PI * phase)) / 2;
+}
+
+// ---------- 摄像机与时间轴 ----------
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
+let manualView = null;
+let currentView = -1;
+
+function useView(i) {
+    if (i === currentView)
+        return;
+    currentView = i;
+    const v = VIEWS[i];
+    camera.position.set(...v.pos);
+    camera.lookAt(...v.target);
+    document.getElementById('view-name').textContent = `视角：${v.name}`;
+}
+
+function resize() {
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+resize();
+
+const repEl = document.getElementById('rep');
+const remainEl = document.getElementById('remain');
+const barEl = document.getElementById('bar');
+const doneEl = document.getElementById('done');
+let startMs = performance.now();
+let finished = false;
+
+function frame(now) {
+    const t = Math.min((now - startMs) / 1000, TOTAL_SEC);
+    pose(t >= TOTAL_SEC ? 0 : depthAt(t));
+    const autoView = Math.min(Math.floor(t / VIEW_SEC), VIEWS.length - 1);
+    useView(manualView ?? autoView);
+    repEl.textContent = `第 ${Math.min(REPS, Math.floor(t / REP_SEC) + 1)} / ${REPS} 次`;
+    remainEl.textContent = `剩余 ${Math.ceil(TOTAL_SEC - t)} 秒`;
+    barEl.style.width = `${(t / TOTAL_SEC) * 100}%`;
+    if (t >= TOTAL_SEC && !finished) {
+        finished = true;
+        doneEl.style.display = 'flex';
+    }
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+document.getElementById('replay').addEventListener('click', () => {
+    startMs = performance.now();
+    finished = false;
+    doneEl.style.display = 'none';
+});
+
+document.getElementById('views').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn)
+        return;
+    const v = btn.dataset.view;
+    manualView = v === 'auto' ? null : Number(v);
+    for (const b of document.querySelectorAll('#views button'))
+        b.classList.toggle('on', b === btn);
+});
+</script>
+</body>
+</html>

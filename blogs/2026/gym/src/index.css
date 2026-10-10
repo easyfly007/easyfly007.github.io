@@ -312,6 +312,41 @@ button.big {
     line-height: 1.7;
 }
 
+/* ---------- 动作视频 ---------- */
+.exercise-video {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.exercise-video video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    visibility: hidden;
+}
+
+.exercise-video video.on {
+    visibility: visible;
+}
+
+.video-view {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+}
+
 /* ---------- 训练报告 / 记录 ---------- */
 :root {
     --bar: #e0531f;

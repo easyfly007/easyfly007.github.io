@@ -4,6 +4,7 @@ import { buildTimeline, locate, stepStart, totalSeconds } from '../engine/timeli
 import { formatDuration } from '../labels';
 import { beep, speak, stopSpeaking } from '../speech';
 import type { Step, Workout } from '../types';
+import { ExerciseVideo } from './ExerciseVideo';
 
 interface Props {
     workout: Workout;
@@ -168,7 +169,7 @@ export function Player({ workout, onExit }: Props) {
                 {repNow !== undefined && (
                     <div className="reps">第 {repNow} / {step.reps} 次</div>
                 )}
-                {/* 以后在这里放动作循环视频 */}
+                {isWork && <ExerciseVideo step={step} intoStep={intoStep} paused={paused} />}
                 <ul className="cues">
                     {ex.cues.map((c) => (
                         <li key={c}>{c}</li>

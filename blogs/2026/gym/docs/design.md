@@ -17,6 +17,7 @@ src/
     filter.ts         按条件过滤动作
     generate.ts       组合成一节训练
     random.ts         可复现的伪随机数
+    timeline.ts       把训练展开成跟练时间线（每一步精确到秒）
   storage/            模板保存/读取
   components/         UI 组件
 ```
@@ -60,6 +61,7 @@ src/
   mode: 'reps' | 'time'       // 计次 / 计时
   defaultReps?: number
   defaultSeconds?: number
+  secPerRep: number           // 计次动作每次耗时（秒），用于换算跟练时长
   perSide?: boolean           // 左右各做一次
   cues: string[]              // 动作要点
 }
@@ -118,3 +120,19 @@ WorkoutItem {
    - 其余 → `circuit`，强度决定做/休比例
 4. **选动作**：用可复现随机数打乱候选，优先覆盖不同肌群，避免重复。
 5. **按时长填充**：逐个估算每个动作耗时，填满目标时长为止。
+
+## 跟练时间线
+
+训练展开为一串步骤 `Step[]`，每步有确定的秒数，跟练播放器只需按顺序倒计时：
+
+```ts
+Step {
+  kind: 'prepare' | 'work' | 'rest'
+  exerciseId?: string         // work 当前动作；rest/prepare 为下一个动作（用于预告）
+  seconds: number
+  label: string               // 屏幕和语音展示的文字，如"卷腹 15 次"
+  side?: 'left' | 'right'     // 单侧动作拆为左右两步
+}
+```
+
+整节课总时长 = 所有步骤秒数之和，与生成时的预估时长一致。

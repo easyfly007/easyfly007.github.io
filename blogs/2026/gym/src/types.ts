@@ -55,6 +55,7 @@ export interface Exercise {
     mode: 'reps' | 'time';
     defaultReps?: number;
     defaultSeconds?: number;
+    secPerRep: number;          // 计次动作每次耗时（秒），用于换算跟练时长
     perSide?: boolean;
     cues: string[];
 }

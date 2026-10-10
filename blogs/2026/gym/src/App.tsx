@@ -1,14 +1,17 @@
 import { useMemo, useState } from 'react';
 import { ConditionsForm } from './components/ConditionsForm';
+import { History } from './components/History';
 import { Player } from './components/Player';
+import { Report } from './components/Report';
 import { SavedList } from './components/SavedList';
 import { WorkoutView } from './components/WorkoutView';
 import { generateWorkout } from './engine/generate';
 import { newSeed } from './engine/random';
+import { MIN_RECORD_SEC, playedSeconds } from './engine/report';
 import { describeConditions } from './labels';
 import { unlockAudio } from './speech';
 import { createSavedStore } from './storage/saved';
-import type { Conditions, SavedWorkout, Workout } from './types';
+import type { Conditions, SavedWorkout, Workout, WorkoutRecord } from './types';
 
 const DEFAULT_CONDITIONS: Conditions = {
     equipment: ['mat'],
@@ -24,7 +27,7 @@ const DEFAULT_CONDITIONS: Conditions = {
     rest: 'normal',
 };
 
-type View = 'home' | 'plan' | 'player';
+type View = 'home' | 'plan' | 'player' | 'report';
 
 function App() {
     const store = useMemo(() => createSavedStore(window.localStorage), []);
@@ -33,6 +36,10 @@ function App() {
     const [workout, setWorkout] = useState<Workout | null>(null);
     const [savedId, setSavedId] = useState<string | null>(null);
     const [view, setView] = useState<View>('home');
+    const [history, setHistory] = useState<WorkoutRecord[]>(() => store.history());
+    const [report, setReport] = useState<WorkoutRecord | null>(null);
+    const [weightKg, setWeightKg] = useState<number | undefined>(() => store.weightKg());
+    const [startedAt, setStartedAt] = useState('');
 
     const current = saved.find((s) => s.id === savedId);
 
@@ -62,7 +69,33 @@ function App() {
             store.markUsed(id);
             setSaved(store.list());
         }
+        setStartedAt(new Date().toISOString());
         setView('player');
+    }
+
+    // 跟练结束：练够 1 分钟才记录并显示报告，否则回到计划页
+    function finish(played: [number, number][]) {
+        if (!workout)
+            return;
+        const draft = { workout, name: current?.name, startedAt, endedAt: new Date().toISOString(), played };
+        if (playedSeconds({ id: '', ...draft }) < MIN_RECORD_SEC) {
+            setView('plan');
+            return;
+        }
+        const r = store.addRecord(draft);
+        setHistory(store.history());
+        setReport(r);
+        setView('report');
+    }
+
+    function openRecord(r: WorkoutRecord) {
+        setReport(r);
+        setView('report');
+    }
+
+    function changeWeight(kg: number) {
+        store.setWeightKg(kg);
+        setWeightKg(kg);
     }
 
     function save() {
@@ -84,7 +117,7 @@ function App() {
     }
 
     if (view === 'player' && workout)
-        return <Player workout={workout} onExit={() => setView('plan')} />;
+        return <Player workout={workout} onExit={finish} />;
 
     return (
         <main>
@@ -93,7 +126,15 @@ function App() {
                 <p className="muted">告诉我你今天的条件，生成一节课，跟着做就好</p>
             </header>
 
-            {view === 'plan' && workout ? (
+            {view === 'report' && report ? (
+                <Report
+                    record={report}
+                    history={history}
+                    weightKg={weightKg}
+                    onWeightChange={changeWeight}
+                    onBack={() => setView('home')}
+                />
+            ) : view === 'plan' && workout ? (
                 <WorkoutView
                     workout={workout}
                     title={describeConditions(workout.conditions)}
@@ -113,6 +154,7 @@ function App() {
                         onRegenerate={(s) => generate(s.workout.conditions)}
                         onDelete={remove}
                     />
+                    <History records={history} onOpen={openRecord} />
                 </>
             )}
         </main>

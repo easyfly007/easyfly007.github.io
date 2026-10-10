@@ -107,3 +107,13 @@ export interface Step {
     set?: { index: number; count: number };
     round?: { index: number; count: number };
 }
+
+// 一次训练记录。只存原始数据，报告里的数字都由 buildTimeline() 和 played 重新算出
+export interface WorkoutRecord {
+    id: string;
+    workout: Workout;
+    name?: string;              // 从模板开练时的模板名
+    startedAt: string;          // ISO 时间
+    endedAt: string;
+    played: [number, number][]; // 实际播放过的时间线区间（秒），跳过的部分不算
+}

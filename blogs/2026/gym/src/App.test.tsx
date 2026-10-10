@@ -62,6 +62,40 @@ describe('App flow', () => {
         expect(within(saved).getByText(/^室内-瑜伽垫\+哑铃-30分钟/)).toBeTruthy();
     });
 
+    it('shows a report after finishing and keeps it in the history', () => {
+        render(<App />);
+        click('15 分钟');
+        click('生成训练');
+        click('▶ 开始跟练');
+        act(() => {
+            vi.advanceTimersByTime(20 * 60 * 1000);
+        });
+
+        expect(screen.getByText('🎉 训练完成')).toBeTruthy();
+        expect(screen.getByText('100%')).toBeTruthy();
+        expect(screen.getByText('最近 7 天')).toBeTruthy();
+        fireEvent.change(screen.getByLabelText('体重（公斤）'), { target: { value: '60' } });
+        click('计算');
+        expect(screen.getByText(/^约 \d+ 千卡$/)).toBeTruthy();
+
+        click('返回');
+        const history = screen.getByText('训练记录').closest('section')!;
+        expect(within(history).getByText(/^室内-瑜伽垫-15分钟/)).toBeTruthy();
+        expect(JSON.parse(window.localStorage.getItem('gym.history.v1')!)).toHaveLength(1);
+    });
+
+    it('does not record a workout ended within the first minute', () => {
+        render(<App />);
+        click('生成训练');
+        click('▶ 开始跟练');
+        act(() => {
+            vi.advanceTimersByTime(5000);
+        });
+        click('结束');
+        expect(screen.getByText('修改条件')).toBeTruthy();
+        expect(window.localStorage.getItem('gym.history.v1')).toBeNull();
+    });
+
     it('applies the chosen rest level to the plan', () => {
         render(<App />);
         click('力量');

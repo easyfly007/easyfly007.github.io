@@ -1,7 +1,11 @@
-import type { Conditions, SavedWorkout, Workout } from '../types';
+import type { Conditions, SavedWorkout, Workout, WorkoutRecord } from '../types';
 
 const SAVED_KEY = 'gym.saved.v1';
 const LAST_CONDITIONS_KEY = 'gym.lastConditions.v1';
+const HISTORY_KEY = 'gym.history.v1';
+const WEIGHT_KEY = 'gym.weightKg.v1';
+// 只保留最近这么多条训练记录，避免本地存储无限增长
+const MAX_RECORDS = 1000;
 
 // 只依赖 getItem/setItem，测试时可传入内存实现
 export type KeyValueStore = Pick<Storage, 'getItem' | 'setItem'>;
@@ -66,6 +70,31 @@ export function createSavedStore(store: KeyValueStore) {
 
         rememberConditions(c: Conditions): void {
             writeJson(store, LAST_CONDITIONS_KEY, c);
+        },
+
+        // 训练记录，新的在前
+        history(): WorkoutRecord[] {
+            return readJson<WorkoutRecord[]>(store, HISTORY_KEY, []);
+        },
+
+        addRecord(r: Omit<WorkoutRecord, 'id'>): WorkoutRecord {
+            const item: WorkoutRecord = { id: newId(), ...r };
+            const all = readJson<WorkoutRecord[]>(store, HISTORY_KEY, []);
+            writeJson(store, HISTORY_KEY, [item, ...all].slice(0, MAX_RECORDS));
+            return item;
+        },
+
+        removeRecord(id: string): void {
+            const all = readJson<WorkoutRecord[]>(store, HISTORY_KEY, []);
+            writeJson(store, HISTORY_KEY, all.filter((r) => r.id !== id));
+        },
+
+        weightKg(): number | undefined {
+            return readJson<number | undefined>(store, WEIGHT_KEY, undefined);
+        },
+
+        setWeightKg(kg: number): void {
+            writeJson(store, WEIGHT_KEY, kg);
         },
     };
 }

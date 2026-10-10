@@ -311,3 +311,147 @@ button.big {
     color: var(--muted);
     line-height: 1.7;
 }
+
+/* ---------- 训练报告 / 记录 ---------- */
+:root {
+    --bar: #e0531f;
+    --meter-track: #fbe3d8;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bar: #e8602c;
+        --meter-track: #3a2a23;
+    }
+}
+
+.row.space {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-title {
+    margin: 18px 0 8px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.stat {
+    background: var(--chip);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 2px 0;
+}
+
+.stat input {
+    width: 90px;
+    font: inherit;
+    padding: 6px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--text);
+}
+
+.meters,
+.report-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.meters li {
+    display: grid;
+    grid-template-columns: 3em 1fr 4em;
+    align-items: center;
+    gap: 8px;
+    margin: 6px 0;
+}
+
+.meter {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--meter-track);
+    overflow: hidden;
+}
+
+.meter span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background: var(--bar);
+}
+
+.report-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.chart {
+    margin: 12px 0;
+}
+
+.chart figcaption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+}
+
+.chart-title {
+    font-weight: 600;
+}
+
+.chart svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.chart-axis {
+    stroke: var(--line);
+    stroke-width: 1;
+}
+
+.chart-bar {
+    cursor: pointer;
+}
+
+.chart-bar path {
+    fill: var(--bar);
+}
+
+.chart-bar:hover path,
+.chart-bar.on path {
+    opacity: 0.8;
+}
+
+.chart-value {
+    font-size: 11px;
+    fill: var(--text);
+}
+
+.chart-label {
+    font-size: 11px;
+    fill: var(--muted);
+}

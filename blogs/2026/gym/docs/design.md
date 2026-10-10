@@ -142,3 +142,24 @@ Step {
 ```
 
 整节课总时长 = 所有步骤秒数之和，与生成时的预估时长一致。
+
+## 训练记录 `WorkoutRecord`
+
+```ts
+{
+  id: string
+  workout: Workout
+  name?: string               // 从模板开练时的模板名
+  startedAt: string           // ISO
+  endedAt: string
+  played: [number, number][]  // 实际播放过的时间线区间（秒）；点"跳过"时结束当前区间
+}
+```
+
+只存原始数据，报告里的数字都在 `src/engine/report.ts` 里由 `buildTimeline()` 和 `played` 重新算出：
+
+- 每步完成秒数 = 该步时间范围与 `played` 的重叠；做到 90% 算这一步完成；单侧动作左右两步合起来算一组
+- 计次动作完成次数 = 完成秒数 ÷ `secPerRep`（向下取整）
+- 估算热量：千卡 = MET × 3.5 × 体重(kg) ÷ 200 × 分钟；动作 MET 按强度等级 1..5 取 3 / 4 / 5.5 / 7 / 8.5，休息取 1.5
+- 按本地日期汇总每天、每周（周一开始）的时长与次数，以及连续打卡天数
+- 存在 localStorage `gym.history.v1`（最多 1000 条），体重存在 `gym.weightKg.v1`

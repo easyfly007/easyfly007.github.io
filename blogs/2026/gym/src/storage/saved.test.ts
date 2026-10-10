@@ -52,4 +52,18 @@ describe('saved store', () => {
         kv.setItem('gym.saved.v1', '{not json');
         expect(createSavedStore(kv).list()).toEqual([]);
     });
+
+    it('keeps workout records newest first and remembers the weight', () => {
+        const s = createSavedStore(memoryStore());
+        const w = generateWorkout(BASE, 5);
+        const a = s.addRecord({ workout: w, startedAt: '2026-10-09T08:00:00Z', endedAt: '2026-10-09T08:30:00Z', played: [[0, 1800]] });
+        const b = s.addRecord({ workout: w, startedAt: '2026-10-10T08:00:00Z', endedAt: '2026-10-10T08:10:00Z', played: [[0, 600]] });
+        expect(s.history().map((r) => r.id)).toEqual([b.id, a.id]);
+        s.removeRecord(b.id);
+        expect(s.history().map((r) => r.id)).toEqual([a.id]);
+
+        expect(s.weightKg()).toBeUndefined();
+        s.setWeightKg(65);
+        expect(s.weightKg()).toBe(65);
+    });
 });

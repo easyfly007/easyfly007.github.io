@@ -1,4 +1,4 @@
-import type { Conditions, Equipment, Goal, Limitation, Muscle, RestLevel } from './types';
+import type { Conditions, Equipment, Goal, Limitation, Muscle, RestLevel, WorkoutRecord } from './types';
 
 export const EQUIPMENT_LABEL: Record<Equipment, string> = {
     mat: '瑜伽垫',
@@ -67,4 +67,15 @@ export function formatDuration(totalSec: number): string {
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+export function recordTitle(r: WorkoutRecord): string {
+    return r.name ?? describeConditions(r.workout.conditions);
+}
+
+export function shortDateTime(iso: string): string {
+    const d = new Date(iso);
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${d.getMonth() + 1}月${d.getDate()}日 ${hh}:${mm}`;
 }

@@ -7,7 +7,8 @@ import type { Step, Workout } from '../types';
 
 interface Props {
     workout: Workout;
-    onExit: (finished: boolean) => void;
+    // 训练做完或中途结束时调用，传出实际播放过的时间线区间（秒）
+    onExit: (played: [number, number][]) => void;
 }
 
 function announce(step: Step): string {
@@ -71,6 +72,14 @@ export function Player({ workout, onExit }: Props) {
 
     useWakeLock(!finished && !paused);
 
+    // 记录实际播放过的区间：跳过时结束当前区间，从跳到的位置开始新区间
+    const played = useRef<[number, number][]>([]);
+    const segStart = useRef(0);
+    function closeSegment(at: number) {
+        if (at > segStart.current)
+            played.current.push([segStart.current, at]);
+    }
+
     // 进入新步骤时播报
     const lastIndex = useRef(-1);
     useEffect(() => {
@@ -79,11 +88,15 @@ export function Player({ workout, onExit }: Props) {
         lastIndex.current = index;
         if (finished) {
             speak('训练完成，辛苦了！');
+            closeSegment(total);
+            onExit(played.current);
             return;
         }
         if (index > 0)
             beep(true);
         speak(announce(steps[index]));
+    // 只在步骤变化时触发；onExit 和 total 在一次跟练中不变
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [index, finished, steps]);
 
     // 最后 3 秒倒计时提示音
@@ -98,29 +111,32 @@ export function Player({ workout, onExit }: Props) {
         beep();
     }, [remaining, index, finished, paused]);
 
-    useEffect(() => () => stopSpeaking(), []);
+    // 正常做完时不打断"训练完成"的播报
+    const finishedRef = useRef(false);
+    finishedRef.current = finished;
+    useEffect(() => () => {
+        if (!finishedRef.current)
+            stopSpeaking();
+    }, []);
 
     function jumpTo(i: number) {
         const target = stepStart(steps, Math.min(i, steps.length)) * 1000;
+        closeSegment(elapsed);
+        segStart.current = target / 1000;
         baseMs.current = target;
         startedAt.current = performance.now();
         setElapsedMs(target);
     }
 
     function exit() {
-        if (finished || window.confirm('确定结束本次训练吗？'))
-            onExit(finished);
+        if (!window.confirm('确定结束本次训练吗？'))
+            return;
+        closeSegment(elapsed);
+        onExit(played.current);
     }
 
-    if (finished) {
-        return (
-            <div className="player done">
-                <div className="big-title">🎉 训练完成</div>
-                <div className="muted">共 {formatDuration(Math.round(total))}</div>
-                <button type="button" className="primary big" onClick={exit}>返回</button>
-            </div>
-        );
-    }
+    if (finished)
+        return <div className="player done" />;
 
     const ex = EXERCISE_BY_ID[step.exerciseId];
     const block = workout.blocks[step.blockIndex];

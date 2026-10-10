@@ -4,7 +4,10 @@ import { buildTimeline, locate, stepStart, totalSeconds } from '../engine/timeli
 import { formatDuration } from '../labels';
 import { beep, speak, stopSpeaking } from '../speech';
 import type { Gender, Step, Workout } from '../types';
+import { hasAnimation } from '../anim/schedule';
+import { clipUrls } from '../videos';
 import { ExerciseBodyMap } from './BodyMap';
+import { ExerciseAnimation } from './ExerciseAnimation';
 import { ExerciseVideo } from './ExerciseVideo';
 
 interface Props {
@@ -171,7 +174,12 @@ export function Player({ workout, coach, onExit }: Props) {
                 {repNow !== undefined && (
                     <div className="reps">第 {repNow} / {step.reps} 次</div>
                 )}
-                {isWork && <ExerciseVideo step={step} intoStep={intoStep} paused={paused} coach={coach} />}
+                {isWork && clipUrls(step.exerciseId, step.side, coach).length > 0 ? (
+                    <ExerciseVideo step={step} intoStep={intoStep} paused={paused} coach={coach} />
+                ) : hasAnimation(step.exerciseId) && (
+                    // 没有视频时用 3D 人偶动画；休息时预演下一个动作
+                    <ExerciseAnimation step={step} intoStep={intoStep} paused={paused} coach={coach} />
+                )}
                 <ul className="cues">
                     {ex.cues.map((c) => (
                         <li key={c}>{c}</li>

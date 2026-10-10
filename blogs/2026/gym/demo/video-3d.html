@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>3D 动作指导样例</title>
+<title>动作动画预览</title>
 <style>
     :root {
         --bg: #f6f7f9;
@@ -57,6 +57,15 @@
         display: block;
         width: 100%;
         height: 100%;
+    }
+    select {
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--text);
+        min-width: 240px;
     }
     .hud {
         position: absolute;
@@ -124,14 +133,15 @@
 </head>
 <body>
 <main>
-    <h1>3D 动作指导样例 · 徒手深蹲</h1>
-    <div class="muted">
-        深蹲 20 次，每次 3 秒，共 60 秒。每做完一次换一个视角：正面 → 侧面 → 全身 → 正面 ……
-        每次都从站直开始、回到站直结束，所以换视角时动作是连贯的。
+    <h1>动作动画预览</h1>
+    <div class="muted" id="intro">选一个动作看 3D 人偶示范。计次动作每做完一次换一个视角（太快的动作每几次换一次）：正面 → 侧面 → 全身 → ……</div>
+    <div class="row">
+        <select id="exercise"></select>
     </div>
     <div class="stage" id="stage">
+        <canvas id="canvas"></canvas>
         <div class="hud" id="hud" hidden>
-            <b>徒手深蹲</b><br>
+            <b id="name"></b><br>
             <span id="view-name"></span> · <span id="rep"></span><br>
             <span id="remain"></span>
         </div>
@@ -142,20 +152,19 @@
         <button type="button" data-coach="female" class="on">女教练</button>
         <button type="button" data-coach="male">男教练</button>
     </div>
+    <div class="row" id="side" hidden>
+        <button type="button" data-side="left" class="on">左侧</button>
+        <button type="button" data-side="right">右侧</button>
+    </div>
     <div class="row" id="views">
-        <button type="button" data-view="auto" class="on">每次换视角</button>
-        <button type="button" data-view="0">只看正面</button>
-        <button type="button" data-view="1">只看侧面</button>
-        <button type="button" data-view="2">只看全身</button>
-    </div>
-    <div class="row">
+        <button type="button" data-view="auto" class="on">自动换视角</button>
+        <button type="button" data-view="0">视角 1</button>
+        <button type="button" data-view="1">视角 2</button>
+        <button type="button" data-view="2">视角 3</button>
         <button type="button" id="replay">重播</button>
-        <button type="button" id="export" class="primary" disabled>导出 3 个片段（每个视角一次深蹲）</button>
     </div>
-    <div class="muted" id="export-note" style="margin-top: 8px">
-        导出的文件放到 <code id="export-dir">src/videos/female/squat/</code>，跟练时会自动按次拼接。
-    </div>
-    </main>
+    <ul class="muted" id="cues"></ul>
+</main>
 
 <script type="module">
 // 加载失败、脚本出错时把原因显示在画面上，而不是一直停在"正在加载"
@@ -167,188 +176,89 @@ function showError(text) {
 window.addEventListener('error', (e) => showError(e.message));
 window.addEventListener('unhandledrejection', (e) => showError(e.reason?.message ?? String(e.reason)));
 
-const THREE = await import('three');
-const { createMannequin, squatDepth } = await import('./mannequin.js');
+// 与跟练播放器用同一套动画代码
+const { createStage } = await import('/src/anim/stage.ts');
+const { ANIMATIONS } = await import('/src/anim/library.ts');
+const { EXERCISES } = await import('/src/data/exercises.ts');
+const { viewIndexAt, animCycleSec } = await import('/src/anim/schedule.ts');
 
-const REPS = 20;
-const REP_SEC = 3;              // 与动作库里深蹲的 secPerRep 一致
-const TOTAL_SEC = REPS * REP_SEC;
-
-// 正面 / 侧面 / 全身：人物面朝 +z，侧面机位在人物左侧（+x）
-const VIEWS = [
-    { id: 'front', name: '正面', pos: [0, 1.0, 3.4], target: [0, 0.8, 0] },
-    { id: 'side', name: '侧面', pos: [3.4, 0.95, 0.1], target: [0, 0.78, 0.1] },
-    { id: 'full', name: '全身', pos: [2.3, 2.6, 2.6], target: [0, 0.7, 0] },
-];
-
-const stage = document.getElementById('stage');
-const hud = document.getElementById('hud');
-const viewNameEl = document.getElementById('view-name');
-const repEl = document.getElementById('rep');
-const remainEl = document.getElementById('remain');
-const barEl = document.getElementById('bar');
-const exportBtn = document.getElementById('export');
-const exportNote = document.getElementById('export-note');
-const exportDir = document.getElementById('export-dir');
-
-const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
-stage.prepend(renderer.domElement);
+const select = document.getElementById('exercise');
+const animated = EXERCISES.filter((e) => e.id in ANIMATIONS);
+document.getElementById('intro').textContent += `（已做 ${animated.length} / ${EXERCISES.length} 个动作）`;
+for (const e of animated) {
+    const o = document.createElement('option');
+    o.value = e.id;
+    o.textContent = e.name;
+    select.append(o);
+}
 
 const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(dark ? 0x1e2127 : 0xeef1f5);
-
-scene.add(new THREE.HemisphereLight(0xffffff, dark ? 0x30343c : 0xb9c0cc, 1.6));
-const sun = new THREE.DirectionalLight(0xffffff, 1.6);
-sun.position.set(2, 4, 3);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
-scene.add(sun);
-
-const floor = new THREE.Mesh(
-    new THREE.CircleGeometry(3, 48),
-    new THREE.MeshStandardMaterial({ color: dark ? 0x2a2e35 : 0xffffff, roughness: 1 }),
-);
-floor.rotation.x = -Math.PI / 2;
-floor.receiveShadow = true;
-scene.add(floor);
-const grid = new THREE.GridHelper(6, 24, dark ? 0x4a505a : 0xc8cdd5, dark ? 0x353a42 : 0xdde1e7);
-grid.position.y = 0.001;
-scene.add(grid);
-
-const camera = new THREE.PerspectiveCamera(36, 16 / 9, 0.1, 50);
-
-function resize() {
-    renderer.setSize(stage.clientWidth, stage.clientHeight, false);
-}
-window.addEventListener('resize', resize);
-resize();
-
-function useView(i) {
-    const v = VIEWS[i];
-    camera.position.set(...v.pos);
-    camera.lookAt(...v.target);
-    viewNameEl.textContent = `视角：${v.name}`;
-}
-
-// ---------- 人偶（女 / 男） ----------
-const coaches = { female: createMannequin(THREE, 'female'), male: createMannequin(THREE, 'male') };
-let coach = 'female';
-let figure = coaches.female;
-scene.add(figure.root);
+const canvas = document.getElementById('canvas');
+const stage = createStage(canvas, dark);
+window.addEventListener('resize', () => stage.resize());
 message.hidden = true;
-hud.hidden = false;
-exportBtn.disabled = false;
+document.getElementById('hud').hidden = false;
 
-function setCoach(which) {
-    scene.remove(figure.root);
-    coach = which;
-    figure = coaches[which];
-    scene.add(figure.root);
-    exportDir.textContent = `src/videos/${which}/squat/`;
-}
-
-// ---------- 时间轴 ----------
+let coach = 'female';
+let side = 'left';
 let manualView = null;
 let startMs = performance.now();
-let recording = null;           // 导出时：{ view, startMs }
+let ex = animated[0];
+
+function load() {
+    ex = animated.find((e) => e.id === select.value) ?? animated[0];
+    document.getElementById('side').hidden = !ex.perSide;
+    stage.setExercise(ex.id, ex.perSide ? side : undefined, coach);
+    document.getElementById('name').textContent = ex.name + (ex.perSide ? `（${side === 'left' ? '左' : '右'}侧）` : '');
+    document.getElementById('cues').innerHTML = ex.cues.map((c) => `<li>${c}</li>`).join('');
+    startMs = performance.now();
+}
+
+function total() {
+    return ex.mode === 'reps' ? ex.defaultReps * ex.secPerRep : ex.defaultSeconds;
+}
 
 function frame(now) {
     requestAnimationFrame(frame);
-    let t;
-    let viewIndex;
-    if (recording) {
-        t = Math.min((now - recording.startMs) / 1000, REP_SEC);
-        viewIndex = recording.view;
-    } else {
-        t = Math.min((now - startMs) / 1000, TOTAL_SEC);
-        const rep = Math.min(Math.floor(t / REP_SEC), REPS - 1);
-        viewIndex = manualView ?? rep % VIEWS.length;
-        repEl.textContent = `第 ${rep + 1} / ${REPS} 次`;
-        remainEl.textContent = t >= TOTAL_SEC ? '完成' : `剩余 ${Math.ceil(TOTAL_SEC - t)} 秒`;
-        barEl.style.width = `${(t / TOTAL_SEC) * 100}%`;
-    }
-    const phase = t >= (recording ? REP_SEC : TOTAL_SEC) ? 0 : (t % REP_SEC) / REP_SEC;
-    figure.pose(squatDepth(phase));
-    useView(viewIndex);
-    renderer.render(scene, camera);
+    const t = ((now - startMs) / 1000) % total();
+    const view = manualView ?? viewIndexAt(ex.id, t);
+    document.getElementById('view-name').textContent = `视角：${stage.render(t, view)}`;
+    document.getElementById('rep').textContent = ex.mode === 'reps'
+        ? `第 ${Math.floor(t / animCycleSec(ex.id)) + 1} / ${ex.defaultReps} 次`
+        : `${ex.defaultSeconds} 秒`;
+    document.getElementById('remain').textContent = `剩余 ${Math.ceil(total() - t)} 秒（循环播放）`;
+    document.getElementById('bar').style.width = `${(t / total()) * 100}%`;
 }
-requestAnimationFrame(frame);
 
+function toggle(groupId, attr, onPick) {
+    document.getElementById(groupId).addEventListener('click', (e) => {
+        const btn = e.target.closest(`button[${attr}]`);
+        if (!btn)
+            return;
+        for (const b of document.querySelectorAll(`#${groupId} button[${attr}]`))
+            b.classList.toggle('on', b === btn);
+        onPick(btn.getAttribute(attr));
+    });
+}
+
+select.addEventListener('change', load);
+toggle('coach', 'data-coach', (v) => {
+    coach = v;
+    load();
+});
+toggle('side', 'data-side', (v) => {
+    side = v;
+    load();
+});
+toggle('views', 'data-view', (v) => {
+    manualView = v === 'auto' ? null : Number(v);
+});
 document.getElementById('replay').addEventListener('click', () => {
     startMs = performance.now();
 });
 
-document.getElementById('views').addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn)
-        return;
-    const v = btn.dataset.view;
-    manualView = v === 'auto' ? null : Number(v);
-    for (const b of document.querySelectorAll('#views button'))
-        b.classList.toggle('on', b === btn);
-});
-
-document.getElementById('coach').addEventListener('click', (e) => {
-    const btn = e.target.closest('button');
-    if (!btn || recording || btn.dataset.coach === coach)
-        return;
-    for (const b of document.querySelectorAll('#coach button'))
-        b.classList.toggle('on', b === btn);
-    setCoach(btn.dataset.coach);
-    startMs = performance.now();
-});
-
-// ---------- 导出片段：每个视角录一次深蹲（站直 → 蹲下 → 站直），1280×720 ----------
-function pickMime() {
-    const types = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
-    return types.find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t));
-}
-
-function recordView(view, mime) {
-    return new Promise((resolve) => {
-        const stream = renderer.domElement.captureStream(30);
-        const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 });
-        const chunks = [];
-        rec.ondataavailable = (e) => chunks.push(e.data);
-        rec.onstop = () => resolve(new Blob(chunks, { type: mime }));
-        rec.start();
-        recording = { view, startMs: performance.now() };
-        setTimeout(() => rec.stop(), REP_SEC * 1000 + 50);
-    });
-}
-
-function download(blob, name) {
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
-exportBtn.addEventListener('click', async () => {
-    const mime = pickMime();
-    if (!mime) {
-        exportNote.textContent = '这个浏览器不支持录制，请用最新版 Chrome 或 Edge。';
-        return;
-    }
-    const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
-    exportBtn.disabled = true;
-    renderer.setPixelRatio(1);
-    renderer.setSize(1280, 720, false);
-    for (let i = 0; i < VIEWS.length; i++) {
-        exportNote.textContent = `正在录制 ${VIEWS[i].name}（${i + 1} / ${VIEWS.length}）……`;
-        const blob = await recordView(i, mime);
-        download(blob, `${VIEWS[i].id}.${ext}`);
-    }
-    recording = null;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    resize();
-    exportBtn.disabled = false;
-    exportNote.textContent = `已导出 front.${ext} / side.${ext} / full.${ext}，放到 src/videos/${coach}/squat/ 即可在跟练里看到。`;
-});
+load();
+requestAnimationFrame(frame);
 </script>
 </body>
 </html>

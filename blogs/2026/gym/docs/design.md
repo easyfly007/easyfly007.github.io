@@ -163,3 +163,13 @@ Step {
 - 估算热量：千卡 = MET × 3.5 × 体重(kg) ÷ 200 × 分钟；动作 MET 按强度等级 1..5 取 3 / 4 / 5.5 / 7 / 8.5，休息取 1.5
 - 按本地日期汇总每天、每周（周一开始）的时长与次数，以及连续打卡天数
 - 存在 localStorage `gym.history.v1`（最多 1000 条），体重存在 `gym.weightKg.v1`
+
+## 动作动画（`src/anim/`）
+
+- `types.ts`：姿态 `Pose`（身体朝向 pitch/roll/yaw、离地 lift、躯干/头/上臂/前臂/大腿/小腿方向向量、脚尖方向）与动画 `AnimDef`（关键帧、锚点、器械）
+- `pose.ts`：写姿态的辅助函数（`limb`/`up`/`legs`/`arms` 等，用"前抬几度、外展几度、弯几度"描述）、关键帧插值（缓入缓出）、左右镜像
+- `figure.ts`：three.js 人偶。每段肢体按方向摆放；摆好后自动贴地（最低点落地），`anchor` 指定的部位水平不动（脚不滑步）；`hang` 时手固定在单杠高度；器械按手/肩位置每帧摆放
+- `library.ts`：每个动作的关键帧。单侧动作只写左侧
+- `schedule.ts`：一个循环的秒数（计次 = secPerRep）和当前视角（循环交界处切换，每个视角至少 2.5 秒）
+- `stage.ts`：场景、灯光、地面、瑜伽垫、三个机位（按整个循环的身体范围自动取景）；由 `ExerciseAnimation` 组件按需加载（three.js 单独打包）
+- 检查：`npx vite-node scripts/anim-preview.ts <目录> [动作 id ...]` 输出每个动作 4 个时刻的正面/侧面骨架图（SVG）；`anim.test.ts` 检查贴地和锚点不滑动

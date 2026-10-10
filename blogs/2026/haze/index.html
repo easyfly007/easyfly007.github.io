@@ -2742,7 +2742,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       h.push('<rect class="hit" x="' + f1(cx - slotW / 2) + '" y="' + CH.top + '" width="' + f1(slotW) + '" height="' + (CH.bottom - CH.top + 46) + '"/>');
       if (v === null) {
         h.push('<rect class="none" x="' + x + '" y="' + (CH.bottom - 34) + '" width="' + f1(barW) + '" height="34" rx="4"/>');
-        h.push('<text class="sub" x="' + f1(cx) + '" y="' + (CH.bottom - 42) + '" text-anchor="middle">暂无统计</text>');
+        h.push('<text class="sub" x="' + f1(cx) + '" y="' + (CH.bottom - 42) + '" text-anchor="middle">暂无</text>');
       } else {
         var bh = Math.max(2, v / metric.max * span);
         var y = f1(CH.bottom - bh);

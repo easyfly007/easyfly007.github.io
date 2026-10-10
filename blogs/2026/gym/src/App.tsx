@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ConditionsForm } from './components/ConditionsForm';
+import { ExerciseLibrary } from './components/ExerciseLibrary';
 import { History } from './components/History';
 import { Player } from './components/Player';
 import { Report } from './components/Report';
 import { SavedList } from './components/SavedList';
 import { SettingsCard } from './components/SettingsCard';
 import { WorkoutView } from './components/WorkoutView';
+import { addExercise, removeItem } from './engine/edit';
 import { generateWorkout } from './engine/generate';
 import { newSeed } from './engine/random';
 import { MIN_RECORD_SEC, playedSeconds } from './engine/report';
@@ -28,7 +30,7 @@ const DEFAULT_CONDITIONS: Conditions = {
     rest: 'normal',
 };
 
-type View = 'home' | 'plan' | 'player' | 'report';
+type View = 'home' | 'plan' | 'player' | 'report' | 'library';
 
 function App() {
     const store = useMemo(() => createSavedStore(window.localStorage), []);
@@ -43,6 +45,8 @@ function App() {
     const [startedAt, setStartedAt] = useState('');
     const [settings, setSettings] = useState<Settings>(() => store.settings());
     const [notice, setNotice] = useState<string | null>(null);
+    const [favorites, setFavorites] = useState<string[]>(() => store.favorites());
+    const [libraryFrom, setLibraryFrom] = useState<'home' | 'plan'>('home');
 
     useEffect(() => {
         setVoiceGender(settings.voice);
@@ -58,7 +62,7 @@ function App() {
     function generate(c: Conditions) {
         store.rememberConditions(c);
         setConditions(c);
-        setWorkout(generateWorkout(c, newSeed()));
+        setWorkout(generateWorkout(c, newSeed(), favorites));
         setSavedId(null);
         setNotice(null);
         setView('plan');
@@ -110,6 +114,24 @@ function App() {
         setView('report');
     }
 
+    function toggleFavorite(id: string) {
+        const next = favorites.includes(id) ? favorites.filter((x) => x !== id) : [...favorites, id];
+        store.saveFavorites(next);
+        setFavorites(next);
+    }
+
+    function openLibrary(from: 'home' | 'plan') {
+        setLibraryFrom(from);
+        setView('library');
+    }
+
+    // 手动改过的训练不再等同于原模板：清掉模板关联，用户可另存为新模板
+    function editWorkout(w: Workout) {
+        setWorkout(w);
+        setSavedId(null);
+        setNotice(null);
+    }
+
     function changeWeight(kg: number) {
         store.setWeightKg(kg);
         setWeightKg(kg);
@@ -143,7 +165,17 @@ function App() {
                 <p className="muted">告诉我你今天的条件，生成一节课，跟着做就好</p>
             </header>
 
-            {view === 'report' && report ? (
+            {view === 'library' ? (
+                <ExerciseLibrary
+                    favorites={favorites}
+                    coach={settings.coach}
+                    canAdd={workout !== null}
+                    addedIds={workout ? workout.blocks.flatMap((b) => b.items.map((i) => i.exerciseId)) : []}
+                    onToggleFavorite={toggleFavorite}
+                    onAdd={(id) => workout && editWorkout(addExercise(workout, id))}
+                    onBack={() => setView(libraryFrom === 'plan' && workout ? 'plan' : 'home')}
+                />
+            ) : view === 'report' && report ? (
                 <Report
                     record={report}
                     history={history}
@@ -162,11 +194,20 @@ function App() {
                         onRegenerate={() => generate(workout.conditions)}
                         onSave={save}
                         onBack={() => setView('home')}
+                        onOpenLibrary={() => openLibrary('plan')}
+                        onRemoveItem={(bi, i) => editWorkout(removeItem(workout, bi, i))}
                     />
                 </>
             ) : (
                 <>
                     <ConditionsForm value={conditions} onChange={setConditions} onGenerate={() => generate(conditions)} />
+                    <section className="card row space">
+                        <div>
+                            <h2>动作库</h2>
+                            <p className="muted small">浏览全部动作的示范动画和练到的肌肉，标记喜欢的动作{favorites.length > 0 ? `（已喜欢 ${favorites.length} 个）` : ''}</p>
+                        </div>
+                        <button type="button" onClick={() => openLibrary('home')}>浏览动作库</button>
+                    </section>
                     <SavedList
                         items={saved}
                         onOpen={open}

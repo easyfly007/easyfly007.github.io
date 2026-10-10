@@ -174,3 +174,9 @@ Step {
 - `schedule.ts`：一个循环的秒数（计次 = secPerRep）和当前视角（循环交界处切换，每个视角至少 2.5 秒）
 - `stage.ts`：场景、灯光、地面、瑜伽垫、三个机位（按整个循环的身体范围自动取景）；由 `ExerciseAnimation` 组件按需加载（three.js 单独打包）
 - 检查：`npx vite-node scripts/anim-preview.ts <目录> [动作 id ...]` 输出每个动作 4 个时刻的正面/侧面骨架图（SVG）；`anim.test.ts` 检查贴地和锚点不滑动
+
+## 手动调整训练（`src/engine/edit.ts`）
+
+- `addExercise(workout, id)`：按动作的 `phases` 选区块（main > warmup > cooldown，缺区块就新建）；新动作的组数、次数/时长、休息跟随区块第一个动作（循环区块用计时做/休）；`estimatedMin` 由时间线重算
+- `removeItem(workout, blockIndex, itemIndex)`：移除后丢掉空区块，重算时长
+- 喜欢的动作：`generateWorkout(c, seed, favorites)`，在排序打分里加 0.7（所有阶段），只影响先后，不绕过过滤；存在 localStorage `gym.favorites.v1`

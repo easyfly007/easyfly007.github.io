@@ -3,6 +3,10 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 
+function last<T>(list: T[]): T {
+    return list[list.length - 1];
+}
+
 function click(name: string | RegExp) {
     fireEvent.click(screen.getByRole('button', { name }));
 }
@@ -127,6 +131,28 @@ describe('App flow', () => {
         render(<App />);
         expect(screen.getByRole('button', { name: '男教练' }).getAttribute('aria-pressed')).toBe('true');
         expect(screen.getByRole('button', { name: '男声' }).getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('browses the exercise library, likes an exercise and adds it to the plan', () => {
+        render(<App />);
+        click('浏览动作库');
+        expect(screen.getByText(/^动作库（\d+ 个）$/)).toBeTruthy();
+        fireEvent.change(screen.getByLabelText('搜索动作名'), { target: { value: '臀桥' } });
+        click('喜欢 臀桥');
+        expect(JSON.parse(window.localStorage.getItem('gym.favorites.v1')!)).toEqual(['glute_bridge']);
+        expect(screen.queryByRole('button', { name: '加入当前训练 臀桥' })).toBeNull();
+        click('返回');
+
+        click('生成训练');
+        const before = screen.getAllByRole('button', { name: /^移除 / }).length;
+        click('＋ 从动作库添加');
+        fireEvent.change(screen.getByLabelText('搜索动作名'), { target: { value: '臀桥' } });
+        click('加入当前训练 臀桥');
+        expect(screen.getByText('已加入当前训练：臀桥')).toBeTruthy();
+        click('返回');
+        expect(screen.getAllByRole('button', { name: /^移除 / }).length).toBe(before + 1);
+        fireEvent.click(last(screen.getAllByRole('button', { name: '移除 臀桥' })));
+        expect(screen.getAllByRole('button', { name: /^移除 / }).length).toBe(before);
     });
 
     it('restores the last conditions on reload', () => {

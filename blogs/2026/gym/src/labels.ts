@@ -1,4 +1,4 @@
-import type { Conditions, Equipment, Goal, Limitation, Muscle, RestLevel, WorkoutRecord } from './types';
+import type { Category, Conditions, Equipment, Goal, Limitation, Muscle, RestLevel, WorkoutRecord } from './types';
 
 export const EQUIPMENT_LABEL: Record<Equipment, string> = {
     mat: '瑜伽垫',
@@ -34,6 +34,14 @@ export const MUSCLE_LABEL: Record<Muscle, string> = {
     arms: '手臂',
     core: '核心',
     full_body: '全身',
+};
+
+export const CATEGORY_LABEL: Record<Category, string> = {
+    strength: '力量',
+    cardio: '有氧',
+    core: '核心',
+    mobility: '灵活性',
+    stretch: '拉伸',
 };
 
 export const INTENSITY_LABEL = ['', '低', '中', '高'];

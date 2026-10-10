@@ -34,8 +34,11 @@ function adjustRest(sec: number, c: Conditions): number {
     return Math.max(MIN_REST_SEC, sec + REST_DELTA[c.rest ?? 'normal']);
 }
 
-function preferenceScore(e: Exercise, c: Conditions, phase: Phase): number {
-    let score = 0;
+// 用户喜欢的动作优先（仍须满足当天条件）
+const FAVORITE_BONUS = 0.7;
+
+function preferenceScore(e: Exercise, c: Conditions, phase: Phase, favorites: Set<string>): number {
+    let score = favorites.has(e.id) ? FAVORITE_BONUS : 0;
     if (phase !== 'main')
         return score;
     if (c.goal === 'fat_loss' && e.category === 'cardio')
@@ -52,8 +55,8 @@ function preferenceScore(e: Exercise, c: Conditions, phase: Phase): number {
 }
 
 // 打乱并排序：随机 + 目标偏好 + 优先覆盖还没练到的肌群
-function orderPool(pool: Exercise[], c: Conditions, phase: Phase, rng: Rng): Exercise[] {
-    const rest = pool.map((e) => ({ e, base: rng() + preferenceScore(e, c, phase) }));
+function orderPool(pool: Exercise[], c: Conditions, phase: Phase, rng: Rng, favorites: Set<string>): Exercise[] {
+    const rest = pool.map((e) => ({ e, base: rng() + preferenceScore(e, c, phase, favorites) }));
     const covered = new Set<Muscle>();
     const out: Exercise[] = [];
     while (rest.length > 0) {
@@ -169,8 +172,8 @@ function mainPool(c: Conditions): Exercise[] {
     return all.filter((e) => e.category !== 'stretch');
 }
 
-function mainBlock(c: Conditions, rng: Rng, targetSec: number): Block {
-    const ordered = orderPool(mainPool(c), c, 'main', rng);
+function mainBlock(c: Conditions, rng: Rng, targetSec: number, favorites: Set<string>): Block {
+    const ordered = orderPool(mainPool(c), c, 'main', rng, favorites);
     if (c.goal === 'flexibility')
         return flowBlock('main', '主训练 · 拉伸', ordered, targetSec);
     if (c.goal === 'strength' || !c.canShower)
@@ -178,19 +181,20 @@ function mainBlock(c: Conditions, rng: Rng, targetSec: number): Block {
     return circuitBlock(ordered, c, targetSec);
 }
 
-export function generateWorkout(c: Conditions, seed: number): Workout {
+export function generateWorkout(c: Conditions, seed: number, favoriteIds: string[] = []): Workout {
+    const favorites = new Set(favoriteIds);
     const rng = createRng(seed);
     const total = c.durationMin * 60;
     const edgeTarget = Math.max(120, Math.round(total * 0.15));
 
-    const warmPool = orderPool(candidates(EXERCISES, c, 'warmup'), c, 'warmup', rng);
+    const warmPool = orderPool(candidates(EXERCISES, c, 'warmup'), c, 'warmup', rng, favorites);
     const warm = flowBlock('warmup', '热身', warmPool, edgeTarget);
-    const coolPool = orderPool(candidates(EXERCISES, c, 'cooldown'), c, 'cooldown', rng);
+    const coolPool = orderPool(candidates(EXERCISES, c, 'cooldown'), c, 'cooldown', rng, favorites);
     const cool = flowBlock('cooldown', '放松', coolPool, edgeTarget);
 
     const overhead = PREPARE_SEC + 2 * BLOCK_TRANSITION_SEC;
     const mainTarget = total - overhead - blockSeconds(warm) - blockSeconds(cool);
-    const main = mainBlock(c, rng, mainTarget);
+    const main = mainBlock(c, rng, mainTarget, favorites);
 
     const blocks = [warm, main, cool].filter((b) => b.items.length > 0);
     const seconds = totalSeconds(buildTimeline(blocks));

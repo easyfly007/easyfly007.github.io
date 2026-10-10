@@ -97,6 +97,20 @@ describe('generateWorkout', () => {
         expect(generateWorkout(old, 4).blocks).toEqual(generateWorkout(BASE, 4).blocks);
     });
 
+    it('prefers favourite exercises when they are feasible', () => {
+        const c = { ...BASE, goal: 'strength' as const };
+        let withFav = 0;
+        let without = 0;
+        for (let seed = 1; seed <= 30; seed++) {
+            const ids = (fav: string[]) => generateWorkout(c, seed, fav).blocks.flatMap((b) => b.items.map((i) => i.exerciseId));
+            if (ids(['wall_sit']).includes('wall_sit'))
+                withFav++;
+            if (ids([]).includes('wall_sit'))
+                without++;
+        }
+        expect(withFav).toBeGreaterThan(without);
+    });
+
     it('does not repeat an exercise within the main block', () => {
         const w = generateWorkout({ ...BASE, goal: 'strength', equipment: ['dumbbell'] }, 9);
         const ids = w.blocks[1].items.map((i) => i.exerciseId);

@@ -5,6 +5,7 @@ const LAST_CONDITIONS_KEY = 'gym.lastConditions.v1';
 const HISTORY_KEY = 'gym.history.v1';
 const WEIGHT_KEY = 'gym.weightKg.v1';
 const SETTINGS_KEY = 'gym.settings.v1';
+const FAVORITES_KEY = 'gym.favorites.v1';
 
 export const DEFAULT_SETTINGS: Settings = { coach: 'female', voice: 'female' };
 // 只保留最近这么多条训练记录，避免本地存储无限增长
@@ -106,6 +107,15 @@ export function createSavedStore(store: KeyValueStore) {
 
         saveSettings(s: Settings): void {
             writeJson(store, SETTINGS_KEY, s);
+        },
+
+        // 喜欢的动作 id
+        favorites(): string[] {
+            return readJson<string[]>(store, FAVORITES_KEY, []);
+        },
+
+        saveFavorites(ids: string[]): void {
+            writeJson(store, FAVORITES_KEY, ids);
         },
     };
 }

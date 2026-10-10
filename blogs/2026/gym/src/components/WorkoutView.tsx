@@ -11,6 +11,8 @@ interface Props {
     onRegenerate: () => void;
     onSave: () => void;
     onBack: () => void;
+    onOpenLibrary: () => void;
+    onRemoveItem: (blockIndex: number, itemIndex: number) => void;
 }
 
 function dose(item: WorkoutItem, perSide: boolean): string {
@@ -30,7 +32,7 @@ function blockSubtitle(b: Block): string {
     return '连续进行';
 }
 
-export function WorkoutView({ workout, title, savedName, onStart, onRegenerate, onSave, onBack }: Props) {
+export function WorkoutView({ workout, title, savedName, onStart, onRegenerate, onSave, onBack, onOpenLibrary, onRemoveItem }: Props) {
     return (
         <section className="card">
             <div className="plan-head">
@@ -50,6 +52,7 @@ export function WorkoutView({ workout, title, savedName, onStart, onRegenerate, 
                 <button type="button" onClick={onRegenerate}>换一批动作</button>
                 {!savedName && <button type="button" onClick={onSave}>保存为模板</button>}
                 <button type="button" onClick={onBack}>修改条件</button>
+                <button type="button" onClick={onOpenLibrary}>＋ 从动作库添加</button>
             </div>
 
             {workout.blocks.map((b, bi) => (
@@ -63,7 +66,18 @@ export function WorkoutView({ workout, title, savedName, onStart, onRegenerate, 
                                 <li key={i}>
                                     <div className="item-head">
                                         <span className="item-name">{ex.name}</span>
-                                        <span className="item-dose">{dose(it, !!ex.perSide)}</span>
+                                        <span className="item-dose">
+                                            {dose(it, !!ex.perSide)}
+                                            <button
+                                                type="button"
+                                                className="item-remove"
+                                                aria-label={`移除 ${ex.name}`}
+                                                title="从这次训练中移除"
+                                                onClick={() => onRemoveItem(bi, i)}
+                                            >
+                                                ×
+                                            </button>
+                                        </span>
                                     </div>
                                     <details className="item-detail">
                                         <summary className="muted small">

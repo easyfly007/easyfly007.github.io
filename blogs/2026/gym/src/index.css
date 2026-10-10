@@ -788,3 +788,105 @@ button.big {
     font-size: 18px;
     padding: 10px 20px;
 }
+
+/* ---------- 我的 / 训练日历 ---------- */
+.app-header.row.space {
+    align-items: flex-start;
+}
+
+.text-input {
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--text);
+    min-width: 0;
+    flex: 1;
+}
+
+.profile-name {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.profile-prompt {
+    border-color: var(--accent);
+}
+
+.month-title {
+    align-self: center;
+    font-weight: 600;
+}
+
+.calendar {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 4px;
+    table-layout: fixed;
+}
+
+.calendar th {
+    font-size: 12px;
+    font-weight: normal;
+    color: var(--muted);
+}
+
+.cal-day {
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    font-size: 14px;
+}
+
+.cal-min {
+    font-size: 10px;
+}
+
+.cal-day.lv1,
+.cal-key.lv1 {
+    background: color-mix(in srgb, var(--bar) 25%, var(--card));
+}
+
+.cal-day.lv2,
+.cal-key.lv2 {
+    background: color-mix(in srgb, var(--bar) 55%, var(--card));
+}
+
+.cal-day.lv3,
+.cal-key.lv3 {
+    background: var(--bar);
+    color: #fff;
+}
+
+.cal-day.today {
+    border: 2px solid var(--text);
+}
+
+.cal-day.picked {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.cal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 6px 0 4px;
+}
+
+.cal-key {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 4px;
+    vertical-align: -2px;
+}

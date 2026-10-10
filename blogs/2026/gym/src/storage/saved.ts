@@ -6,6 +6,14 @@ const HISTORY_KEY = 'gym.history.v1';
 const WEIGHT_KEY = 'gym.weightKg.v1';
 const SETTINGS_KEY = 'gym.settings.v1';
 const FAVORITES_KEY = 'gym.favorites.v1';
+const PROFILE_KEY = 'gym.profile.v1';
+
+// 我的档案：名字和绑定的档案文件
+export interface ProfileInfo {
+    name?: string;
+    fileName?: string;          // 已绑定的档案文件名（只用于显示）
+    lastSyncAt?: string;
+}
 
 export const DEFAULT_SETTINGS: Settings = { coach: 'female', voice: 'female' };
 // 只保留最近这么多条训练记录，避免本地存储无限增长
@@ -88,6 +96,10 @@ export function createSavedStore(store: KeyValueStore) {
             return item;
         },
 
+        replaceHistory(list: WorkoutRecord[]): void {
+            writeJson(store, HISTORY_KEY, list.slice(0, MAX_RECORDS));
+        },
+
         removeRecord(id: string): void {
             const all = readJson<WorkoutRecord[]>(store, HISTORY_KEY, []);
             writeJson(store, HISTORY_KEY, all.filter((r) => r.id !== id));
@@ -105,6 +117,10 @@ export function createSavedStore(store: KeyValueStore) {
             return { ...DEFAULT_SETTINGS, ...readJson<Partial<Settings>>(store, SETTINGS_KEY, {}) };
         },
 
+        hasSettings(): boolean {
+            return store.getItem(SETTINGS_KEY) !== null;
+        },
+
         saveSettings(s: Settings): void {
             writeJson(store, SETTINGS_KEY, s);
         },
@@ -116,6 +132,14 @@ export function createSavedStore(store: KeyValueStore) {
 
         saveFavorites(ids: string[]): void {
             writeJson(store, FAVORITES_KEY, ids);
+        },
+
+        profileInfo(): ProfileInfo {
+            return readJson<ProfileInfo>(store, PROFILE_KEY, {});
+        },
+
+        saveProfileInfo(p: ProfileInfo): void {
+            writeJson(store, PROFILE_KEY, p);
         },
     };
 }

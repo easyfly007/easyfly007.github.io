@@ -181,3 +181,12 @@ Step {
 - `addExercise(workout, id)`：按动作的 `phases` 选区块（main > warmup > cooldown，缺区块就新建）；新动作的组数、次数/时长、休息跟随区块第一个动作（循环区块用计时做/休）；`estimatedMin` 由时间线重算
 - `removeItem(workout, blockIndex, itemIndex)`：移除后丢掉空区块，重算时长
 - 喜欢的动作：`generateWorkout(c, seed, favorites)`，在排序打分里加 0.7（所有阶段），只影响先后，不绕过过滤；存在 localStorage `gym.favorites.v1`
+
+## 训练档案（`src/storage/profile.ts`、`profileFile.ts`）
+
+- `ProfileFile`：`{ format: 'gym-profile', version: 1, name, updatedAt, weightKg?, settings?, favorites, records }`
+- `mergeProfile`：记录按 id 取并集（新的在前），喜欢的动作取并集，本机没有的体重/设置用文件里的
+- 文件系统访问（Chrome/Edge 桌面）：`showSaveFilePicker` 新建 / `showOpenFilePicker` 打开，文件句柄存在 IndexedDB（`gym-files`），
+  读写前 `queryPermission`，需要时在用户点击后 `requestPermission`
+- 不支持时：导出用 `navigator.share`（手机）或下载，导入用 `<input type=file>`
+- 名字和绑定的文件名存在 localStorage `gym.profile.v1`；`name` 为空字符串表示用户点过"以后再说"

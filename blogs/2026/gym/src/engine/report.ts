@@ -200,3 +200,62 @@ export function streakDays(records: WorkoutRecord[], today: Date): number {
     }
     return n;
 }
+
+// ---------- 月历 ----------
+
+// 某月的日历格子：按周排（周一开始），不属于本月的格子为 null
+export function monthGrid(year: number, month: number): (Date | null)[][] {
+    const first = new Date(year, month, 1);
+    const days = new Date(year, month + 1, 0).getDate();
+    const lead = (first.getDay() + 6) % 7;
+    const cells: (Date | null)[] = Array.from({ length: lead }, () => null);
+    for (let d = 1; d <= days; d++)
+        cells.push(new Date(year, month, d));
+    while (cells.length % 7 !== 0)
+        cells.push(null);
+    const weeks: (Date | null)[][] = [];
+    for (let i = 0; i < cells.length; i += 7)
+        weeks.push(cells.slice(i, i + 7));
+    return weeks;
+}
+
+export interface MonthSummary {
+    count: number;
+    seconds: number;
+    activeDays: number;
+    kcal?: number;
+    muscles: { muscle: Muscle; seconds: number }[];   // 本月练得最多的部位，多到少
+    byDay: Map<string, { seconds: number; records: WorkoutRecord[] }>;
+}
+
+export function monthSummary(records: WorkoutRecord[], year: number, month: number, weightKg?: number): MonthSummary {
+    const byDay = new Map<string, { seconds: number; records: WorkoutRecord[] }>();
+    const muscles = new Map<Muscle, number>();
+    let seconds = 0;
+    let kcal = 0;
+    let count = 0;
+    for (const r of records) {
+        const d = new Date(r.startedAt);
+        if (d.getFullYear() !== year || d.getMonth() !== month)
+            continue;
+        const s = summarize(r, weightKg);
+        count += 1;
+        seconds += s.doneSec;
+        kcal += s.kcal ?? 0;
+        for (const m of s.muscles)
+            muscles.set(m.muscle, (muscles.get(m.muscle) ?? 0) + m.seconds);
+        const key = dayKey(d);
+        const day = byDay.get(key) ?? { seconds: 0, records: [] };
+        day.seconds += s.doneSec;
+        day.records.push(r);
+        byDay.set(key, day);
+    }
+    return {
+        count,
+        seconds,
+        activeDays: byDay.size,
+        kcal: weightKg ? kcal : undefined,
+        muscles: [...muscles.entries()].map(([muscle, sec]) => ({ muscle, seconds: sec })).sort((a, b) => b.seconds - a.seconds),
+        byDay,
+    };
+}

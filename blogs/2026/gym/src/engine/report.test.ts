@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Block, WorkoutRecord } from '../types';
 import { BASE } from './fixtures';
 import { generateWorkout } from './generate';
-import { dailyTotals, streakDays, summarize, weeklyTotals } from './report';
+import { dailyTotals, monthGrid, monthSummary, streakDays, summarize, weeklyTotals } from './report';
 import { buildTimeline, PREPARE_SEC, totalSeconds } from './timeline';
 
 // 准备 10 秒 → 深蹲 30 秒（10 次 × 3 秒）→ 休息 30 → 深蹲 30 → 休息 30 → 弓步 左 30 / 换边 5 / 右 30
@@ -91,5 +91,32 @@ describe('history aggregation', () => {
         expect(streakDays(records, today)).toBe(2);
         expect(streakDays(records, new Date(2026, 9, 11))).toBe(2);
         expect(streakDays(records, new Date(2026, 9, 12))).toBe(0);
+    });
+});
+
+describe('month calendar', () => {
+    it('lays out a month in Monday-first weeks', () => {
+        const weeks = monthGrid(2026, 9); // 2026 年 10 月，1 日是周四
+        expect(weeks[0].slice(0, 3)).toEqual([null, null, null]);
+        expect(weeks[0][3]!.getDate()).toBe(1);
+        expect(weeks.flat().filter(Boolean)).toHaveLength(31);
+        expect(weeks.every((w) => w.length === 7)).toBe(true);
+    });
+
+    it('sums one month of training by day', () => {
+        const full: [number, number][] = [[0, TOTAL]];
+        const records = [
+            record(full, new Date(2026, 9, 9, 7).toISOString()),
+            record(full, new Date(2026, 9, 9, 19).toISOString()),
+            record(full, new Date(2026, 9, 1, 7).toISOString()),
+            record(full, new Date(2026, 8, 30, 7).toISOString()),
+        ];
+        const m = monthSummary(records, 2026, 9, 60);
+        expect(m.count).toBe(3);
+        expect(m.activeDays).toBe(2);
+        expect(m.seconds).toBe(TOTAL * 3);
+        expect(m.byDay.get('2026-10-09')!.records).toHaveLength(2);
+        expect(m.kcal).toBeGreaterThan(0);
+        expect(m.muscles.length).toBeGreaterThan(0);
     });
 });

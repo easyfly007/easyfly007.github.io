@@ -83,10 +83,24 @@ describe('App flow', () => {
         click('计算');
         expect(screen.getByText(/^约 \d+ 千卡$/)).toBeTruthy();
 
+        // 第一次训练后提示保存档案；这个浏览器（测试环境）不能直接读写文件，"以后再说"
+        expect(screen.getByText('保存训练档案')).toBeTruthy();
+        click('以后再说');
+        expect(screen.queryByText('保存训练档案')).toBeNull();
+
         click('返回');
+        click('👤 我的');
         const history = screen.getByText('训练记录').closest('section')!;
         expect(within(history).getByText(/^室内-瑜伽垫-15分钟/)).toBeTruthy();
+        expect(screen.getByText('训练日历')).toBeTruthy();
+        expect(screen.getByText('本月总结')).toBeTruthy();
         expect(JSON.parse(window.localStorage.getItem('gym.history.v1')!)).toHaveLength(1);
+
+        // 填名字
+        fireEvent.change(screen.getByLabelText('你的名字'), { target: { value: '小明' } });
+        click('保存');
+        expect(screen.getByText('小明')).toBeTruthy();
+        expect(screen.getByText(/不能直接读写本地文件/)).toBeTruthy();
     });
 
     it('shows a report when ending early after the first minute', () => {

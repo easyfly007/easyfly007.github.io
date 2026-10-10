@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ConditionsForm } from './components/ConditionsForm';
 import { ExerciseLibrary } from './components/ExerciseLibrary';
-import { History } from './components/History';
+import { ProfilePage, ProfilePrompt } from './components/ProfilePage';
 import { Player } from './components/Player';
 import { Report } from './components/Report';
 import { SavedList } from './components/SavedList';
@@ -13,6 +13,8 @@ import { newSeed } from './engine/random';
 import { MIN_RECORD_SEC, playedSeconds } from './engine/report';
 import { describeConditions } from './labels';
 import { setVoiceGender, unlockAudio } from './speech';
+import { buildProfile, profileText } from './storage/profile';
+import { writeBoundFile } from './storage/profileFile';
 import { createSavedStore } from './storage/saved';
 import type { Conditions, SavedWorkout, Settings, Workout, WorkoutRecord } from './types';
 
@@ -30,7 +32,7 @@ const DEFAULT_CONDITIONS: Conditions = {
     rest: 'normal',
 };
 
-type View = 'home' | 'plan' | 'player' | 'report' | 'library';
+type View = 'home' | 'plan' | 'player' | 'report' | 'library' | 'profile';
 
 function App() {
     const store = useMemo(() => createSavedStore(window.localStorage), []);
@@ -47,6 +49,9 @@ function App() {
     const [notice, setNotice] = useState<string | null>(null);
     const [favorites, setFavorites] = useState<string[]>(() => store.favorites());
     const [libraryFrom, setLibraryFrom] = useState<'home' | 'plan'>('home');
+    // 训练后同步档案文件的结果；askProfile：第一次训练后提示保存档案
+    const [sync, setSync] = useState<'ok' | 'need-permission' | null>(null);
+    const [askProfile, setAskProfile] = useState(false);
 
     useEffect(() => {
         setVoiceGender(settings.voice);
@@ -107,6 +112,33 @@ function App() {
         setHistory(store.history());
         setReport(r);
         setView('report');
+        syncProfile(false);
+    }
+
+    // 训练记录同步到档案文件：没绑定文件且从没填过名字时，提示保存档案
+    function syncProfile(interactive: boolean) {
+        const info = store.profileInfo();
+        setSync(null);
+        setAskProfile(info.name === undefined);
+        if (!info.fileName)
+            return;
+        writeBoundFile(profileText(buildProfile(store, info.name ?? '')), interactive)
+            .then((res) => {
+                if (res.status === 'ok') {
+                    store.saveProfileInfo({ ...store.profileInfo(), lastSyncAt: new Date().toISOString() });
+                    setSync('ok');
+                } else if (res.status === 'need-permission')
+                    setSync('need-permission');
+            })
+            .catch(() => setSync('need-permission'));
+    }
+
+    // 档案合并后重新读取本机数据
+    function reloadLocal() {
+        setHistory(store.history());
+        setFavorites(store.favorites());
+        setWeightKg(store.weightKg());
+        setSettings(store.settings());
     }
 
     function openRecord(r: WorkoutRecord) {
@@ -160,12 +192,24 @@ function App() {
 
     return (
         <main>
-            <header className="app-header">
-                <h1>健身计划生成器</h1>
-                <p className="muted">告诉我你今天的条件，生成一节课，跟着做就好</p>
+            <header className="app-header row space">
+                <div>
+                    <h1>健身计划生成器</h1>
+                    <p className="muted">告诉我你今天的条件，生成一节课，跟着做就好</p>
+                </div>
+                <button type="button" onClick={() => setView('profile')}>👤 我的</button>
             </header>
 
-            {view === 'library' ? (
+            {view === 'profile' ? (
+                <ProfilePage
+                    store={store}
+                    records={history}
+                    weightKg={weightKg}
+                    onChanged={reloadLocal}
+                    onOpenRecord={openRecord}
+                    onBack={() => setView('home')}
+                />
+            ) : view === 'library' ? (
                 <ExerciseLibrary
                     favorites={favorites}
                     coach={settings.coach}
@@ -176,13 +220,27 @@ function App() {
                     onBack={() => setView(libraryFrom === 'plan' && workout ? 'plan' : 'home')}
                 />
             ) : view === 'report' && report ? (
-                <Report
+                <>
+                    {sync === 'ok' && <p className="notice">已同步到档案文件</p>}
+                    {sync === 'need-permission' && (
+                        <p className="notice">
+                            训练记录已保存在本机，但浏览器需要你允许才能写入档案文件。
+                            <button type="button" onClick={() => syncProfile(true)}>同步到档案文件</button>
+                        </p>
+                    )}
+                    {askProfile && <ProfilePrompt store={store} onDone={() => {
+                        setAskProfile(false);
+                        setSync(store.profileInfo().fileName ? 'ok' : null);
+                    }}
+                    />}
+                    <Report
                     record={report}
                     history={history}
                     weightKg={weightKg}
                     onWeightChange={changeWeight}
                     onBack={() => setView('home')}
-                />
+                    />
+                </>
             ) : view === 'plan' && workout ? (
                 <>
                     {notice && <p className="notice">{notice}</p>}
@@ -216,7 +274,6 @@ function App() {
                         onDelete={remove}
                     />
                     <SettingsCard value={settings} onChange={changeSettings} />
-                    <History records={history} onOpen={openRecord} />
                 </>
             )}
         </main>

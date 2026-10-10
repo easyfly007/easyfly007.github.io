@@ -481,7 +481,26 @@ section.block { padding-block: 56px; border-top: 1px solid var(--line); }
   overflow: hidden;
 }
 @media (max-width: 820px) { .reach { grid-template-columns: minmax(0, 1fr); } }
-.map { background: var(--sea); min-width: 0; }
+.map { background: var(--sea); min-width: 0; position: relative; }
+/* 三层严格按地图比例叠放（.map 可能被右侧面板拉高） */
+#smokeCv, #mapTop { position: absolute; left: 0; top: 0; width: 100%; height: auto; aspect-ratio: 640 / 500; }
+#smokeCv { pointer-events: none; }
+.mapdate {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.mapdate b { font-size: 1.25rem; font-weight: 700; color: var(--ink); }
+.mapdate span { font-size: var(--step--1); color: var(--muted); }
 .map svg { display: block; width: 100%; height: auto; }
 .map .land { fill: var(--land); stroke: color-mix(in srgb, var(--muted) 45%, transparent); stroke-width: 1; }
 .map .grat { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 5; opacity: 0.35; }
@@ -1017,7 +1036,10 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
 
       <div class="reach">
         <div class="map">
-          <svg id="map" viewBox="0 0 640 500" role="group" aria-label="东南亚烟霾影响范围示意图"></svg>
+          <svg id="map" viewBox="0 0 640 500" aria-hidden="true"></svg>
+          <canvas id="smokeCv" aria-hidden="true"></canvas>
+          <svg id="mapTop" viewBox="0 0 640 500" role="group" aria-label="东南亚烟霾影响范围示意图"></svg>
+          <div class="mapdate" id="mapDate" aria-hidden="true"></div>
         </div>
         <div class="panel" id="panel" aria-live="polite"></div>
       </div>
@@ -1037,14 +1059,15 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
         </div>
         <div class="presets" id="jumps" role="group" aria-label="跳到关键日期"></div>
         <p class="legend">
-          <span><i style="background:var(--ember)"></i>已受影响的地点</span>
+          <span><i style="background:var(--psi-unhealthy)"></i><i style="background:var(--psi-very)"></i><i style="background:var(--psi-hazard)"></i>最近一次读数：不健康 / 非常不健康 / 危险（颜色越深、烟越浓）</span>
+          <span><i style="background:var(--ember)"></i>受影响，但没有找到读数（淡淡一层烟）</span>
           <span><i style="background:var(--land);border:1.5px solid var(--muted)"></i>截至所选日期还没有记录</span>
           <span><i style="background:var(--ember);opacity:.5"></i>火区（闪烁的点）</span>
           <span>↗ 西南季风，风向示意</span>
         </p>
       </div>
       <p class="note">
-        这是示意图：海岸线经过简化，烟雾的范围和浓淡只表示大致方向，不是实测数据。各国用的空气质量指数不同（新加坡、文莱用 PSI，马来西亚用 API，印尼用 ISPU），数字不能直接相互比较。
+        这是示意图：海岸线经过简化。各地烟的浓淡和标记颜色，按截至所选日期最近一次有出处的读数，统一用 PSI 的五级分界示意；两次读数之间沿用上一次的值，中间的日子并没有实测数据。火区冒出的烟按西南季风往东北飘，也是示意，不是实测风场。各国用的空气质量指数不同（新加坡、文莱用 PSI，马来西亚用 API，印尼用 ISPU），数字不能直接相互比较。
       </p>
     </div>
   </section>
@@ -2013,6 +2036,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
   }
 
   var svg = document.getElementById("map");
+  var svgTop = document.getElementById("mapTop");
   var panel = document.getElementById("panel");
   var daySlider = document.getElementById("day");
   var playBtn = document.getElementById("play");
@@ -2054,6 +2078,9 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
         "M" + f1(x2 - 9) + "," + f1(y2) + "L" + f1(x2) + "," + f1(y2) + "L" + f1(x2) + "," + f1(y2 + 9) + '"/>');
     });
 
+    svg.innerHTML = h.join("");
+    // 顶层：火区和地点，浮在烟上面
+    h = [];
     // 火点：每个火区几颗闪烁的点
     var r = rng(3);
     h.push('<g class="fires" data-id="fires" tabindex="0" role="button" aria-label="印尼火区，查看事件">');
@@ -2081,15 +2108,188 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
         '<circle class="dot" cx="' + f1(p[0]) + '" cy="' + f1(p[1]) + '" r="5.5"/>' +
         '<text x="' + f1(p[0]) + '" y="' + f1(p[1]) + '" dx="' + (left ? "-0.75em" : "0.75em") + '" dy="0.35em" text-anchor="' + (left ? "end" : "start") + '">' + s.name + "</text></g>");
     });
-    svg.innerHTML = h.join("");
+    svgTop.innerHTML = h.join("");
   })();
+
+  // ---------- 烟雾动画 ----------
+  // 浓淡依据：各地截至所选日期最近一次有出处的读数（两次读数之间沿用上一次的值，只是示意）
+  var READINGS = [
+    ["sarawak", "8/12", 201, "西连 API 超过 200", ["wiki"]],
+    ["sarawak", "8/21", 242, "西连 API 242", ["wiki"]],
+    ["sarawak", "8/29", 302, "西连 API 302", ["wiki"]],
+    ["sarawak", "8/31", 475, "砂拉越一个监测站 API 475", ["wiki"]],
+    ["sarawak", "9/4", 501, "西连空气质量指数超过 500", ["wiki", "jp"]],
+    ["brunei", "9/1", 164, "文莱 PSI 164–215", ["wiki"]],
+    ["kalteng", "9/2", 1919, "中加里曼丹 ISPU 1,919", ["abc"]],
+    ["sg", "9/4", 101, "新加坡中区 24 小时 PSI 101", ["nea"]],
+    ["sg", "10/9", 181, "新加坡中区 24 小时 PSI 181–192", ["tempo", "malaymail"]],
+    ["kl", "9/18", 198, "雪兰莪 Johan Setia API 198", ["wiki"]],
+    ["johor", "10/7", 203, "峇株巴辖 API 203", ["wiki"]]
+  ].map(function (r) {
+    return { site: r[0], date: r[1], day: dayOf(r[1]), v: r[2], label: r[3], src: r[4] };
+  });
+
+  function latestReading(site, day) {
+    var best = null;
+    READINGS.forEach(function (r) {
+      if (r.site === site && r.day <= day && (!best || r.day >= best.day))
+        best = r;
+    });
+    return best;
+  }
+
+  // 各等级对应的烟浓度（0–1）；受影响但没有读数的地点用一个很淡的值
+  var DENS_BY_BAND = [0.12, 0.2, 0.45, 0.7, 0.95];
+  var DENS_UNKNOWN = 0.18;
+
+  function siteDensity(k, day) {
+    if (!SITES[k].ll || SITES[k].first > day)
+      return 0;
+    var r = latestReading(k, day);
+    return r ? DENS_BY_BAND[bandIndex(r.v)] : DENS_UNKNOWN;
+  }
+  function fireIntensity(day) {
+    return 0.3 + 0.7 * Math.min(1, day / 40);
+  }
+
+  var smokeCv = document.getElementById("smokeCv");
+  var sctx = smokeCv.getContext("2d");
+  var mapDate = document.getElementById("mapDate");
+  var puffs = [];
+  var MAX_PUFFS = 650;
+  var sprite = null;
+  var spriteColor = "";
+  var sRng = rng(29);
+
+  // 预先画好一团模糊的烟，之后只做贴图，省得每帧算渐变
+  function makeSprite() {
+    var col = getComputedStyle(document.documentElement).getPropertyValue("--smoke").trim() || "#a88a4e";
+    if (col === spriteColor && sprite)
+      return;
+    spriteColor = col;
+    sprite = document.createElement("canvas");
+    sprite.width = 64;
+    sprite.height = 64;
+    var g = sprite.getContext("2d");
+    var grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, col);
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+  }
+
+  function spawn(x, y, kind, strength) {
+    if (puffs.length >= MAX_PUFFS)
+      return;
+    var fire = kind === "fire";
+    puffs.push({
+      x: x + (sRng() - 0.5) * (fire ? 24 : 36),
+      y: y + (sRng() - 0.5) * (fire ? 24 : 36),
+      // 西南季风：整体往东北（右上）飘
+      vx: fire ? 0.2 + sRng() * 0.12 : 0.05 + sRng() * 0.06,
+      vy: fire ? -0.13 - sRng() * 0.09 : -0.03 - sRng() * 0.05,
+      age: 0,
+      life: fire ? 280 + sRng() * 160 : 200 + sRng() * 140,
+      r0: fire ? 12 : 16,
+      r1: fire ? 64 : 46,
+      a: fire ? 0.05 * strength : 0.025 + 0.08 * strength
+    });
+  }
+
+  function stepSmoke() {
+    var fi = fireIntensity(selDay);
+    FIRE_AREAS.forEach(function (ll) {
+      if (sRng() < 0.4 * fi) {
+        var p = P(ll);
+        spawn(p[0], p[1], "fire", fi);
+      }
+    });
+    Object.keys(SITES).forEach(function (k) {
+      var d = siteDensity(k, selDay);
+      if (d > 0 && sRng() < d * 0.55) {
+        var p = P(SITES[k].ll);
+        spawn(p[0], p[1], "site", d);
+      }
+    });
+    for (var i = puffs.length - 1; i >= 0; i--) {
+      var q = puffs[i];
+      q.age += 1;
+      q.x += q.vx + (sRng() - 0.5) * 0.15;
+      q.y += q.vy + (sRng() - 0.5) * 0.15;
+      if (q.age >= q.life)
+        puffs.splice(i, 1);
+    }
+  }
+
+  function drawSmoke() {
+    var w = smokeCv.width;
+    var hgt = smokeCv.height;
+    sctx.clearRect(0, 0, w, hgt);
+    if (!sprite)
+      return;
+    var k = w / 640;
+    puffs.forEach(function (q) {
+      var t = q.age / q.life;
+      var r = (q.r0 + (q.r1 - q.r0) * t) * k;
+      sctx.globalAlpha = q.a * Math.sin(Math.PI * t);
+      sctx.drawImage(sprite, q.x * k - r, q.y * k - r, r * 2, r * 2);
+    });
+    sctx.globalAlpha = 1;
+  }
+
+  function sizeSmoke() {
+    var rect = smokeCv.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    smokeCv.width = Math.max(1, Math.round(rect.width * dpr));
+    smokeCv.height = Math.max(1, Math.round(rect.height * dpr));
+    drawSmoke();
+  }
+
+  // 跳到别的日期时清空旧的烟，再"预跑"一段，画面马上就是这一天的浓淡；
+  // 播放时逐日前进就不清空，让烟连续飘
+  var smokeDay = -1;
+  function warmSmoke() {
+    makeSprite();
+    var jump = smokeDay < 0 || Math.abs(selDay - smokeDay) > 1 || reduce;
+    smokeDay = selDay;
+    if (!jump)
+      return;
+    puffs.length = 0;
+    for (var i = 0; i < 320; i++)
+      stepSmoke();
+    drawSmoke();
+  }
+
+  var smokeRaf = 0;
+  var smokeVisible = true;
+  function smokeTick() {
+    stepSmoke();
+    drawSmoke();
+    smokeRaf = smokeVisible && !reduce ? requestAnimationFrame(smokeTick) : 0;
+  }
+  function startSmoke() {
+    if (!smokeRaf && !reduce)
+      smokeRaf = requestAnimationFrame(smokeTick);
+  }
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      smokeVisible = entries[0].isIntersecting;
+      if (smokeVisible)
+        startSmoke();
+    }).observe(smokeCv);
+  }
+
+  function renderMapDate() {
+    var md = dateOf(selDay);
+    mapDate.innerHTML = "<b>2026-" + (md[0] < 10 ? "0" : "") + md[0] + "-" + (md[1] < 10 ? "0" : "") + md[1] + "</b><span>第 " + (selDay + 1) + " 天</span>";
+  }
 
   // 标签字号：让屏幕上的字大约保持 12px
   function sizeLabels() {
     var w = svg.getBoundingClientRect().width;
     if (!w)
       return;
-    svg.style.setProperty("--lbl", f1(Math.max(12, Math.min(24, 12 * 640 / w))) + "px");
+    svg.parentNode.style.setProperty("--lbl", f1(Math.max(12, Math.min(24, 12 * 640 / w))) + "px");
   }
 
   // 拖动条上标出有事件的日子
@@ -2126,6 +2326,9 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
       h += "<h3>" + s.name + "</h3>";
       if (s.idx)
         h += '<p class="hint">当地空气质量指数：' + s.idx + "</p>";
+      var rd = latestReading(selSite, selDay);
+      if (rd)
+        h += '<p class="hint">最近一次读数（' + rd.date + "）：" + rd.label + "，" + BANDS[bandIndex(rd.v)].name + refs(rd.src) + "</p>";
       if (list.length)
         h += '<ul class="events">' + list.slice().reverse().map(function (e) {
           return eventLi(e, false);
@@ -2165,17 +2368,19 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
   }
 
   function renderMap() {
-    svg.querySelectorAll(".site").forEach(function (g) {
+    svgTop.querySelectorAll(".site").forEach(function (g) {
       var k = g.getAttribute("data-id");
       g.classList.toggle("on", SITES[k].first <= selDay);
       g.classList.toggle("sel", k === selSite);
+      // 有读数的地点按最近一次读数的等级上色
+      var rd = latestReading(k, selDay);
+      g.querySelector(".dot").style.fill = rd ? "var(" + BANDS[bandIndex(rd.v)].token + ")" : "";
     });
     svg.querySelectorAll(".haze circle[data-site]").forEach(function (c) {
-      var on = SITES[c.getAttribute("data-site")].first <= selDay;
-      c.setAttribute("opacity", on ? 0.55 : 0);
+      c.setAttribute("opacity", f1(siteDensity(c.getAttribute("data-site"), selDay) * 0.6));
     });
     // 火区的烟随日期渐浓（示意，不对应实测数值）
-    var fireOp = f1(0.3 + 0.5 * Math.min(1, selDay / 40));
+    var fireOp = f1(0.6 * fireIntensity(selDay));
     svg.querySelectorAll(".haze circle[data-fire]").forEach(function (c) {
       c.setAttribute("opacity", fireOp);
     });
@@ -2189,6 +2394,8 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     daySlider.value = d;
     renderMap();
     renderPanel();
+    renderMapDate();
+    warmSmoke();
   }
 
   function selectSite(k) {
@@ -2222,10 +2429,10 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     var k = g.getAttribute("data-id");
     selectSite(k === selSite ? null : k);
   }
-  svg.addEventListener("click", function (ev) {
+  svgTop.addEventListener("click", function (ev) {
     onSite(ev.target);
   });
-  svg.addEventListener("keydown", function (ev) {
+  svgTop.addEventListener("keydown", function (ev) {
     if (ev.key !== "Enter" && ev.key !== " ")
       return;
     ev.preventDefault();
@@ -2257,9 +2464,20 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
     }, 220);
   });
 
-  window.addEventListener("resize", sizeLabels);
+  window.addEventListener("resize", function () {
+    sizeLabels();
+    sizeSmoke();
+  });
   sizeLabels();
+  sizeSmoke();
   setDay(LAST_DAY);
+  startSmoke();
+  // 切换深浅色时换烟的颜色
+  if (window.matchMedia)
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+      spriteColor = "";
+      makeSprite();
+    });
 
   // ---------- 成因：泥炭地剖面 ----------
   var PEAT_TOP = 120;      // 地表的 y

@@ -490,3 +490,11 @@ button.big {
     font-size: 11px;
     fill: var(--muted);
 }
+
+.notice {
+    background: var(--chip);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 0 0 16px;
+}

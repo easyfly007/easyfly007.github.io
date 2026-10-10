@@ -42,6 +42,7 @@ function App() {
     const [weightKg, setWeightKg] = useState<number | undefined>(() => store.weightKg());
     const [startedAt, setStartedAt] = useState('');
     const [settings, setSettings] = useState<Settings>(() => store.settings());
+    const [notice, setNotice] = useState<string | null>(null);
 
     useEffect(() => {
         setVoiceGender(settings.voice);
@@ -59,6 +60,7 @@ function App() {
         setConditions(c);
         setWorkout(generateWorkout(c, newSeed()));
         setSavedId(null);
+        setNotice(null);
         setView('plan');
     }
 
@@ -66,6 +68,7 @@ function App() {
         setWorkout(s.workout);
         setConditions(s.workout.conditions);
         setSavedId(s.id);
+        setNotice(null);
         setView('plan');
     }
 
@@ -81,6 +84,7 @@ function App() {
             setSaved(store.list());
         }
         setStartedAt(new Date().toISOString());
+        setNotice(null);
         setView('player');
     }
 
@@ -89,7 +93,9 @@ function App() {
         if (!workout)
             return;
         const draft = { workout, name: current?.name, startedAt, endedAt: new Date().toISOString(), played };
-        if (playedSeconds({ id: '', ...draft }) < MIN_RECORD_SEC) {
+        const sec = Math.round(playedSeconds({ id: '', ...draft }));
+        if (sec < MIN_RECORD_SEC) {
+            setNotice(`这次实际练了 ${sec} 秒（跳过的部分不算），不足 ${MIN_RECORD_SEC} 秒，没有记录，也不生成训练报告。`);
             setView('plan');
             return;
         }
@@ -146,15 +152,18 @@ function App() {
                     onBack={() => setView('home')}
                 />
             ) : view === 'plan' && workout ? (
-                <WorkoutView
-                    workout={workout}
-                    title={describeConditions(workout.conditions)}
-                    savedName={current?.name}
-                    onStart={() => start()}
-                    onRegenerate={() => generate(workout.conditions)}
-                    onSave={save}
-                    onBack={() => setView('home')}
-                />
+                <>
+                    {notice && <p className="notice">{notice}</p>}
+                    <WorkoutView
+                        workout={workout}
+                        title={describeConditions(workout.conditions)}
+                        savedName={current?.name}
+                        onStart={() => start()}
+                        onRegenerate={() => generate(workout.conditions)}
+                        onSave={save}
+                        onBack={() => setView('home')}
+                    />
+                </>
             ) : (
                 <>
                     <ConditionsForm value={conditions} onChange={setConditions} onGenerate={() => generate(conditions)} />

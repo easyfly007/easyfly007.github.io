@@ -84,6 +84,18 @@ describe('App flow', () => {
         expect(JSON.parse(window.localStorage.getItem('gym.history.v1')!)).toHaveLength(1);
     });
 
+    it('shows a report when ending early after the first minute', () => {
+        render(<App />);
+        click('生成训练');
+        click('▶ 开始跟练');
+        act(() => {
+            vi.advanceTimersByTime(90 * 1000);
+        });
+        click('结束');
+        expect(screen.getByText(/^训练报告 · 完成 \d+%$/)).toBeTruthy();
+        expect(JSON.parse(window.localStorage.getItem('gym.history.v1')!)).toHaveLength(1);
+    });
+
     it('does not record a workout ended within the first minute', () => {
         render(<App />);
         click('生成训练');
@@ -93,6 +105,7 @@ describe('App flow', () => {
         });
         click('结束');
         expect(screen.getByText('修改条件')).toBeTruthy();
+        expect(screen.getByText(/不足 60 秒，没有记录/)).toBeTruthy();
         expect(window.localStorage.getItem('gym.history.v1')).toBeNull();
     });
 

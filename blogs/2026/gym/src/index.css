@@ -501,16 +501,16 @@ button.big {
 
 /* ---------- 人体肌肉图 ---------- */
 :root {
-    --bm-base: #dfe2e6;
-    --bm-none: #c6cbd2;
+    --bm-body: #eef0f3;
+    --bm-outline: #a9b0ba;
     --bm-primary: #e0531f;
     --bm-secondary: #f5b08c;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bm-base: #2f343c;
-        --bm-none: #444a54;
+        --bm-body: #2b3038;
+        --bm-outline: #6b7380;
         --bm-primary: #e8602c;
         --bm-secondary: #8c4a2c;
     }
@@ -538,19 +538,21 @@ button.big {
     text-align: left;
 }
 
-.bm-base {
-    fill: var(--bm-base);
+.bm-outline {
+    fill: var(--bm-body);
+    stroke: var(--bm-outline);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
 }
 
-.bm-none,
+.bm-body {
+    fill: var(--bm-body);
+}
+
 .bm-primary,
 .bm-secondary {
-    stroke: var(--card);
+    stroke: var(--bm-body);
     stroke-width: 0.6;
-}
-
-.bm-none {
-    fill: var(--bm-none);
 }
 
 .bm-primary {

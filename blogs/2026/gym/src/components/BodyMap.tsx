@@ -1,65 +1,68 @@
 import { EXERCISE_MUSCLES, MUSCLE_DETAIL_LABEL, type MuscleDetail } from '../data/muscles';
 
-// 人体肌肉图：正面 + 背面。主要肌肉橙色，次要肌肉浅橙色，其余灰色。
-// 每个视图的坐标系是 100 × 230，人物居中（x = 50）；左右对称的肌肉只画一侧，另一侧镜像
+// 人体肌肉图：正面 + 背面。只画人物轮廓和用到的肌肉：主要肌肉橙色，次要肌肉浅橙色，没用到的不画。
+// 每个视图的坐标系是 100 × 230，人物居中（x = 50），体型按偏健壮的正常人；
+// 左右对称的形状只写一侧（画面左半边），另一侧镜像
 interface Shape {
-    muscle?: MuscleDetail;      // 不填则是身体底色（头、关节、手脚等）
+    muscle?: MuscleDetail;
     d: string;
     mirror?: boolean;           // 是否再镜像画到另一侧
 }
 
+// 人物轮廓：头、颈，加上从中线出发绕半个身体一圈的闭合路径（含手臂、腿、手脚）
 const BODY: Shape[] = [
-    { d: 'M50,5 a9,11 0 1,0 0.01,0 Z' },
-    { d: 'M45,24 h10 v9 h-10 Z' },
-    { d: 'M37,34 Q50,30 63,34 L66,44 Q64,60 61,80 L63,96 L37,96 L39,80 Q36,60 34,44 Z' },
-    { d: 'M34,36 Q27,38 26,48 L24,68 Q26,72 30,70 L33,50 Z', mirror: true },
-    { d: 'M24,70 Q20,80 19,96 L23,97 Q27,84 29,72 Z', mirror: true },
-    { d: 'M20,96 a3.5,5 0 1,0 0.01,0 Z', mirror: true },
-    { d: 'M37,95 Q35,120 38,148 L48,148 Q50,120 50,97 Z', mirror: true },
-    { d: 'M38,148 Q36,175 39,203 L45,203 Q48,175 48,148 Z', mirror: true },
-    { d: 'M38,203 L46,203 L47,211 Q41,213 36,211 Z', mirror: true },
+    { d: 'M50,3.5 a9.5,11.5 0 1,0 0.01,0 Z' },
+    { d: 'M44.5,22 L55.5,22 L56,30 L44,30 Z' },
+    {
+        d: 'M50.5,26 L45,26 C45,29 44,31 41,32 C35,33 28,34 24,38 C20,41 19,47 19,52 C18,58 17,64 17,70 '
+            + 'C16,74 15,78 14,84 C13,90 13,96 13,100 C13,103 14,106 15,108 C14,112 15,117 18,118 '
+            + 'C21,118 22,113 22,108 C23,104 23,98 24,92 C25,86 26,80 26,76 C27,70 28,64 29,58 '
+            + 'C30.5,62 32,70 33,76 C34,82 33,88 31,94 C29,100 29,106 30,112 C30,124 31,134 33,146 '
+            + 'C34,152 34,156 33,160 C31,168 31,178 33,190 C34,198 35,204 36,208 C33,211 32,214 35,215 '
+            + 'L45,215 C46,213 46,210 45,207 C45,198 46,188 46,178 C46,168 47,160 47,154 '
+            + 'C48,140 49,124 49.5,112 L50.5,104 Z',
+        mirror: true,
+    },
 ];
 
 const FRONT: Shape[] = [
-    { muscle: 'traps', d: 'M45,29 Q41,32 38,34 L45.5,34 Z', mirror: true },
-    { muscle: 'delts', d: 'M36,35 Q28,36 27,44 Q28,49 31,50 Q34,44 39,39 Z', mirror: true },
-    { muscle: 'chest', d: 'M49,37 Q41,35 38,39 Q35,46 38,51 Q44,54 49,52 Z', mirror: true },
-    { muscle: 'biceps', d: 'M30,51 Q27,52 26,58 L25,66 Q27,68 29,67 Q31,60 32,52 Z', mirror: true },
-    { muscle: 'forearms', d: 'M25,71 Q21,78 20,92 L23,93 Q26,82 28,73 Z', mirror: true },
-    { muscle: 'abs', d: 'M44.5,55 h4.5 v7.5 h-4.5 Z', mirror: true },
-    { muscle: 'abs', d: 'M44.5,64 h4.5 v7.5 h-4.5 Z', mirror: true },
-    { muscle: 'abs', d: 'M44.5,73 h4.5 v8 h-4.5 Z', mirror: true },
-    { muscle: 'obliques', d: 'M43,55 Q38,58 38,68 Q38,78 41,85 L43,85 Z', mirror: true },
-    { muscle: 'hip_flexors', d: 'M43,88 Q39,90 38.5,96 L44,99 L48.5,92 Z', mirror: true },
-    { muscle: 'quads', d: 'M38,100 Q36,118 39,143 Q43,147 46,143 Q47,124 47,104 Q44,100 40,99 Z', mirror: true },
-    { muscle: 'adductors', d: 'M48.5,100 Q47.5,114 47.5,128 L49.5,126 L49.5,100 Z', mirror: true },
-    { muscle: 'calves', d: 'M38.5,155 Q36,168 38.5,183 Q41,186 43,183 Q44.5,168 43.5,155 Q41,152 38.5,155 Z', mirror: true },
+    { muscle: 'traps', d: 'M45,28.5 C43,31 40,32.2 37,33 L45,33.6 Z', mirror: true },
+    { muscle: 'delts', d: 'M38,34.5 C31,33.5 24,36 21.5,43 C20.5,48 21,52 23,54 C26,48 30,42 38,38.5 Z', mirror: true },
+    { muscle: 'chest', d: 'M49.5,36.5 C42,35.5 36.5,37.5 33.5,42 C32.5,48 34,53 38,55 C43,57 47,56 49.5,54 Z', mirror: true },
+    { muscle: 'biceps', d: 'M24.5,56 C21.5,58.5 20.5,64 20.5,70 C21.5,74 24,75 26,73 C27,67 28,61 28.2,56.5 Z', mirror: true },
+    { muscle: 'forearms', d: 'M17.5,80 C15.5,86 15.5,94 16.2,101 L19.2,101 C21,94 23,86 24,80.5 Z', mirror: true },
+    { muscle: 'abs', d: 'M44.5,58.5 h4.8 v7 h-4.8 Z', mirror: true },
+    { muscle: 'abs', d: 'M44.5,67 h4.8 v7 h-4.8 Z', mirror: true },
+    { muscle: 'abs', d: 'M44.5,75.5 h4.8 v7.5 h-4.8 Z', mirror: true },
+    { muscle: 'abs', d: 'M45,84.5 h4.3 v7 h-4.3 Z', mirror: true },
+    { muscle: 'obliques', d: 'M42.5,58 C38,60 35.5,66 35.5,74 C35.5,80 37.5,86 41,90 L43,90 C43,80 43,68 42.5,58 Z', mirror: true },
+    { muscle: 'hip_flexors', d: 'M41,93.5 C38,96 37,101 38,106 L45,104 L48.5,97 Z', mirror: true },
+    { muscle: 'quads', d: 'M33.5,109 C31.5,119 32.5,132 36,144 C39,148 43,148 45,145 C47,135 47,122 46,110.5 C43,105 37.5,104 33.5,109 Z', mirror: true },
+    { muscle: 'adductors', d: 'M48.6,105 C47.2,112 46.6,124 46.8,134 L49.2,128 L49.6,106 Z', mirror: true },
+    { muscle: 'calves', d: 'M34,162 C32.5,170 32.5,180 34.5,188 C36.5,191 38.5,190 39.5,187 C40.5,178 40.5,168 39.5,161 Z', mirror: true },
 ];
 
 const BACK: Shape[] = [
-    { muscle: 'lats', d: 'M48,46 Q41,43 36.5,44 Q36,58 40,70 Q45,77 49,77 Z', mirror: true },
-    { muscle: 'traps', d: 'M50,26 L41,33 Q44,40 50,57 Q56,40 59,33 Z' },
-    { muscle: 'delts', d: 'M36,35 Q28,36 27,44 Q28,49 31,50 Q34,44 39,39 Z', mirror: true },
-    { muscle: 'triceps', d: 'M30,51 Q27,52 26,58 L25,66 Q27,68 29,67 Q31,60 32,52 Z', mirror: true },
-    { muscle: 'forearms', d: 'M25,71 Q21,78 20,92 L23,93 Q26,82 28,73 Z', mirror: true },
-    { muscle: 'lower_back', d: 'M44.5,73 h5 v17 h-5 Z', mirror: true },
-    { muscle: 'glutes', d: 'M49.5,93 Q41,90 37.5,96 Q36.5,106 40,110 Q46,112 49.5,108 Z', mirror: true },
-    { muscle: 'hamstrings', d: 'M38.5,114 Q37.5,128 39.5,144 Q43,147 46.5,144 Q48,128 48,114 Q43,111.5 38.5,114 Z', mirror: true },
-    { muscle: 'calves', d: 'M38.5,154 Q35.5,166 38.5,180 Q41.5,184 44.5,180 Q47,166 46,154 Q42,151 38.5,154 Z', mirror: true },
+    { muscle: 'lats', d: 'M47,47 C41,44 35,44 31.5,47.5 C31.5,58 33.5,68 37,77 C41,83 46,86 49.5,86 L49.5,62 Z', mirror: true },
+    { muscle: 'traps', d: 'M50,25.5 C46,29 41,31 37,33 C41,37 45,44 50,60 C55,44 59,37 63,33 C59,31 54,29 50,25.5 Z' },
+    { muscle: 'delts', d: 'M38,34.5 C31,33.5 24,36 21.5,43 C20.5,48 21,52 23,54 C26,48 30,42 38,38.5 Z', mirror: true },
+    { muscle: 'triceps', d: 'M24.5,56 C21.5,58.5 20.5,64 20.5,70 C21.5,74 24,75 26,73 C27,67 28,61 28.2,56.5 Z', mirror: true },
+    { muscle: 'forearms', d: 'M17.5,80 C15.5,86 15.5,94 16.2,101 L19.2,101 C21,94 23,86 24,80.5 Z', mirror: true },
+    { muscle: 'lower_back', d: 'M44.5,72 C43.5,78 43.5,86 44.5,94 L49.5,94 L49.5,72 Z', mirror: true },
+    { muscle: 'glutes', d: 'M49.7,96 C42,94 35,96 32,104 C31,112 35,118 41,119 C45,119 48,117 49.7,114 Z', mirror: true },
+    { muscle: 'hamstrings', d: 'M33.5,121 C32.5,131 34,141 37,149 C40,152 44,152 46,148 C47.5,138 47.5,128 47,121 C42,118 37,118 33.5,121 Z', mirror: true },
+    { muscle: 'calves', d: 'M33.5,160 C31,168 31,178 34,186 C37,190 41,190 43,186 C45,178 45.5,168 44.5,160 C41,156 36,156 33.5,160 Z', mirror: true },
 ];
 
 const MIRROR = 'matrix(-1 0 0 1 100 0)';
 
-type Level = 'primary' | 'secondary' | 'none';
-
-function levelOf(muscle: MuscleDetail | undefined, primary: MuscleDetail[], secondary: MuscleDetail[]): Level | 'base' {
-    if (!muscle)
-        return 'base';
-    if (primary.includes(muscle))
-        return 'primary';
-    if (secondary.includes(muscle))
-        return 'secondary';
-    return 'none';
+function paths(shapes: Shape[], cls: string) {
+    return shapes.map((s, i) => (
+        <g key={i}>
+            <path d={s.d} className={cls} />
+            {s.mirror && <path d={s.d} className={cls} transform={MIRROR} />}
+        </g>
+    ));
 }
 
 function Figure({ shapes, primary, secondary, dx, label }: {
@@ -69,20 +72,15 @@ function Figure({ shapes, primary, secondary, dx, label }: {
     dx: number;
     label: string;
 }) {
-    const all = [...BODY, ...shapes];
+    // 左右两半的轮廓各自闭合，先整体描边、再整体填充，中线处的描边会被填充盖住，只留下外轮廓
+    const used = (level: MuscleDetail[]) => shapes.filter((s) => s.muscle && level.includes(s.muscle));
     return (
         <g transform={`translate(${dx} 0)`}>
-            {all.map((s, i) => {
-                const cls = `bm-${levelOf(s.muscle, primary, secondary)}`;
-                const title = s.muscle ? <title>{MUSCLE_DETAIL_LABEL[s.muscle]}</title> : null;
-                return (
-                    <g key={i}>
-                        <path d={s.d} className={cls}>{title}</path>
-                        {s.mirror && <path d={s.d} className={cls} transform={MIRROR}>{title}</path>}
-                    </g>
-                );
-            })}
-            <text x={50} y={226} textAnchor="middle" className="bm-label">{label}</text>
+            {paths(BODY, 'bm-outline')}
+            {paths(BODY, 'bm-body')}
+            {paths(used(secondary), 'bm-secondary')}
+            {paths(used(primary), 'bm-primary')}
+            <text x={50} y={227} textAnchor="middle" className="bm-label">{label}</text>
         </g>
     );
 }

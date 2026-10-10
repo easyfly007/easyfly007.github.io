@@ -155,8 +155,7 @@
     <div class="muted" id="export-note" style="margin-top: 8px">
         导出的文件放到 <code id="export-dir">src/videos/female/squat/</code>，跟练时会自动按次拼接。
     </div>
-    <div class="muted" style="margin-top: 8px">人物模型：three.js 官方示例中的 Michelle（女）和 Soldier（男，原模型是士兵造型），均来自 Mixamo，仅用于效果演示。</div>
-</main>
+    </main>
 
 <script type="module">
 // 加载失败、脚本出错时把原因显示在画面上，而不是一直停在"正在加载"
@@ -167,27 +166,19 @@ function showError(text) {
 }
 window.addEventListener('error', (e) => showError(e.message));
 window.addEventListener('unhandledrejection', (e) => showError(e.reason?.message ?? String(e.reason)));
-message.textContent = '正在加载 3D 引擎……';
 
 const THREE = await import('three');
-const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-const { RoomEnvironment } = await import('three/examples/jsm/environments/RoomEnvironment.js');
-const { createSquatRig, faceForward, squatDepth } = await import('./squat-rig.js');
+const { createMannequin, squatDepth } = await import('./mannequin.js');
 
-// 模型放在本地 demo/models/，不依赖外网 CDN
-const MODELS = {
-    female: new URL('./models/female.glb', import.meta.url).href,
-    male: new URL('./models/male.glb', import.meta.url).href,
-};
 const REPS = 20;
 const REP_SEC = 3;              // 与动作库里深蹲的 secPerRep 一致
 const TOTAL_SEC = REPS * REP_SEC;
 
-// 正面 / 侧面 / 全身：人物面朝 +z，侧面机位在人物左侧（+x）。坐标按 1.7 米身高，加载后按实际身高缩放
+// 正面 / 侧面 / 全身：人物面朝 +z，侧面机位在人物左侧（+x）
 const VIEWS = [
-    { id: 'front', name: '正面', pos: [0, 0.95, 3.8], target: [0, 0.82, 0] },
-    { id: 'side', name: '侧面', pos: [3.8, 0.95, 0.05], target: [0, 0.82, 0.05] },
-    { id: 'full', name: '全身', pos: [2.4, 2.5, 3.0], target: [0, 0.66, 0] },
+    { id: 'front', name: '正面', pos: [0, 1.0, 3.4], target: [0, 0.8, 0] },
+    { id: 'side', name: '侧面', pos: [3.4, 0.95, 0.1], target: [0, 0.78, 0.1] },
+    { id: 'full', name: '全身', pos: [2.3, 2.6, 2.6], target: [0, 0.7, 0] },
 ];
 
 const stage = document.getElementById('stage');
@@ -202,52 +193,32 @@ const exportDir = document.getElementById('export-dir');
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 stage.prepend(renderer.domElement);
 
+const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xe9ecef);
-scene.fog = new THREE.Fog(0xe9ecef, 8, 16);
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.background = new THREE.Color(dark ? 0x1e2127 : 0xeef1f5);
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0xb0b4ba, 0.6));
-const key = new THREE.DirectionalLight(0xffffff, 2.2);
-key.position.set(2.5, 5, 3.5);
-key.castShadow = true;
-key.shadow.mapSize.set(2048, 2048);
-key.shadow.camera.left = -2;
-key.shadow.camera.right = 2;
-key.shadow.camera.top = 2.5;
-key.shadow.camera.bottom = -1;
-key.shadow.radius = 4;
-key.shadow.bias = -0.0005;
-scene.add(key);
-const fill = new THREE.DirectionalLight(0xffffff, 0.6);
-fill.position.set(-3, 2, -2);
-scene.add(fill);
+scene.add(new THREE.HemisphereLight(0xffffff, dark ? 0x30343c : 0xb9c0cc, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(2, 4, 3);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+scene.add(sun);
 
-// 地板 + 瑜伽垫
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(30, 30),
-    new THREE.MeshStandardMaterial({ color: 0xd9dce0, roughness: 0.9 }),
+    new THREE.CircleGeometry(3, 48),
+    new THREE.MeshStandardMaterial({ color: dark ? 0x2a2e35 : 0xffffff, roughness: 1 }),
 );
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
 scene.add(floor);
-const mat = new THREE.Mesh(
-    new THREE.BoxGeometry(0.66, 0.008, 1.8),
-    new THREE.MeshStandardMaterial({ color: 0x3d5a80, roughness: 0.7 }),
-);
-mat.position.set(0, 0.004, 0.1);
-mat.receiveShadow = true;
-scene.add(mat);
+const grid = new THREE.GridHelper(6, 24, dark ? 0x4a505a : 0xc8cdd5, dark ? 0x353a42 : 0xdde1e7);
+grid.position.y = 0.001;
+scene.add(grid);
 
-const camera = new THREE.PerspectiveCamera(30, 16 / 9, 0.1, 50);
+const camera = new THREE.PerspectiveCamera(36, 16 / 9, 0.1, 50);
 
 function resize() {
     renderer.setSize(stage.clientWidth, stage.clientHeight, false);
@@ -255,60 +226,28 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-let rig = null;
-let model = null;
-let coach = 'female';
-const cache = {};
-
 function useView(i) {
     const v = VIEWS[i];
-    const k = rig ? rig.height / 1.7 : 1;
-    camera.position.set(v.pos[0] * k, v.pos[1] * k, v.pos[2] * k);
-    camera.lookAt(v.target[0] * k, v.target[1] * k, v.target[2] * k);
+    camera.position.set(...v.pos);
+    camera.lookAt(...v.target);
     viewNameEl.textContent = `视角：${v.name}`;
 }
 
-// ---------- 加载人物（女 / 男），加载过的直接复用 ----------
-async function loadCoach(which) {
-    exportBtn.disabled = true;
-    if (!cache[which]) {
-        message.hidden = false;
-        message.textContent = '正在加载人物模型……';
-        const gltf = await new GLTFLoader().loadAsync(MODELS[which], (e) => {
-            if (e.total)
-                message.textContent = `正在加载人物模型…… ${Math.round((e.loaded / e.total) * 100)}%`;
-        });
-        const m = gltf.scene;
-        m.traverse((o) => {
-            if (o.isMesh) {
-                o.castShadow = true;
-                o.receiveShadow = true;
-                o.frustumCulled = false;
-            }
-        });
-        // 先摆成 T 姿态，作为骨骼"对准"的起点
-        const tpose = gltf.animations.find((a) => a.name === 'TPose');
-        if (tpose) {
-            const mixer = new THREE.AnimationMixer(m);
-            mixer.clipAction(tpose).play();
-            mixer.update(0);
-            mixer.stopAllAction();
-        }
-        faceForward(THREE, m);
-        const r = createSquatRig(THREE, m);
-        m.position.y -= r.floorY;
-        m.updateMatrixWorld(true);
-        cache[which] = { model: m, rig: r };
-    }
-    if (model)
-        scene.remove(model);
-    ({ model, rig } = cache[which]);
-    scene.add(model);
+// ---------- 人偶（女 / 男） ----------
+const coaches = { female: createMannequin(THREE, 'female'), male: createMannequin(THREE, 'male') };
+let coach = 'female';
+let figure = coaches.female;
+scene.add(figure.root);
+message.hidden = true;
+hud.hidden = false;
+exportBtn.disabled = false;
+
+function setCoach(which) {
+    scene.remove(figure.root);
     coach = which;
+    figure = coaches[which];
+    scene.add(figure.root);
     exportDir.textContent = `src/videos/${which}/squat/`;
-    message.hidden = true;
-    hud.hidden = false;
-    exportBtn.disabled = false;
 }
 
 // ---------- 时间轴 ----------
@@ -318,8 +257,6 @@ let recording = null;           // 导出时：{ view, startMs }
 
 function frame(now) {
     requestAnimationFrame(frame);
-    if (!rig)
-        return;
     let t;
     let viewIndex;
     if (recording) {
@@ -334,7 +271,7 @@ function frame(now) {
         barEl.style.width = `${(t / TOTAL_SEC) * 100}%`;
     }
     const phase = t >= (recording ? REP_SEC : TOTAL_SEC) ? 0 : (t % REP_SEC) / REP_SEC;
-    rig.pose(squatDepth(phase));
+    figure.pose(squatDepth(phase));
     useView(viewIndex);
     renderer.render(scene, camera);
 }
@@ -354,13 +291,13 @@ document.getElementById('views').addEventListener('click', (e) => {
         b.classList.toggle('on', b === btn);
 });
 
-document.getElementById('coach').addEventListener('click', async (e) => {
+document.getElementById('coach').addEventListener('click', (e) => {
     const btn = e.target.closest('button');
     if (!btn || recording || btn.dataset.coach === coach)
         return;
     for (const b of document.querySelectorAll('#coach button'))
         b.classList.toggle('on', b === btn);
-    await loadCoach(btn.dataset.coach);
+    setCoach(btn.dataset.coach);
     startMs = performance.now();
 });
 
@@ -412,9 +349,6 @@ exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = false;
     exportNote.textContent = `已导出 front.${ext} / side.${ext} / full.${ext}，放到 src/videos/${coach}/squat/ 即可在跟练里看到。`;
 });
-
-await loadCoach('female');
-startMs = performance.now();
 </script>
 </body>
 </html>

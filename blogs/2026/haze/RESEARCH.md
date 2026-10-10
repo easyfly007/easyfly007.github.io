@@ -96,6 +96,11 @@
 - NEA 9/5：近期活动看 1 小时 PM2.5，计划看 24 小时 PSI 预报；渠道 haze.gov.sg、NEA、MSS 网站、myENV 应用
 - Mongabay：林业部长 8/6 称预算不够就应增加
 
+## 泥炭地解释（追加，2026-10-10）
+
+- IUCN Issues Brief「Peatlands and climate change」https://iucn.org/resources/issues-brief/peatlands-and-climate-change （PDF 标 nov21）：泥炭地是湿地；"peatland" 指泥炭土壤加地表湿地生境；常年积水使植物分解极慢、残体堆积成泥炭；东南亚为泥炭沼泽森林；陆地最大天然碳库，泥炭土壤含碳超过 6,000 亿吨，最多占全部土壤碳 44%
+- NASA 地球观测站（Image of the Day 2026-09-03）：印尼拥有全球约 36% 的热带泥炭地；1990 年代为大规模种稻挖灌溉渠、排干泥炭沼泽，大幅降低地下水位（Mark Cochrane）；油棕等种植园常见；泥炭火低温阴燃、常在地下蔓延、极难扑灭；一项估计：细颗粒物是其他热带林火 3 倍、二氧化硫 5 倍、有机碳 3 倍、甲烷和一氧化碳 2 倍
+
 ## 现场图片（追加，2026-10-10 核对原网页图注）
 
 - NASA 地球观测站 https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/ ：Aqua MODIS 2026-09-01；图：Lauren Dauphin，数据 NASA EOSDIS LANCE、GIBS/Worldview；文：Adam Voiland。下载 indonesiafires_amo_20260901.jpg（1280×853）

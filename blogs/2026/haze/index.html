@@ -578,6 +578,21 @@ section.block { padding-block: 56px; border-top: 1px solid var(--line); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
 
 /* 成因：卡片 + 泥炭地剖面 */
+.explain {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 32px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--peat-dry);
+  border-radius: 6px;
+  padding: clamp(16px, 3vw, 24px);
+}
+@media (max-width: 700px) { .explain { grid-template-columns: minmax(0, 1fr); } }
+.explain h3 { grid-column: 1 / -1; font-family: var(--font-display); font-weight: 900; font-size: var(--step-1); margin: 0 0 6px; }
+.explain h4 { font-size: var(--step-0); margin: 12px 0 4px; }
+.explain p { margin: 0; font-size: 0.92rem; line-height: 1.75; }
 .causes {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
@@ -1029,6 +1044,22 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
         印尼气象局（BMKG）的说法是：强厄尔尼诺让大部分地区干旱，但火要烧起来，仍然需要人去点<a class="src" href="https://www.abc.net.au/news/2026-09-04/causes-of-indonesian-wildfires-and-how-the-government-tackling/107113456" target="_blank" rel="noopener">ABC</a>。天气把柴晒干，人划了火柴，季风再把烟送出国境。
       </p>
 
+      <div class="explain">
+        <h3>先弄清楚：什么是泥炭地？</h3>
+        <div>
+          <h4>泡在水里的"半腐烂"植物</h4>
+          <p>泥炭地是一种湿地。那里一年到头积水，植物死后分解得极慢，残体一层层堆积下来，就成了泥炭；"泥炭地"指的是泥炭土壤加上长在上面的湿地生境<a class="src" href="https://iucn.org/resources/issues-brief/peatlands-and-climate-change" target="_blank" rel="noopener">IUCN</a>。在东南亚，它原本的样子是泥炭沼泽森林<a class="src" href="https://iucn.org/resources/issues-brief/peatlands-and-climate-change" target="_blank" rel="noopener">IUCN</a>。</p>
+          <h4>和沼泽是一回事吗？</h4>
+          <p>不完全是。沼泽是按"地面积水"来说的，泥炭地是按"地下有泥炭"来说的。原生的泥炭沼泽森林两者都是；挖渠排水、种上作物以后，地面不再积水，不算沼泽了，但泥炭还在，所以仍然是泥炭地，而且是变干了的泥炭地。</p>
+        </div>
+        <div>
+          <h4>一座巨大的碳库</h4>
+          <p>泥炭地是陆地上最大的天然碳库，全球泥炭土壤储存的碳超过 6,000 亿吨，最多占全部土壤碳的 44%<a class="src" href="https://iucn.org/resources/issues-brief/peatlands-and-climate-change" target="_blank" rel="noopener">IUCN</a>。印尼拥有全世界约 36% 的热带泥炭地<a class="src" href="https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/" target="_blank" rel="noopener">NASA</a>。</p>
+          <h4>排干以后为什么难救</h4>
+          <p>1990 年代为了大规模种稻，这一带挖了大量水渠、排干泥炭沼泽，地下水位大幅下降；如今这里油棕等种植园也很常见<a class="src" href="https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/" target="_blank" rel="noopener">NASA</a>。泥炭火在低温下阴燃，常常顺着泥炭层在地下烧，极难扑灭；有估计认为，它产生的细颗粒物是其他热带林火的 3 倍，二氧化硫是 5 倍<a class="src" href="https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/" target="_blank" rel="noopener">NASA</a>。</p>
+        </div>
+      </div>
+
       <div class="causes">
         <article class="cause">
           <div class="no">01</div>
@@ -1209,7 +1240,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
         <a href="https://www.thejakartapost.com/news/2014/09/17/ri-ratifies-haze-treaty.html" target="_blank" rel="noopener"><b>Jakarta Post</b>：2014-09-17：印尼批准烟霾协定<span>https://www.thejakartapost.com/news/2014/09/17/ri-ratifies-haze-treaty.html</span></a>
         <a href="https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent" target="_blank" rel="noopener"><b>WEF</b>：2019-08：印尼森林砍伐禁令永久化<span>https://weforum.org/agenda/2019/08/indonesia-president-makes-moratorium-on-forest-clearance-permanent</span></a>
         <h3>卫星图与实拍照片</h3>
-        <a href="https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/" target="_blank" rel="noopener"><b>NASA 地球观测站</b>：2026-09：泥炭地火灾让印尼天空变暗（9 月 1 日 Aqua 卫星图）<span>https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/</span></a>
+        <a href="https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/" target="_blank" rel="noopener"><b>NASA 地球观测站</b>：2026-09-03：泥炭地火灾让印尼天空变暗（9 月 1 日 Aqua 卫星图；印尼热带泥炭地占比、泥炭火排放）<span>https://science.nasa.gov/missions/aqua/peatland-fires-darken-skies-in-indonesia/</span></a>
         <a href="https://www.earthdata.nasa.gov/news/worldview-image-archive/wildland-fires-indonesia-august-2026" target="_blank" rel="noopener"><b>NASA Earthdata</b>：2026-08-31：印尼林火（8 月 28 日 NOAA-20 卫星图）<span>https://www.earthdata.nasa.gov/news/worldview-image-archive/wildland-fires-indonesia-august-2026</span></a>
         <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/" target="_blank" rel="noopener"><b>NASA</b>：图片与媒体使用指南<span>https://www.nasa.gov/nasa-brand-center/images-and-media/</span></a>
         <a href="https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/07/haze-in-singapore-psi-in-unhealthy-range-across-the-island-pm25-levels-elevated-in-all-regions" target="_blank" rel="noopener"><b>The Star</b>：2026-10-07：新加坡全岛 PSI 不健康（海峡时报照片）<span>https://www.thestar.com.my/aseanplus/aseanplus-news/2026/10/07/haze-in-singapore-psi-in-unhealthy-range-across-the-island-pm25-levels-elevated-in-all-regions</span></a>
@@ -1218,6 +1249,7 @@ footer { padding-block: 40px 56px; border-top: 1px solid var(--line); color: var
         <a href="https://interaksyon.philstar.com/trends-spotlights/2026/09/02/318619/haze-alert-how-filipinos-stay-safe-poor-air-quality/" target="_blank" rel="noopener"><b>Philstar Interaksyon</b>：2026-09-02：菲律宾烟霾警报（路透社照片）<span>https://interaksyon.philstar.com/trends-spotlights/2026/09/02/318619/haze-alert-how-filipinos-stay-safe-poor-air-quality/</span></a>
         <a href="https://tribune.net.ph/2026/09/01/metro-manila-areas-record-high-pm25-levels-amid-indonesia-haze" target="_blank" rel="noopener"><b>Daily Tribune</b>：2026-09-01：大马尼拉 PM2.5 升高<span>https://tribune.net.ph/2026/09/01/metro-manila-areas-record-high-pm25-levels-amid-indonesia-haze</span></a>
         <h3>研究与法规</h3>
+        <a href="https://iucn.org/resources/issues-brief/peatlands-and-climate-change" target="_blank" rel="noopener"><b>IUCN</b>：Issues Brief「泥炭地与气候变化」：泥炭地的定义与储碳量<span>https://iucn.org/resources/issues-brief/peatlands-and-climate-change</span></a>
         <a href="https://journal.untar.ac.id/index.php/hukum/article/view/1073" target="_blank" rel="noopener"><b>Christiawan 2017</b>：Era Hukum 期刊：PP 57/2016 泥炭地地下水位 0.4 米的规定<span>https://journal.untar.ac.id/index.php/hukum/article/view/1073</span></a>
       </div>
     </div>

@@ -5,6 +5,16 @@
 
 const DEG = Math.PI / 180;
 
+// 有的模型面朝 -z（比如 Soldier），先整体转过来，让人物面朝 +z
+export function faceForward(THREE, root) {
+    root.updateMatrixWorld(true);
+    const foot = root.getObjectByName('mixamorigLeftFoot').getWorldPosition(new THREE.Vector3());
+    const toe = root.getObjectByName('mixamorigLeftToeBase').getWorldPosition(new THREE.Vector3());
+    if (toe.z < foot.z)
+        root.rotation.y += Math.PI;
+    root.updateMatrixWorld(true);
+}
+
 export function createSquatRig(THREE, root) {
     const bone = (name) => {
         const b = root.getObjectByName(`mixamorig${name}`);

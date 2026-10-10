@@ -117,3 +117,11 @@ export interface WorkoutRecord {
     endedAt: string;
     played: [number, number][]; // 实际播放过的时间线区间（秒），跳过的部分不算
 }
+
+export type Gender = 'female' | 'male';
+
+// 用户偏好：视频里的教练、语音播报的声音
+export interface Settings {
+    coach: Gender;
+    voice: Gender;
+}

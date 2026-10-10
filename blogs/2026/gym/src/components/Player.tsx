@@ -3,11 +3,12 @@ import { EXERCISE_BY_ID } from '../data/exercises';
 import { buildTimeline, locate, stepStart, totalSeconds } from '../engine/timeline';
 import { formatDuration } from '../labels';
 import { beep, speak, stopSpeaking } from '../speech';
-import type { Step, Workout } from '../types';
+import type { Gender, Step, Workout } from '../types';
 import { ExerciseVideo } from './ExerciseVideo';
 
 interface Props {
     workout: Workout;
+    coach: Gender;
     // 训练做完或中途结束时调用，传出实际播放过的时间线区间（秒）
     onExit: (played: [number, number][]) => void;
 }
@@ -42,7 +43,7 @@ function useWakeLock(active: boolean) {
     }, [active]);
 }
 
-export function Player({ workout, onExit }: Props) {
+export function Player({ workout, coach, onExit }: Props) {
     const steps = useMemo(() => buildTimeline(workout.blocks), [workout]);
     const total = useMemo(() => totalSeconds(steps), [steps]);
 
@@ -169,7 +170,7 @@ export function Player({ workout, onExit }: Props) {
                 {repNow !== undefined && (
                     <div className="reps">第 {repNow} / {step.reps} 次</div>
                 )}
-                {isWork && <ExerciseVideo step={step} intoStep={intoStep} paused={paused} />}
+                {isWork && <ExerciseVideo step={step} intoStep={intoStep} paused={paused} coach={coach} />}
                 <ul className="cues">
                     {ex.cues.map((c) => (
                         <li key={c}>{c}</li>

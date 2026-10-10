@@ -1,10 +1,10 @@
-// 生成动作视频片段清单 docs/video-clips.csv：每个动作 × 每个视角（单侧动作再 × 左右）一行，含文件路径和 AI 生成提示词。
+// 生成动作视频片段清单 docs/video-clips.csv：每位教练 × 每个动作 × 每个视角（单侧动作再 × 左右）一行，含文件路径和 AI 生成提示词。
 // 用法（在本目录下）：npx vite-node scripts/video-list.ts
 import { writeFileSync } from 'node:fs';
 import { EXERCISES } from '../src/data/exercises';
 import { CLIP_VIEW_LABEL, CLIP_VIEWS, clipName, cycleSeconds, TIME_CLIP_SEC, type ClipView } from '../src/engine/clips';
 import { EQUIPMENT_LABEL } from '../src/labels';
-import type { Exercise } from '../src/types';
+import type { Exercise, Gender } from '../src/types';
 
 const CLIP_SEC = 5;
 
@@ -16,9 +16,16 @@ const VIEW_DESC: Record<ClipView, string> = {
 
 const SIDE_LABEL = { left: '左侧', right: '右侧' };
 
-function prompt(e: Exercise, view: ClipView, side?: 'left' | 'right'): string {
+const COACHES: Gender[] = ['female', 'male'];
+const COACH_LABEL: Record<Gender, string> = { female: '女', male: '男' };
+const COACH_DESC: Record<Gender, string> = {
+    female: '同一位女性健身教练',
+    male: '同一位男性健身教练',
+};
+
+function prompt(coach: Gender, e: Exercise, view: ClipView, side?: 'left' | 'right'): string {
     const parts = [
-        '同一位健身教练（使用角色参考图，服装、发型、背景与其他片段完全一致），干净的浅色室内背景',
+        `${COACH_DESC[coach]}（使用该教练的角色参考图，服装、发型、背景与其他片段完全一致），干净的浅色室内背景`,
         VIEW_DESC[view],
         '固定机位，镜头不移动、不变焦、不剪辑，无字幕、无水印、无音乐',
     ];
@@ -42,23 +49,26 @@ function csvCell(s: string | number): string {
     return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
 }
 
-const header = ['文件', '动作 id', '动作', '视角', '侧', '计时/计次', '片段时长(秒)', '跟练中每段时长(秒)', '提示词'];
+const header = ['文件', '教练', '动作 id', '动作', '视角', '侧', '计时/计次', '片段时长(秒)', '跟练中每段时长(秒)', '提示词'];
 const rows: (string | number)[][] = [];
-for (const e of EXERCISES) {
-    const sides: ('left' | 'right' | undefined)[] = e.perSide ? ['left', 'right'] : [undefined];
-    for (const side of sides) {
-        for (const view of CLIP_VIEWS) {
-            rows.push([
-                `src/videos/${e.id}/${clipName(view, side)}.mp4`,
-                e.id,
-                e.name,
-                CLIP_VIEW_LABEL[view],
-                side ? SIDE_LABEL[side] : '',
-                e.mode === 'reps' ? '计次' : '计时',
-                CLIP_SEC,
-                e.mode === 'reps' ? cycleSeconds(e) : TIME_CLIP_SEC,
-                prompt(e, view, side),
-            ]);
+for (const coach of COACHES) {
+    for (const e of EXERCISES) {
+        const sides: ('left' | 'right' | undefined)[] = e.perSide ? ['left', 'right'] : [undefined];
+        for (const side of sides) {
+            for (const view of CLIP_VIEWS) {
+                rows.push([
+                    `src/videos/${coach}/${e.id}/${clipName(view, side)}.mp4`,
+                    COACH_LABEL[coach],
+                    e.id,
+                    e.name,
+                    CLIP_VIEW_LABEL[view],
+                    side ? SIDE_LABEL[side] : '',
+                    e.mode === 'reps' ? '计次' : '计时',
+                    CLIP_SEC,
+                    e.mode === 'reps' ? cycleSeconds(e) : TIME_CLIP_SEC,
+                    prompt(coach, e, view, side),
+                ]);
+            }
         }
     }
 }

@@ -4,11 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3D 动作指导样例</title>
-<!-- 给 CDN 上的 three 扩展模块（GLTFLoader 等）解析 'three' 用；页面自己的脚本用完整地址导入，
-     因为 Vite 开发服务器会改写内联脚本里的裸模块名并忽略 importmap -->
-<script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
-</script>
 <style>
     :root {
         --bg: #f6f7f9;
@@ -140,9 +135,13 @@
             <span id="view-name"></span> · <span id="rep"></span><br>
             <span id="remain"></span>
         </div>
-        <div class="message" id="message">正在加载人物模型（约 3 MB）……</div>
+        <div class="message" id="message">正在加载……</div>
     </div>
     <div class="progress"><div id="bar"></div></div>
+    <div class="row" id="coach">
+        <button type="button" data-coach="female" class="on">女教练</button>
+        <button type="button" data-coach="male">男教练</button>
+    </div>
     <div class="row" id="views">
         <button type="button" data-view="auto" class="on">每次换视角</button>
         <button type="button" data-view="0">只看正面</button>
@@ -154,31 +153,44 @@
         <button type="button" id="export" class="primary" disabled>导出 3 个片段（每个视角一次深蹲）</button>
     </div>
     <div class="muted" id="export-note" style="margin-top: 8px">
-        导出的文件放到 <code>src/videos/squat/</code>，跟练时会自动按次拼接。
+        导出的文件放到 <code id="export-dir">src/videos/female/squat/</code>，跟练时会自动按次拼接。
     </div>
-    <div class="muted" style="margin-top: 8px">人物模型：three.js 官方示例中的 Michelle（来自 Mixamo），仅用于效果演示。</div>
+    <div class="muted" style="margin-top: 8px">人物模型：three.js 官方示例中的 Michelle（女）和 Soldier（男，原模型是士兵造型），均来自 Mixamo，仅用于效果演示。</div>
 </main>
 
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
-import { RoomEnvironment } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/environments/RoomEnvironment.js';
-import { createSquatRig, squatDepth } from './squat-rig.js';
+// 加载失败、脚本出错时把原因显示在画面上，而不是一直停在"正在加载"
+const message = document.getElementById('message');
+function showError(text) {
+    message.hidden = false;
+    message.textContent = `出错了：${text}（按 F12 打开控制台可看详细信息）`;
+}
+window.addEventListener('error', (e) => showError(e.message));
+window.addEventListener('unhandledrejection', (e) => showError(e.reason?.message ?? String(e.reason)));
+message.textContent = '正在加载 3D 引擎……';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r160/examples/models/gltf/Michelle.glb';
+const THREE = await import('three');
+const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+const { RoomEnvironment } = await import('three/examples/jsm/environments/RoomEnvironment.js');
+const { createSquatRig, faceForward, squatDepth } = await import('./squat-rig.js');
+
+// 模型放在本地 demo/models/，不依赖外网 CDN
+const MODELS = {
+    female: new URL('./models/female.glb', import.meta.url).href,
+    male: new URL('./models/male.glb', import.meta.url).href,
+};
 const REPS = 20;
 const REP_SEC = 3;              // 与动作库里深蹲的 secPerRep 一致
 const TOTAL_SEC = REPS * REP_SEC;
 
-// 正面 / 侧面 / 全身：人物面朝 +z，侧面机位在人物左侧（+x）
+// 正面 / 侧面 / 全身：人物面朝 +z，侧面机位在人物左侧（+x）。坐标按 1.7 米身高，加载后按实际身高缩放
 const VIEWS = [
-    { id: 'front', name: '正面', pos: [0, 0.9, 3.6], target: [0, 0.78, 0] },
-    { id: 'side', name: '侧面', pos: [3.6, 0.9, 0.05], target: [0, 0.78, 0.05] },
-    { id: 'full', name: '全身', pos: [2.3, 2.4, 2.9], target: [0, 0.62, 0] },
+    { id: 'front', name: '正面', pos: [0, 0.95, 3.8], target: [0, 0.82, 0] },
+    { id: 'side', name: '侧面', pos: [3.8, 0.95, 0.05], target: [0, 0.82, 0.05] },
+    { id: 'full', name: '全身', pos: [2.4, 2.5, 3.0], target: [0, 0.66, 0] },
 ];
 
 const stage = document.getElementById('stage');
-const message = document.getElementById('message');
 const hud = document.getElementById('hud');
 const viewNameEl = document.getElementById('view-name');
 const repEl = document.getElementById('rep');
@@ -186,6 +198,7 @@ const remainEl = document.getElementById('remain');
 const barEl = document.getElementById('bar');
 const exportBtn = document.getElementById('export');
 const exportNote = document.getElementById('export-note');
+const exportDir = document.getElementById('export-dir');
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -242,43 +255,60 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
+let rig = null;
+let model = null;
+let coach = 'female';
+const cache = {};
+
 function useView(i) {
     const v = VIEWS[i];
-    camera.position.set(...v.pos);
-    camera.lookAt(...v.target);
+    const k = rig ? rig.height / 1.7 : 1;
+    camera.position.set(v.pos[0] * k, v.pos[1] * k, v.pos[2] * k);
+    camera.lookAt(v.target[0] * k, v.target[1] * k, v.target[2] * k);
     viewNameEl.textContent = `视角：${v.name}`;
 }
 
-// ---------- 加载人物 ----------
-let rig = null;
-try {
-    const gltf = await new GLTFLoader().loadAsync(MODEL_URL);
-    const model = gltf.scene;
-    model.traverse((o) => {
-        if (o.isMesh) {
-            o.castShadow = true;
-            o.receiveShadow = true;
+// ---------- 加载人物（女 / 男），加载过的直接复用 ----------
+async function loadCoach(which) {
+    exportBtn.disabled = true;
+    if (!cache[which]) {
+        message.hidden = false;
+        message.textContent = '正在加载人物模型……';
+        const gltf = await new GLTFLoader().loadAsync(MODELS[which], (e) => {
+            if (e.total)
+                message.textContent = `正在加载人物模型…… ${Math.round((e.loaded / e.total) * 100)}%`;
+        });
+        const m = gltf.scene;
+        m.traverse((o) => {
+            if (o.isMesh) {
+                o.castShadow = true;
+                o.receiveShadow = true;
+                o.frustumCulled = false;
+            }
+        });
+        // 先摆成 T 姿态，作为骨骼"对准"的起点
+        const tpose = gltf.animations.find((a) => a.name === 'TPose');
+        if (tpose) {
+            const mixer = new THREE.AnimationMixer(m);
+            mixer.clipAction(tpose).play();
+            mixer.update(0);
+            mixer.stopAllAction();
         }
-    });
-    // 先摆成 T 姿态，作为骨骼"对准"的起点
-    const mixer = new THREE.AnimationMixer(model);
-    const tpose = gltf.animations.find((a) => a.name === 'TPose');
-    if (tpose) {
-        mixer.clipAction(tpose).play();
-        mixer.update(0);
-        mixer.stopAllAction();
+        faceForward(THREE, m);
+        const r = createSquatRig(THREE, m);
+        m.position.y -= r.floorY;
+        m.updateMatrixWorld(true);
+        cache[which] = { model: m, rig: r };
     }
+    if (model)
+        scene.remove(model);
+    ({ model, rig } = cache[which]);
     scene.add(model);
-    model.updateMatrixWorld(true);
-    rig = createSquatRig(THREE, model);
-    model.position.y -= rig.floorY;
-    model.updateMatrixWorld(true);
+    coach = which;
+    exportDir.textContent = `src/videos/${which}/squat/`;
     message.hidden = true;
     hud.hidden = false;
     exportBtn.disabled = false;
-} catch (err) {
-    message.textContent = `人物模型加载失败：${err.message}`;
-    throw err;
 }
 
 // ---------- 时间轴 ----------
@@ -287,6 +317,9 @@ let startMs = performance.now();
 let recording = null;           // 导出时：{ view, startMs }
 
 function frame(now) {
+    requestAnimationFrame(frame);
+    if (!rig)
+        return;
     let t;
     let viewIndex;
     if (recording) {
@@ -304,7 +337,6 @@ function frame(now) {
     rig.pose(squatDepth(phase));
     useView(viewIndex);
     renderer.render(scene, camera);
-    requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
@@ -320,6 +352,16 @@ document.getElementById('views').addEventListener('click', (e) => {
     manualView = v === 'auto' ? null : Number(v);
     for (const b of document.querySelectorAll('#views button'))
         b.classList.toggle('on', b === btn);
+});
+
+document.getElementById('coach').addEventListener('click', async (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || recording || btn.dataset.coach === coach)
+        return;
+    for (const b of document.querySelectorAll('#coach button'))
+        b.classList.toggle('on', b === btn);
+    await loadCoach(btn.dataset.coach);
+    startMs = performance.now();
 });
 
 // ---------- 导出片段：每个视角录一次深蹲（站直 → 蹲下 → 站直），1280×720 ----------
@@ -368,8 +410,11 @@ exportBtn.addEventListener('click', async () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     resize();
     exportBtn.disabled = false;
-    exportNote.textContent = `已导出 front.${ext} / side.${ext} / full.${ext}，放到 src/videos/squat/ 即可在跟练里看到。`;
+    exportNote.textContent = `已导出 front.${ext} / side.${ext} / full.${ext}，放到 src/videos/${coach}/squat/ 即可在跟练里看到。`;
 });
+
+await loadCoach('female');
+startMs = performance.now();
 </script>
 </body>
 </html>

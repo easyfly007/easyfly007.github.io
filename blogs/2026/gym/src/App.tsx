@@ -1,17 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ConditionsForm } from './components/ConditionsForm';
 import { History } from './components/History';
 import { Player } from './components/Player';
 import { Report } from './components/Report';
 import { SavedList } from './components/SavedList';
+import { SettingsCard } from './components/SettingsCard';
 import { WorkoutView } from './components/WorkoutView';
 import { generateWorkout } from './engine/generate';
 import { newSeed } from './engine/random';
 import { MIN_RECORD_SEC, playedSeconds } from './engine/report';
 import { describeConditions } from './labels';
-import { unlockAudio } from './speech';
+import { setVoiceGender, unlockAudio } from './speech';
 import { createSavedStore } from './storage/saved';
-import type { Conditions, SavedWorkout, Workout, WorkoutRecord } from './types';
+import type { Conditions, SavedWorkout, Settings, Workout, WorkoutRecord } from './types';
 
 const DEFAULT_CONDITIONS: Conditions = {
     equipment: ['mat'],
@@ -40,6 +41,16 @@ function App() {
     const [report, setReport] = useState<WorkoutRecord | null>(null);
     const [weightKg, setWeightKg] = useState<number | undefined>(() => store.weightKg());
     const [startedAt, setStartedAt] = useState('');
+    const [settings, setSettings] = useState<Settings>(() => store.settings());
+
+    useEffect(() => {
+        setVoiceGender(settings.voice);
+    }, [settings.voice]);
+
+    function changeSettings(s: Settings) {
+        store.saveSettings(s);
+        setSettings(s);
+    }
 
     const current = saved.find((s) => s.id === savedId);
 
@@ -117,7 +128,7 @@ function App() {
     }
 
     if (view === 'player' && workout)
-        return <Player workout={workout} onExit={finish} />;
+        return <Player workout={workout} coach={settings.coach} onExit={finish} />;
 
     return (
         <main>
@@ -154,6 +165,7 @@ function App() {
                         onRegenerate={(s) => generate(s.workout.conditions)}
                         onDelete={remove}
                     />
+                    <SettingsCard value={settings} onChange={changeSettings} />
                     <History records={history} onOpen={openRecord} />
                 </>
             )}

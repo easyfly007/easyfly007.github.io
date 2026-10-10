@@ -66,4 +66,11 @@ describe('saved store', () => {
         s.setWeightKg(65);
         expect(s.weightKg()).toBe(65);
     });
+
+    it('remembers coach and voice settings', () => {
+        const s = createSavedStore(memoryStore());
+        expect(s.settings()).toEqual({ coach: 'female', voice: 'female' });
+        s.saveSettings({ coach: 'male', voice: 'female' });
+        expect(s.settings()).toEqual({ coach: 'male', voice: 'female' });
+    });
 });

@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { EXERCISE_BY_ID } from '../data/exercises';
 import { CLIP_VIEW_LABEL, clipAt, cycleSeconds } from '../engine/clips';
-import type { Step } from '../types';
+import type { Gender, Step } from '../types';
 import { clipUrls } from '../videos';
 
 interface Props {
     step: Step;
     intoStep: number;
     paused: boolean;
+    coach: Gender;
 }
 
 // 播放位置与计时的偏差超过这么多秒（按片段自身时间算）就重新对齐
@@ -26,8 +27,8 @@ function fixUnknownDuration(e: React.SyntheticEvent<HTMLVideoElement>) {
 
 // 按跟练计时拼接动作片段：每个视角一个 <video> 叠在一起，只显示当前视角那个，切换时不黑屏。
 // 片段按播放速度缩放到"一次动作"的时长，所以画面始终和计时、计次对齐
-export function ExerciseVideo({ step, intoStep, paused }: Props) {
-    const clips = clipUrls(step.exerciseId, step.side);
+export function ExerciseVideo({ step, intoStep, paused, coach }: Props) {
+    const clips = clipUrls(step.exerciseId, step.side, coach);
     const pos = clipAt(step, intoStep, clips.map((c) => c.view));
     const refs = useRef<(HTMLVideoElement | null)[]>([]);
     const cycleSec = cycleSeconds(EXERCISE_BY_ID[step.exerciseId]);

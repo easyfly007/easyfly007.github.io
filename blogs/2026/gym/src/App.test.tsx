@@ -104,6 +104,17 @@ describe('App flow', () => {
         expect(screen.getByText('组间休息 90 秒')).toBeTruthy();
     });
 
+    it('remembers the coach and voice choice', () => {
+        const first = render(<App />);
+        click('男教练');
+        click('男声');
+        first.unmount();
+
+        render(<App />);
+        expect(screen.getByRole('button', { name: '男教练' }).getAttribute('aria-pressed')).toBe('true');
+        expect(screen.getByRole('button', { name: '男声' }).getAttribute('aria-pressed')).toBe('true');
+    });
+
     it('restores the last conditions on reload', () => {
         const first = render(<App />);
         click('杠铃');

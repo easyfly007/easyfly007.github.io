@@ -1,9 +1,12 @@
-import type { Conditions, SavedWorkout, Workout, WorkoutRecord } from '../types';
+import type { Conditions, SavedWorkout, Settings, Workout, WorkoutRecord } from '../types';
 
 const SAVED_KEY = 'gym.saved.v1';
 const LAST_CONDITIONS_KEY = 'gym.lastConditions.v1';
 const HISTORY_KEY = 'gym.history.v1';
 const WEIGHT_KEY = 'gym.weightKg.v1';
+const SETTINGS_KEY = 'gym.settings.v1';
+
+export const DEFAULT_SETTINGS: Settings = { coach: 'female', voice: 'female' };
 // 只保留最近这么多条训练记录，避免本地存储无限增长
 const MAX_RECORDS = 1000;
 
@@ -95,6 +98,14 @@ export function createSavedStore(store: KeyValueStore) {
 
         setWeightKg(kg: number): void {
             writeJson(store, WEIGHT_KEY, kg);
+        },
+
+        settings(): Settings {
+            return { ...DEFAULT_SETTINGS, ...readJson<Partial<Settings>>(store, SETTINGS_KEY, {}) };
+        },
+
+        saveSettings(s: Settings): void {
+            writeJson(store, SETTINGS_KEY, s);
         },
     };
 }

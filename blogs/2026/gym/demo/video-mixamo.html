@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixamo 素材预览</title>
+<style>
+    :root {
+        --bg: #f6f7f9;
+        --card: #ffffff;
+        --text: #1d2330;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --accent: #ff6b35;
+        --overlay: rgba(0, 0, 0, 0.55);
+        font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        color: var(--text);
+        background: var(--bg);
+    }
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bg: #14161a;
+            --card: #1e2127;
+            --text: #e8eaed;
+            --muted: #9aa0a6;
+            --line: #2e323a;
+        }
+    }
+    body {
+        margin: 0;
+        background: var(--bg);
+    }
+    main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 16px;
+    }
+    h1 {
+        font-size: 22px;
+        margin: 4px 0;
+    }
+    h2 {
+        font-size: 16px;
+        margin: 18px 0 6px;
+    }
+    .muted {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    .stage {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #000;
+        margin-top: 12px;
+    }
+    .stage canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    select, input[type=number], input[type=text] {
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--text);
+    }
+    input[type=number] {
+        width: 90px;
+    }
+    input[type=text] {
+        flex: 1;
+        min-width: 200px;
+    }
+    .hud {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        padding: 6px 10px;
+        border-radius: 8px;
+        background: var(--overlay);
+        color: #fff;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .hud b {
+        font-size: 18px;
+    }
+    .message {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 16px;
+        text-align: center;
+        padding: 16px;
+    }
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .row label {
+        font-size: 14px;
+        color: var(--muted);
+    }
+    input[type=range] {
+        flex: 1;
+        min-width: 200px;
+        accent-color: var(--accent);
+    }
+    button {
+        font: inherit;
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 8px 14px;
+        cursor: pointer;
+    }
+    button.on,
+    button.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+    }
+    button:disabled {
+        opacity: 0.5;
+        cursor: default;
+    }
+    code {
+        font-size: 13px;
+    }
+</style>
+</head>
+<body>
+<main>
+    <h1>Mixamo 素材预览</h1>
+    <div class="muted">
+        把 Mixamo 下载的人物（With Skin）放到 <code>assets/mixamo/characters/</code>，动作（Without Skin）放到 <code>assets/mixamo/anims/</code>，刷新本页即可看到。
+        用下面的进度条找到"一次动作"的开始帧和结束帧，点"设为起点 / 终点"，循环播放检查首尾是否连贯，最后复制 CSV 行到 <code>docs/anim-clips.csv</code>。
+    </div>
+    <div class="row">
+        <label>人物</label>
+        <select id="character"></select>
+        <label>动作</label>
+        <select id="anim"></select>
+        <label><input type="checkbox" id="mirror"> 左右镜像</label>
+    </div>
+    <div class="stage" id="stage">
+        <canvas id="canvas"></canvas>
+        <div class="hud" id="hud" hidden>
+            <b id="title"></b><br>
+            <span id="view-name"></span> · <span id="loop"></span><br>
+            <span id="frame-info"></span>
+        </div>
+        <div class="message" id="message">正在加载……</div>
+    </div>
+    <div class="row">
+        <button type="button" id="play" class="primary">暂停</button>
+        <label>速度</label>
+        <select id="speed">
+            <option value="0.25">0.25×</option>
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+        </select>
+        <input type="range" id="slider" min="0" max="0" step="1" value="0">
+        <span id="frame-label" class="muted">0 / 0</span>
+    </div>
+
+    <h2>一次动作的范围</h2>
+    <div class="row">
+        <label>起点帧</label>
+        <input type="number" id="start" min="0" value="0">
+        <button type="button" id="set-start">设为起点</button>
+        <label>终点帧</label>
+        <input type="number" id="end" min="0" value="0">
+        <button type="button" id="set-end">设为终点</button>
+        <button type="button" id="whole">整段</button>
+    </div>
+    <div class="row">
+        <label>按每次时长播放（秒，0 = 原速）</label>
+        <input type="number" id="sec-per-rep" min="0" step="0.1" value="0">
+        <span class="muted">跟练时片段会缩放到动作库里的 secPerRep，这里可以提前看效果</span>
+    </div>
+    <div class="row" id="views">
+        <button type="button" data-view="auto" class="on">每次换视角</button>
+        <button type="button" data-view="0">视角 1</button>
+        <button type="button" data-view="1">视角 2</button>
+        <button type="button" data-view="2">视角 3</button>
+    </div>
+    <div class="row">
+        <label>CSV 行</label>
+        <input type="text" id="csv" readonly>
+        <button type="button" id="copy">复制</button>
+    </div>
+    <div class="muted" id="info"></div>
+</main>
+
+<script type="module">
+const message = document.getElementById('message');
+function showError(text) {
+    message.hidden = false;
+    message.textContent = `出错了：${text}（按 F12 打开控制台可看详细信息）`;
+}
+window.addEventListener('error', (e) => showError(e.message));
+window.addEventListener('unhandledrejection', (e) => showError(e.reason?.message ?? String(e.reason)));
+
+const M = await import('/demo/mixamo.ts');
+const $ = (id) => document.getElementById(id);
+
+const characters = M.listCharacters();
+const anims = M.listAnims();
+if (characters.length === 0 || anims.length === 0) {
+    showError(`没有找到素材（人物 ${characters.length} 个，动作 ${anims.length} 个）。请按上面的说明放好文件后刷新`);
+    throw new Error('no assets');
+}
+for (const [sel, list] of [[$('character'), characters], [$('anim'), anims]]) {
+    for (const item of list) {
+        const o = document.createElement('option');
+        o.value = item.url;
+        o.textContent = item.name;
+        sel.append(o);
+    }
+}
+const femaleFirst = characters.find((c) => /female/i.test(c.name));
+if (femaleFirst)
+    $('character').value = femaleFirst.url;
+
+const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const stage = M.createStage($('canvas'), dark);
+window.addEventListener('resize', () => stage.resize());
+
+let ch = null;          // 当前人物
+let action = null;      // 当前动作
+let clip = null;
+let frames = 0;
+let start = 0;
+let end = 0;
+let framing = null;
+let playing = true;
+let manualView = null;
+let elapsed = 0;        // 播放累计秒数（按速度缩放后）
+let lastNow = performance.now();
+let loadToken = 0;
+
+function animName() {
+    return anims.find((a) => a.url === $('anim').value)?.name ?? '';
+}
+
+function rangeSec() {
+    const spr = Number($('sec-per-rep').value);
+    if (spr > 0)
+        return spr;
+    return Math.max(1, end - start) / M.FPS;
+}
+
+function updateCsv() {
+    const mirror = $('mirror').checked ? 'mirror' : '';
+    $('csv').value = `${animName()},${animName()}.fbx,${start},${end},${mirror}`;
+}
+
+function applyRange() {
+    start = Math.max(0, Math.min(Number($('start').value), frames - 1));
+    end = Math.max(start + 1, Math.min(Number($('end').value), frames - 1));
+    $('start').value = start;
+    $('end').value = end;
+    if (ch && action)
+        framing = M.frameAnimation(ch, action, start, end);
+    elapsed = 0;
+    updateCsv();
+}
+
+async function loadCharacter() {
+    const token = ++loadToken;
+    message.hidden = false;
+    message.textContent = '正在加载人物（约 50 MB，第一次会慢一些）……';
+    const url = $('character').value;
+    const loaded = await M.loadCharacter(url, (r) => {
+        message.textContent = `正在加载人物…… ${Math.round(r * 100)}%`;
+    });
+    if (token !== loadToken)
+        return;
+    if (ch)
+        stage.scene.remove(ch.root);
+    ch = loaded;
+    stage.scene.add(ch.root);
+    await loadAnim();
+}
+
+async function loadAnim() {
+    const token = loadToken;
+    message.hidden = false;
+    message.textContent = '正在加载动作……';
+    clip = await M.loadAnim($('anim').value, ch);
+    if (token !== loadToken)
+        return;
+    ch.mixer.stopAllAction();
+    action = ch.mixer.clipAction(clip);
+    action.play();
+    action.paused = true;
+    frames = M.frameCount(clip);
+    $('slider').max = frames - 1;
+    $('start').max = frames - 1;
+    $('end').max = frames - 1;
+    $('start').value = 0;
+    $('end').value = frames - 1;
+    applyRange();
+    const bones = clip.tracks.length;
+    $('info').textContent = `动作：${animName()}，${frames} 帧，${clip.duration.toFixed(2)} 秒（${M.FPS} 帧/秒），${bones} 条轨道；人物身高 ${ch.height.toFixed(2)} 米`;
+    $('title').textContent = animName();
+    message.hidden = true;
+    $('hud').hidden = false;
+}
+
+function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = (now - lastNow) / 1000;
+    lastNow = now;
+    if (!ch || !action || !framing)
+        return;
+    let f;
+    const dur = rangeSec();
+    const span = Math.max(1, end - start);
+    if (playing) {
+        elapsed += dt * Number($('speed').value);
+        const phase = (elapsed / dur) % 1;
+        f = start + phase * span;
+        $('slider').value = Math.floor(f);
+    } else {
+        f = Number($('slider').value);
+    }
+    M.setFrame(ch, action, f);
+    const loops = Math.floor(elapsed / dur);
+    const perView = Math.max(1, Math.ceil(2.5 / dur));
+    const viewIndex = manualView ?? Math.floor(loops / perView) % 3;
+    const view = framing.views[viewIndex];
+    stage.place(framing, view);
+    stage.render();
+    $('view-name').textContent = `视角：${M.VIEW_LABEL[view]}`;
+    $('loop').textContent = playing ? `第 ${loops + 1} 次` : '已暂停';
+    $('frame-info').textContent = `第 ${Math.floor(f)} 帧（范围 ${start}–${end}，每次 ${dur.toFixed(2)} 秒）`;
+    $('frame-label').textContent = `${Math.floor(f)} / ${frames - 1}`;
+}
+
+$('character').addEventListener('change', loadCharacter);
+$('anim').addEventListener('change', () => {
+    loadToken++;
+    loadAnim();
+});
+$('mirror').addEventListener('change', () => {
+    if (ch)
+        ch.root.scale.x = ($('mirror').checked ? -1 : 1) * 0.01;
+    updateCsv();
+});
+$('play').addEventListener('click', () => {
+    playing = !playing;
+    $('play').textContent = playing ? '暂停' : '播放';
+    $('play').classList.toggle('primary', playing);
+});
+$('slider').addEventListener('input', () => {
+    playing = false;
+    $('play').textContent = '播放';
+    $('play').classList.remove('primary');
+});
+$('start').addEventListener('change', applyRange);
+$('end').addEventListener('change', applyRange);
+$('sec-per-rep').addEventListener('change', () => {
+    elapsed = 0;
+});
+$('set-start').addEventListener('click', () => {
+    $('start').value = $('slider').value;
+    applyRange();
+});
+$('set-end').addEventListener('click', () => {
+    $('end').value = $('slider').value;
+    applyRange();
+});
+$('whole').addEventListener('click', () => {
+    $('start').value = 0;
+    $('end').value = frames - 1;
+    applyRange();
+});
+document.getElementById('views').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-view]');
+    if (!btn)
+        return;
+    for (const b of document.querySelectorAll('#views button[data-view]'))
+        b.classList.toggle('on', b === btn);
+    const v = btn.getAttribute('data-view');
+    manualView = v === 'auto' ? null : Number(v);
+});
+$('copy').addEventListener('click', async () => {
+    await navigator.clipboard.writeText($('csv').value);
+    $('copy').textContent = '已复制';
+    setTimeout(() => {
+        $('copy').textContent = '复制';
+    }, 1200);
+});
+
+loadCharacter();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

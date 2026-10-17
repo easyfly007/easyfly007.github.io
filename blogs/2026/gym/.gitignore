@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Mixamo 原始素材（几十 MB），不提交；转换后的 GLB 放 public/models/
+assets/mixamo/

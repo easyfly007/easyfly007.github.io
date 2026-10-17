@@ -67,7 +67,7 @@ export async function loadCharacter(url: string, onProgress?: (ratio: number) =>
 
 // 动作文件里的骨骼名和人物不一致时，把轨道名对到人物的骨骼上。
 // Mixamo 的前缀不固定：动作文件是 mixamorig，人物可能是 mixamorig5、mixamorig: 等
-function retarget(clip: THREE.AnimationClip, boneNames: Set<string>): THREE.AnimationClip {
+export function retarget(clip: THREE.AnimationClip, boneNames: Set<string>): THREE.AnimationClip {
     const strip = (n: string) => n.replace(/^mixamorig\d*:?/, '');
     const byStripped = new Map<string, string>();
     for (const n of boneNames)
@@ -103,11 +103,154 @@ export function frameCount(clip: THREE.AnimationClip): number {
     return Math.round(clip.duration * FPS);
 }
 
-// 把人物摆到动画的某一帧
-export function setFrame(ch: Character, action: THREE.AnimationAction, frame: number) {
+// 把人物摆到动画的某一帧，再把撑地的手脚钉在地上
+export function setFrame(ch: Character, action: THREE.AnimationAction, frame: number, locks: Lock[] = []) {
     action.time = Math.max(0, frame) / FPS;
     ch.mixer.update(0);
     ch.root.updateMatrixWorld(true);
+    if (locks.length === 0)
+        return;
+    // 髋部位移是按别的身材算的，手脚可能悬在固定点上方够不到：悬多高，整个身体就往下沉多少，再解一次
+    const hips = findBone(ch, 'Hips');
+    const p = new THREE.Vector3();
+    for (let iter = 0; iter < 4; iter++) {
+        let gap = 0;
+        for (const lock of locks) {
+            solveLock(lock);
+            gap = Math.max(gap, lock.end.getWorldPosition(p).y - lock.target.y);
+        }
+        if (gap < 0.003 || !hips)
+            break;
+        hips.getWorldPosition(p);
+        p.y -= gap;
+        hips.position.copy(hips.parent!.worldToLocal(p));
+        hips.updateMatrixWorld(true);
+    }
+}
+
+// ---------- 接触点锁定 ----------
+// Mixamo 动作只存髋部位移和关节旋转，手脚落点是算出来的：套到身材不同的人物上会悬空，
+// 动捕本身也常有几厘米的滑动。整段都撑地的手脚，每帧用两段肢体的反向关节把末端钉在固定点上
+
+export interface Lock {
+    label: string;
+    root: THREE.Bone;           // 上臂 / 大腿
+    mid: THREE.Bone;            // 前臂 / 小腿
+    end: THREE.Bone;            // 手 / 脚
+    target: THREE.Vector3;      // 世界坐标的固定点
+    pole: THREE.Vector3;        // 上一帧的弯曲面法线，肢体伸直时沿用
+}
+
+interface Limb {
+    label: string;
+    root: string;
+    mid: string;
+    end: string;
+    contact: string;            // 用来判断是否触地的骨骼（脚用脚尖）
+    floor: number | null;       // 末端骨骼贴地时的高度（米）；null = 取整段里观察到的最低点
+}
+
+const LIMBS: Limb[] = [
+    { label: '左手', root: 'LeftArm', mid: 'LeftForeArm', end: 'LeftHand', contact: 'LeftHand', floor: 0.04 },
+    { label: '右手', root: 'RightArm', mid: 'RightForeArm', end: 'RightHand', contact: 'RightHand', floor: 0.04 },
+    { label: '左脚', root: 'LeftUpLeg', mid: 'LeftLeg', end: 'LeftFoot', contact: 'LeftToeBase', floor: null },
+    { label: '右脚', root: 'RightUpLeg', mid: 'RightLeg', end: 'RightFoot', contact: 'RightToeBase', floor: null },
+];
+
+const CONTACT_MAX_Y = 0.14;     // 触地骨骼最低点低于这个高度才算撑地
+const CONTACT_MAX_DRIFT = 0.15; // 整段里水平移动小于这个距离才算一直撑地（迈步、跳跃的脚不锁）
+
+function findBone(ch: Character, suffix: string): THREE.Bone | undefined {
+    const name = [...ch.boneNames].find((n) => n.endsWith(suffix) && !n.endsWith('_' + suffix));
+    return name ? (ch.root.getObjectByName(name) as THREE.Bone | undefined) : undefined;
+}
+
+// 采样整段，找出一直撑地的手脚，固定点取各帧的平均水平位置和贴地高度
+export function detectLocks(ch: Character, action: THREE.AnimationAction, start: number, end: number): Lock[] {
+    const locks: Lock[] = [];
+    const p = new THREE.Vector3();
+    for (const limb of LIMBS) {
+        const root = findBone(ch, limb.root);
+        const mid = findBone(ch, limb.mid);
+        const endBone = findBone(ch, limb.end);
+        const contact = findBone(ch, limb.contact);
+        if (!root || !mid || !endBone || !contact)
+            continue;
+        let minY = Infinity;
+        const lowest = new THREE.Vector3(0, Infinity, 0);   // 末端骨骼最低那一帧的位置：真实到得了的点
+        const box = new THREE.Box3();
+        const samples = 24;
+        for (let i = 0; i < samples; i++) {
+            setFrame(ch, action, start + ((end - start) * i) / samples);
+            contact.getWorldPosition(p);
+            minY = Math.min(minY, p.y);
+            box.expandByPoint(p);
+            endBone.getWorldPosition(p);
+            if (p.y < lowest.y)
+                lowest.copy(p);
+        }
+        const size = box.getSize(new THREE.Vector3());
+        if (minY > CONTACT_MAX_Y || Math.max(size.x, size.z) > CONTACT_MAX_DRIFT)
+            continue;
+        const target = lowest.clone();
+        // 手掌平放时手腕高度固定，悬空的手压到这个高度；脚踝高度随姿势变（脚尖撑地时很高），用观察到的最低点
+        if (limb.floor !== null)
+            target.y = Math.min(limb.floor, lowest.y);
+        locks.push({ label: limb.label, root, mid, end: endBone, target, pole: new THREE.Vector3(0, 0, 1) });
+    }
+    return locks;
+}
+
+const _a = new THREE.Vector3();
+const _b = new THREE.Vector3();
+const _c = new THREE.Vector3();
+const _n = new THREE.Vector3();
+const _u = new THREE.Vector3();
+const _v = new THREE.Vector3();
+const _q = new THREE.Quaternion();
+const _wq = new THREE.Quaternion();
+const _pq = new THREE.Quaternion();
+
+// 在世界坐标里给骨骼再加一个旋转
+function rotateWorld(bone: THREE.Bone, q: THREE.Quaternion) {
+    bone.getWorldQuaternion(_wq);
+    _wq.premultiply(q);
+    bone.parent!.getWorldQuaternion(_pq);
+    bone.quaternion.copy(_pq.invert().multiply(_wq));
+    bone.updateMatrixWorld(true);
+}
+
+// 两段肢体的反向关节：先调中间关节的弯曲角度让末端到固定点的距离正好，再转根关节把末端对准固定点
+function solveLock(lock: Lock) {
+    const { root, mid, end, target } = lock;
+    root.getWorldPosition(_a);
+    mid.getWorldPosition(_b);
+    end.getWorldPosition(_c);
+    const l1 = _a.distanceTo(_b);
+    const l2 = _b.distanceTo(_c);
+    const d = THREE.MathUtils.clamp(_a.distanceTo(target), 1e-3, (l1 + l2) * 0.999);
+
+    _n.crossVectors(_u.subVectors(_b, _a), _v.subVectors(_c, _b));
+    if (_n.lengthSq() < 1e-8)
+        _n.copy(lock.pole);
+    else
+        lock.pole.copy(_n.normalize());
+
+    _u.subVectors(_a, _b).normalize();
+    _v.subVectors(_c, _b).normalize();
+    const cur = Math.acos(THREE.MathUtils.clamp(_u.dot(_v), -1, 1));
+    const want = Math.acos(THREE.MathUtils.clamp((l1 * l1 + l2 * l2 - d * d) / (2 * l1 * l2), -1, 1));
+    let delta = want - cur;
+    // 绕法线转正还是转负，试一下哪个方向能到目标角度
+    const test = _v.clone().applyQuaternion(_q.setFromAxisAngle(_n, delta));
+    if (Math.abs(Math.acos(THREE.MathUtils.clamp(_u.dot(test), -1, 1)) - want) > 1e-3)
+        delta = -delta;
+    rotateWorld(mid, _q.setFromAxisAngle(_n, delta));
+
+    end.getWorldPosition(_c);
+    _u.subVectors(_c, _a).normalize();
+    _v.subVectors(target, _a).normalize();
+    rotateWorld(root, _q.setFromUnitVectors(_u, _v));
 }
 
 export interface Framing {
@@ -118,14 +261,14 @@ export interface Framing {
 }
 
 // 采样整段动画，取身体范围，决定机位距离和中心；躺/撑的动作先看侧面（与 src/anim/stage.ts 同样的规则）
-export function frameAnimation(ch: Character, action: THREE.AnimationAction, start: number, end: number): Framing {
+export function frameAnimation(ch: Character, action: THREE.AnimationAction, start: number, end: number, locks: Lock[] = []): Framing {
     const box = new THREE.Box3();
-    const hips = ch.root.getObjectByName([...ch.boneNames].find((n) => /Hips$/.test(n)) ?? '');
-    const head = ch.root.getObjectByName([...ch.boneNames].find((n) => /Head$/.test(n)) ?? '');
+    const hips = findBone(ch, 'Hips');
+    const head = findBone(ch, 'Head');
     let upright = true;
     const p = new THREE.Vector3();
     for (let i = 0; i < 12; i++) {
-        setFrame(ch, action, start + ((end - start) * i) / 12);
+        setFrame(ch, action, start + ((end - start) * i) / 12, locks);
         ch.root.traverse((o) => {
             if ((o as THREE.Bone).isBone)
                 box.expandByPoint(o.getWorldPosition(p));
@@ -151,6 +294,8 @@ export interface Stage {
     place: (framing: Framing, view: View) => void;
     render: () => void;
     resize: () => void;
+    // 左右镜像：翻转镜头画面而不是翻转模型，骨骼计算不受影响
+    setMirror: (on: boolean) => void;
 }
 
 export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage {
@@ -183,6 +328,19 @@ export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage
     scene.add(grid);
 
     const camera = new THREE.PerspectiveCamera(FOV, 16 / 9, 0.1, 50);
+    let mirror = false;
+    const flipX = new THREE.Matrix4().makeScale(-1, 1, 1);
+
+    function updateProjection() {
+        camera.updateProjectionMatrix();
+        if (mirror)
+            camera.projectionMatrix.multiply(flipX);
+    }
+
+    function setMirror(on: boolean) {
+        mirror = on;
+        updateProjection();
+    }
 
     function place(framing: Framing, view: View) {
         const { target: t, halfV, halfH } = framing;
@@ -203,9 +361,9 @@ export function createStage(canvas: HTMLCanvasElement, darkMode: boolean): Stage
             return;
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
-        camera.updateProjectionMatrix();
+        updateProjection();
     }
 
     resize();
-    return { scene, camera, place, render: () => renderer.render(scene, camera), resize };
+    return { scene, camera, place, render: () => renderer.render(scene, camera), resize, setMirror };
 }

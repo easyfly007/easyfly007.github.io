@@ -155,6 +155,7 @@
         <label>动作</label>
         <select id="anim"></select>
         <label><input type="checkbox" id="mirror"> 左右镜像</label>
+        <label><input type="checkbox" id="lock" checked> 撑地的手脚钉在地上</label>
     </div>
     <div class="stage" id="stage">
         <canvas id="canvas"></canvas>
@@ -204,6 +205,7 @@
         <button type="button" id="copy">复制</button>
     </div>
     <div class="muted" id="info"></div>
+    <div class="muted" id="locks"></div>
 </main>
 
 <script type="module">
@@ -247,6 +249,7 @@ let frames = 0;
 let start = 0;
 let end = 0;
 let framing = null;
+let locks = [];
 let playing = true;
 let manualView = null;
 let elapsed = 0;        // 播放累计秒数（按速度缩放后）
@@ -274,8 +277,11 @@ function applyRange() {
     end = Math.max(start + 1, Math.min(Number($('end').value), frames - 1));
     $('start').value = start;
     $('end').value = end;
-    if (ch && action)
-        framing = M.frameAnimation(ch, action, start, end);
+    if (ch && action) {
+        locks = $('lock').checked ? M.detectLocks(ch, action, start, end) : [];
+        framing = M.frameAnimation(ch, action, start, end, locks);
+        $('locks').textContent = locks.length > 0 ? `钉在地上的：${locks.map((l) => l.label).join('、')}` : '没有整段撑地的手脚';
+    }
     elapsed = 0;
     updateCsv();
 }
@@ -339,7 +345,7 @@ function frame(now) {
     } else {
         f = Number($('slider').value);
     }
-    M.setFrame(ch, action, f);
+    M.setFrame(ch, action, f, locks);
     const loops = Math.floor(elapsed / dur);
     const perView = Math.max(1, Math.ceil(2.5 / dur));
     const viewIndex = manualView ?? Math.floor(loops / perView) % 3;
@@ -358,10 +364,10 @@ $('anim').addEventListener('change', () => {
     loadAnim();
 });
 $('mirror').addEventListener('change', () => {
-    if (ch)
-        ch.root.scale.x = ($('mirror').checked ? -1 : 1) * 0.01;
+    stage.setMirror($('mirror').checked);
     updateCsv();
 });
+$('lock').addEventListener('change', applyRange);
 $('play').addEventListener('click', () => {
     playing = !playing;
     $('play').textContent = playing ? '暂停' : '播放';
